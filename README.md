@@ -1,2 +1,2 @@
 # boot4go-etcdv3-browser
-a Etcd client with javascipt
+A client of etcd with v3 api to browse and maintain the data and resource of etcd.
