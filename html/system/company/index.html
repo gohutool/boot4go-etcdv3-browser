@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:jc="http://www.joinsunsoft.com">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <script src="/static/common/js/ui.js"></script>
+</head>
+
+<body>
+<div id="loading" class="loading-wrap">
+    <div class="loading-content">
+        <div class="loading-round"></div>
+        <div class="loading-dot"></div>
+    </div>
+</div>
+<script id="tmpl1" type="text/x-jquery-tmpl">
+<table id="productDg"></table>
+<!-- 表格工具栏开始 -->
+<div id="productDg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'datagrid',
+           id:'productDg'
+       }">
+
+    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+            method: 'openDialog',
+            extend: '#productDg-toolbar',
+            btnCls: 'cubeui-btn-orange',
+            iconCls: 'fa fa-plus',
+            dialog: {
+                id: 'userAddDialog',
+                maximized:true,
+                height: 480,
+                title: '添加新公司',
+                content1:'AAA\{\{:test\}\} \{\{:test\}\} AAAA',
+                render1: function(opts, handler){
+                handler.render({test:'Hello world'})
+                },
+                href: contextpath + '/system/company/detail.html?id=0',
+                buttonsGroup: [
+                    {
+                        text: '保存',
+                        url: contextpath + '/system/company/detail/save',
+                        iconCls: 'fa fa-plus',
+                        handler: 'ajaxForm',
+                        btnCls: 'cubeui-btn-brown'
+                    }
+                ]
+            }
+        }">新增</a>
+
+<!--    <@showhbutton permission='ACCOUNT_MAN|SYSTEM_ADMIN'  title="${i18n.text('core.common.title.edit', '')}" options="{-->
+    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+            method: 'openDialog',
+            extend: '#productDg-toolbar',
+            iconCls: 'fa fa-pencil',
+            btnCls: 'cubeui-btn-green',
+            grid: {
+                type: 'datagrid',
+                id: 'productDg',
+                param: 'ID:ID'
+            },
+            dialog: {
+                title:'编辑公司',
+            	id: 'editd',
+                maximized:true,
+                height: 480,
+                href: contextpath + '/html/system/company/detail.html?id={ID}',
+                buttonsGroup: [
+                    {
+                        text: '保存',
+                        url: contextpath + '/system/company/detail/save',
+                        iconCls: 'fa fa-save',
+                        handler: 'ajaxForm',
+                        btnCls: 'cubeui-btn-green'
+                    }
+                ]
+            }
+          }">编辑</a>
+
+<!--    <@showhbutton permission='ACCOUNT_MAN|SYSTEM_ADMIN'  title="${i18n.text('core.common.title.remove', '删除')}"  options="{-->
+    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+            method: 'doAjax',
+            extend: '#productDg-toolbar',
+            iconCls: 'fa fa-trash',
+            btnCls: 'cubeui-btn-brown',
+            confirmMsg: '确定需要删除勾选的{0}家公司？',
+            grid: {
+                type: 'datagrid',
+                id: 'productDg',
+                uncheckedMsg: '请先勾选要删除的公司',
+                param: 'ID:ID,code:code'
+            },
+            url: contextpath + '/system/company/detail/remove'
+        }">删除</a>
+
+<!--    <@showhbutton permission='ACCOUNT_MAN|SYSTEM_ADMIN'  title="${i18n.text('core.common.title.active', '激活')}" options="{-->
+    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+            method: 'doAjax',
+            extend: '#productDg-toolbar',
+            iconCls: 'fa fa-chain',
+            btnCls: 'cubeui-btn-green',
+            confirmMsg: '确定需要激活勾选的{0}家公司？',
+            grid: {
+                type: 'datagrid',
+                id: 'productDg',
+                uncheckedMsg: '请先勾选要激活的公司',
+                param: 'ID:ID,code:code'
+            },
+            url: contextpath + '/system/company/detail/active?flag=1'
+        }">激活</a>
+
+<!--    <@showhbutton permission='ACCOUNT_MAN|SYSTEM_ADMIN'  title="${i18n.text('core.common.title.inactive', '禁用')}" options="{-->
+    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+            method: 'doAjax',
+            extend: '#productDg-toolbar',
+            iconCls: 'fa fa-unlink',
+            btnCls: 'cubeui-btn-black',
+            confirmMsg: '确定需要禁用勾选的{0}家公司？',
+            grid: {
+                type: 'datagrid',
+                id: 'productDg',
+                uncheckedMsg: '请先勾选要禁用的公司',
+                param: 'ID:ID,code:code'
+            },
+            url: contextpath + '/system/company/detail/active?flag=-1'
+        }">禁用</a>
+
+<!--    <@showhbutton permission='ACCOUNT_MAN|SYSTEM_ADMIN'  title="${i18n.text('core.system.company.button.permission', '设定权限')}"  options="{-->
+    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+       method: 'openDialog',
+            extend: '#productDg-toolbar',
+            iconCls: 'fa fa-pencil',
+            btnCls: 'cubeui-btn-green',
+            
+            grid: {
+                type: 'datagrid',
+                id: 'productDg',
+                param: 'ID:ID'
+            },
+            dialog: {
+                title:'设定公司权限',
+                height: 450,
+                width:620,
+                id:'prvidialog',
+                href: contextpath + '/system/company/privs/view?id={ID}',
+                buttonsGroup: [
+                    {
+                        text: '设定权限',
+                        url: contextpath + '/system/company/privs/save',
+                        iconCls: 'fa fa-save',
+                        handler1: 'ajaxForm',
+                        handler: savepriv,
+                        btnCls: 'cubeui-btn-green'
+                    }
+                ]
+            }}">设定权限</a>
+    <!--
+    <a href="javascript:void(0)"
+       data-toggle="cubeui-menubutton"
+       data-options="method:'search',
+       extend: '#productDg-toolbar',
+       btnCls:'cubeui-btn-blue'">高级查询</a>-->
+
+    <form id="queryForm" class="search-box">
+    	<input type="text" name="email" data-toggle="cubeui-textbox"
+               data-options="id:'email',prompt:'注册邮件模糊查询',width:150">
+        <input type="text" name="companyno" data-toggle="cubeui-textbox"
+               data-options="id:'companyno',prompt:'企业标识模糊查询',width:150">
+        <input type="text" name="companyname" data-toggle="cubeui-textbox"
+               data-options="id:'companyname',prompt:'企业名称模糊查询',width:150">
+        <a href="javascript:void(0)"
+           data-toggle="cubeui-menubutton"
+           data-options="method:'query',
+           iconCls:'fa fa-search',
+           btnCls:'cubeui-btn-blue',
+           form:{id:'queryForm'},
+           grid:{type:'datagrid','id':'productDg'}">查询</a>
+    </form>
+</div>
+<!-- 表格工具栏结束 -->
+
+<!-- 表格行编辑窗口 -->
+<form id="editDialog"></form>
+
+</script>
+
+</body>
+<script>
+    new APP(function () {
+        return {
+            css: [],
+            js: [
+                ROOT_RES_URL + "/static/module/index.js",
+            ],
+            render: function () {
+                stop = true
+                console.log("finish")
+
+                //var t = $.templates("#tmpl1").render({id:"1022", name:"davidliu"})
+                //$("#test").replaceWith(t)
+
+                let t = $.templates("#tmpl1").render({id:"1022", name:"davidliu"})
+                $('body div').remove()
+                $(t).appendTo($('body'))
+
+                load();
+            }
+        }
+    });
+
+    function load() {
+        jquery(function () {
+            var productDg = {
+                type: 'datagrid',
+                id: 'productDg'
+            };
+
+            $("#productDg").iDatagrid({
+                url: contextpath + '/system/company/listjson',
+                idField: 'ID',
+                sortName: 'COMPANYNO',
+                sortOrder: "asc",
+                checkedRows1: [999, 22],// add checkedRows test data, just for debug
+                columns: [[
+                    {field: 'ID', title: '', checkbox: true},
+                    {field: 'COMPANYNO', title: '企业标识', sortable: true, width: 100},
+                    {
+                        field: 'COMPANYNAME',
+                        title: '企业名称',
+                        sortable: true,
+                        width: 250,
+                        formatter: $.iGrid.tooltipformatter()
+                    },
+                    {
+                        field: 'REGISTERTYPE',
+                        title: '开户类型',
+                        sortable: false,
+                        width: 100,
+                        formatter: $.iGrid.evalconditionformatter(['rowData.REGISTERTYPE=="系统用户"', 'rowData.REGISTERTYPE=="网络版用户"', 'rowData.REGISTERTYPE=="单机版用户"', 'rowData.REGISTERTYPE=="演示用户"'], ['系统用户', '网络版用户', '单机版用户', '演示用户'], '  ')
+                    },
+                    {
+                        field: 'MODULES',
+                        title: '使用系统',
+                        sortable: false,
+                        width: 200,
+                        formatter: $.iGrid.tooltipformatter()
+                    },
+                    {field: 'ADDRESS', title: '地址', sortable: false, width: 200, formatter: $.iGrid.tooltipformatter()},
+                    {field: 'EMAIL', title: '注册邮箱', sortable: false, width: 200, formatter: $.iGrid.tooltipformatter()},
+                    {
+                        field: 'COMPANY_STATUS',
+                        title: '状态',
+                        sortable: false,
+                        width: 80,
+                        formatter: $.iGrid.evalconditionformatter(['rowData.COMPANY_STATUS=="--"', 'rowData.COMPANY_STATUS=="正常"', 'rowData.COMPANY_STATUS=="禁用"'], ['N/A', '正常', '禁用'], '  ')
+                    },
+                    {field: 'ENDDATE', title: '到期日', sortable: false, width: 120}
+                ]],
+                loadFilter: function (data) {
+                    // add checkedRows test data, just for debug
+                    var d = $.fn.iDatagrid.defaults.loadFilter.call(this, data);
+                    d.checkedRows = [999, 22];
+                    return d;
+                }
+            });
+        });
+    }
+
+
+    function savepriv() {
+        $.app.debug(this);
+        var d = $.iGrid.checkedNodeDatas2Arrayjson('functionTg', 'FUNCTIONID');
+        var id = $('#prvidialog #id').val();
+
+        $.app.post(contextpath + '/system/company/privs/save',
+            {functionids: d, id: id}, function (data) {
+
+                $.app.show(data.msg);
+                $.app.closeDialog('prvidialog');
+
+            }, null, '权限数据处理中.....');
+        $.app.debug(d);
+        //$.app.debug(this);
+    }
+
+</script>
+</html>

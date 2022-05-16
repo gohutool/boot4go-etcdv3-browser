@@ -1,0 +1,24 @@
+
+#parse("/WEB-INF/include/cude/public/global.evn.html")
+#parse("/WEB-INF/include/cude/public/macro.html")
+<table  style="margin: 20px;" data-toggle="cubeui-treegrid"
+               data-options="id:'roleselectTg',
+			   idField:'ID',
+			   singleSelect:true,
+			   checkOnSelect:true,
+			   selectOnCheck:true,
+			   param:'pid:ID',
+			   treeField:'ROLENAME',
+			   checkbox:false,
+			   checkedRows:['$!data.role_parentid'],
+			   data:$.extends.arrayToTree(#json_html($rolelist), 'ID', 'ROLE_PARENTID')">
+    <thead>
+    <tr>
+    	<th data-options="field:'UUID',title:'',checkbox:true"></th>
+        <th data-options="field:'ROLENAME',title:'#i18nhtml('core.system.role.label.ROLENAME', '角色名称')',width:150"></th>
+        <th data-options="field:'ROLE_DEMO',title:'#i18nhtml('core.system.role.label.ROLE_DEMO', '备注')',width:400"></th>
+        <th data-options="field:'ROLE_SYSTEMTAG',title:'',width:80,formatter:$.iGrid.checkedformatter3('ID', ['$!data.role_parentid'], ['<span class=&quot;cube-label cube-label-blue&quot;>#i18nhtml('core.system.role.label.SELECTED','已选择')</span>'], '  ')"></th>
+    </tr>
+    </thead>
+</table>
+<input type='hidden' id='id' name='id' value='$data.id'/>

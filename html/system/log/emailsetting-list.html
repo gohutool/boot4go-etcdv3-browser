@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+	#parse("/WEB-INF/include/cude/public/global.evn.html")
+	#parse("/WEB-INF/include/cude/public/macro.html")
+	#parse("/WEB-INF/include/cude/public/head.html")
+</head>
+
+<body>
+<table id="userDg"></table>
+
+<!-- 表格工具栏开始 -->
+<div id="userDg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'datagrid',
+           id:'userDg'
+       }">
+    
+   
+    #showhref("#i18n('core.common.title.add', '新增')" 'javascript:void(0)' 'MAILSETTING_MAN' "data-toggle='cubeui-menubutton'
+    	data-options=""{
+            method: 'openDialog',
+            extend: '#userDg-toolbar',
+            btnCls: 'cubeui-btn-orange',
+            iconCls: 'fa fa-plus',
+            dialog: {
+                id: 'userAddDialog',
+                height:450,
+                maximized:true,
+                title: '#i18n('core.system.log.title.MAIL_ADD_ACCOUNT','添加邮件账户')',
+                href: contextpath + '/system/notify/emailaccount/create',
+                buttonsGroup: [
+                    {
+                        text: '#i18n('core.common.title.save', '保存')',
+                        url: contextpath + '/system/notify/emailaccount/save',
+                        iconCls: 'fa fa-plus',
+                        handler: 'ajaxForm',
+                        btnCls: 'cubeui-btn-brown'
+                    }
+                ]
+            }
+        }""")
+        
+    #showhref("#i18n('core.common.title.edit', '编辑')" 'javascript:void(0)' 'MAILSETTING_MAN' "data-toggle='cubeui-menubutton'
+       data-options=""{method: 'openDialog',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-pencil',
+            btnCls: 'cubeui-btn-green',
+            dialog: {
+                title:'#i18n('core.system.log.title.MAIL_MODIFY_ACCOUNT', '编辑邮件账户')',
+                
+                height:450,
+                maximized:true,
+                href: contextpath + '/system/notify/emailaccount/detail-{ID}',
+                
+                buttonsGroup: [
+                    {
+                        text: '#i18n('core.common.title.save', '保存')',
+                        url: contextpath + '/system/notify/emailaccount/save',
+                        iconCls: 'fa fa-save',
+                        handler: 'ajaxForm',
+                        btnCls: 'cubeui-btn-green'
+                    }
+                ]
+            }
+          }""")
+            
+      
+    #showhref("#i18n('core.common.title.active', '激活')" 'javascript:void(0)' 'MAILSETTING_MAN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-chain',
+            btnCls: 'cubeui-btn-blue',
+            confirmMsg: '#i18n('core.system.log.message.NOTIFY_MAIL_CONFIRM_ACTIVE','确定需要激活勾选的{0}个邮件账户？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                uncheckedMsg: '#i18n('core.system.log.message.NOTIFY_MAIL_SELECT_ATFIRST','请先勾选要激活的邮件账户')',
+                param: 'ID:ID'
+            },
+            url: contextpath + '/system/notify/emailaccount/active'
+        }""")
+        
+    #showhref("#i18n('core.common.title.inactive', '禁用')" 'javascript:void(0)' 'MAILSETTING_MAN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-unlink',
+            btnCls: 'cubeui-btn-black',
+            confirmMsg: '#i18n('core.system.log.message.NOTIFY_MAIL_CONFIRM_INACTIVE','确定需要禁用勾选的{0}个邮件账户？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                uncheckedMsg: '#i18n('core.system.log.message.NOTIFY_MAIL_CONFIRM_INACTIVE_UNSELECTED','请先勾选要禁用的邮件账户')',
+                param: 'ID:ID'
+            },
+            url: contextpath + '/system/notify/emailaccount/inactive'
+        }""")
+                
+    #showhref("#i18n('core.common.title.remove', '删除')"  'javascript:void(0)' 'MAILSETTING_MAN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-trash',
+            btnCls: 'cubeui-btn-brown',
+            confirmMsg: '#i18n('core.system.log.message.NOTIFY_MAIL_ACCOUNT_REMOVE','确定需要删除勾选的{0}个邮件账户？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                param: 'ID:ID',
+                uncheckedMsg: '#i18n('core.system.log.message.NOTIFY_MAIL_ACCOUNT_REMOVE_CONFIRM','请先勾选要删除的邮件账户')'
+            },
+            url: contextpath + '/system/notify/emailaccount/remove'
+        }""")
+      
+    <form id="queryForm" class="search-box">
+	    
+           
+        
+    </form>
+</div>
+<!-- 表格工具栏结束 -->
+
+<!-- 表格行编辑窗口 -->
+<form id="editDialog"></form>
+
+<script>
+
+    jquery(function () {
+        
+        $("#userDg").iDatagrid({
+            url: contextpath + '/system/notify/emailaccount/listjson',
+            idField:'ID',
+            sortName:'CREATETIME',
+            sortOrder:"desc",
+            columns: [[
+				{field: 'ID', title: '', checkbox: true},
+                {field: 'NAME', title: '#i18n('core.system.log.label.NOTIFY_MAIL_ACCOUNTNAME','名称')', width:200, sortable: true, formatter:$.iGrid.tooltipformatter()},
+                {field: 'ACCOUNT', title: '#i18n('core.system.log.label.NOTIFY_MAIL_ACCOUNTNAME','邮件账户')', width:200, sortable: true, formatter:$.iGrid.tooltipformatter()},
+                {field: 'DEMO', title: '#i18n('core.system.company.label.MEMO','备注')', sortable: false, width:120, formatter:$.iGrid.tooltipformatter()},
+                {field: 'SMTPSERVER', title: '#i18n('core.system.log.label.NOTIFY_MAIL_SMTPSERVER','发送服务器')', sortable: false},
+                {field: 'POPSERVER', title: '#i18n('core.system.log.label.NOTIFY_MAIL_POPSERVER','接收服务器')', sortable: false},
+                {field: 'STATUS', title: '#i18n('core.common.title.STATUS','状态')', sortable: false,formatter:$.iGrid.checkedformatter(1, '#i18n('core.system.log.label.LOG_ACTIVE', '活动')', '#i18n('core.system.log.label.LOG_INACTIVE', '冻结')')},
+                {field: 'CREATETIME', title: '#i18n('core.common.title.CREATETIME','创建日期')', sortable: true}
+            ]]
+        });
+    });
+    
+</script>
+</body>
+</html>

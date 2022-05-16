@@ -1,0 +1,49 @@
+#parse("/WEB-INF/include/cude/public/global.evn.html")
+#parse("/WEB-INF/include/cude/public/macro.html")
+<div style="margin: 0px;" >
+</div>
+<!-- 
+#json($m)
+#json($!m)
+ -->
+<div class="cubeui-fluid" removebuttons="" #if($!data.department_systemtag==1)disablebuttons="['#i18nhtml('core.common.title.UPDATE', '更新')']"#end>
+    <fieldset>
+        <legend>#i18nhtml('core.common.title.baseinfo_mandatory', '基本信息(必填)')</legend>
+    </fieldset>
+    <input type='hidden' id='id' name='id' value='$!data.id'/>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18nhtml('core.system.department.label.DEPARTMENTNAME', '部门名称'):</label>
+            <div class="cubeui-input-block">
+                <input #if($!data.department_systemtag==1)disabled="disabled"#end type="text" id="departmentname" name="departmentname" value='$!data.departmentname' data-toggle="cubeui-textbox" data-options="#if($!data.department_systemtag==1)disabled:true,#end required:true,validType:length[0,50],prompt:'#i18nhtml('core.system.company.message.COMPANYNO_prompt', '部门的名称，必须填写')'">
+            </div>
+        </div>
+    </div>
+    
+    <!-- -->
+    <fieldset>
+        <legend>#i18nhtml('core.common.title.extrainfo_optional', '扩展信息(选填)')</legend>
+    </fieldset>
+    
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18nhtml('core.system.department.label.DEPARTMENT_DEMO', '部门备注')</label>
+            <div class="cubeui-input-block">
+                <input #if($!data.department_systemtag==1)disabled="disabled"#end value='#html($!{data.department_demo})' type="text" id="department_demo" name="department_demo" data-toggle="cubeui-textarea" data-options="#if($!data.department_systemtag==1)disabled:true,#end validType:length[0,100],prompt:'#i18nhtml('core.system.department.label.DEPARTMENT_DEMO_prompt', '部门备注，有关公司的介绍描述')'">
+            </div>
+        </div>
+    </div>
+    
+    #if(!$new && $!data.department_systemtag==1) 
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18nhtml('core.system.department.label.DEPARTMENT_SYSTEMTAG', '系统保留'):</label>
+            <div class="cubeui-input-block">
+            	<input disabled="disabled" data-toggle="cubeui-checkbox" name="department_systemtag" checked="checked">
+            	
+            </div>
+        </div>
+    </div>
+    #end
+    
+</div>

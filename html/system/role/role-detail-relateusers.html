@@ -1,0 +1,85 @@
+#parse("/WEB-INF/include/cude/public/global.evn.html")
+#parse("/WEB-INF/include/cude/public/macro.html")
+<table id="userDg"></table>
+
+<!-- 表格工具栏开始 -->
+<input type='hidden' id='id' name='id' value='$!data.id'/>
+<div id="userDg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'datagrid',
+           id:'userDg'
+       }">
+    
+   <!-- 
+    #showhref('添加授权用户' 'javascript:void(0)' 'ROLE_MAN|COMPANY_ADMIN' "id='add1' data-toggle='cubeui-menubutton' data-options=""{
+            method: 'openDialog',
+            extend: '#userDg-toolbar',
+            btnCls: 'cubeui-btn-orange',
+            iconCls: 'fa fa-plus',
+            dialog: {
+                title: '添加授权用户',
+                href: contextpath + '/system/user/detail/new',
+                buttonsGroup: [
+                    {
+                        text: '授权',
+                        url: contextpath + '/system/user/detail/save',
+                        iconCls: 'fa fa-plus',
+                        handler: 'ajaxForm',
+                        btnCls: 'cubeui-btn-brown'
+                    }
+                ]
+            }
+        }""") 
+        -->
+        
+            
+    #showhref("#i18nhtml('core.system.role.title.UNASSIGN_USER','移除')" 'javascript:void(0)' 'ROLE_MAN|COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-trash',
+            btnCls: 'cubeui-btn-brown',
+            confirmMsg: '#i18nhtml('core.system.role.message.ARE_SURE_UNASSIGN','确定需要移除勾选的{0}个用户？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+        		param: 'USERID:USERID', 
+                uncheckedMsg: '#i18nhtml('core.system.role.message.UNASSIGN_UNCHECKED','请先勾选要移除的用户')'
+            },
+            url: contextpath + '/system/role/unassignusers?id=$!data.id'
+        }""")
+     
+    <form id="queryForm" class="search-box">
+    	
+        <input type="text" name="name" data-toggle="cubeui-textbox"
+               data-options="id:'name',prompt:'#i18nhtml('core.system.role.message.EMAIL_QUERY_PROMPT','邮箱,名称模糊查询')',width:200">
+        <a href="javascript:void(0)"
+           data-toggle="cubeui-menubutton"
+           data-options="method:'query',
+           iconCls:'fa fa-search',
+           btnCls:'cubeui-btn-blue',
+           form:{id:'queryForm'},
+           grid:{type:'datagrid','id':'userDg'}">#i18nhtml('core.common.title.search', '查询')</a>
+    </form>
+</div>
+<!-- 表格工具栏结束 -->
+
+<script>
+
+    jquery(function () {
+        
+        $("#userDg").iDatagrid({
+            url: contextpath + '/system/role/users?id=$!data.id',
+            idField:'USERID',
+            columns: [[
+				{field: 'USERID', title: '', checkbox: true},
+                {field: 'FIRSTNAME', title: '#i18n('core.system.user.label.USERNAME', '用户姓名')',formatter:$.iGrid.templateformatter('{FIRSTNAME}{LASTNAME}'), sortable: true},
+                {field: 'EMAIL', title: '#i18n('core.system.user.label.ACCOUNT','注册邮箱')',width1:'80px', sortable: true},
+                {field: 'LASTLOGINTIME', title: '#i18n('core.system.user.label.LOGINTIME','登录时间')', sortable: true},
+                {field: 'CREATETIME', title: '#i18n('core.system.role.label.ASSIGNROLE_TIME','授权时间')', sortable: true},
+                {field: 'SYSTEMTAG', title: '#i18n('core.common.title.STATUS','状态')', sortable: false,formatter:$.iGrid.checkedformatter(1, '<span class="cube-label cube-label-blue">#i18nhtml('core.common.title.SYSTEM_DEFINED','系统设定')</span>', '  ')}
+            ]]
+        });
+    });
+    
+</script>

@@ -1,0 +1,33 @@
+<style>
+    .editTable .label {
+        min-width: 80px;
+        width: 80px;
+    }
+</style>
+<table class="editTable">
+    <tr>
+        <td class="label">#i18n('core.profile.firstname', '姓')</td>
+        <td><input type="text" id="firstname" name="firstname" value="$!session.face_user.firstname"></td>
+    </tr>
+    <tr>
+        <td class="label">#i18n('core.profile.lastname', '名')</td>
+        <td><input type="text" id="lastname" name="lastname" value="$!session.face_user.lastname"></td>
+    </tr>
+</table>
+
+
+
+<script type="text/javascript">
+    $(function () {
+        $('#firstname').iTextbox({
+            width: 200,
+            required: true,
+            validType: "length[1,20]"
+        });
+        $('#lastname').iTextbox({
+            width: 200,
+            required: true,
+            validType: "length[1,20]"
+        });
+    });
+</script>

@@ -1,0 +1,30 @@
+
+#parse("/WEB-INF/include/cude/public/global.evn.html")	
+#parse("/WEB-INF/include/cude/public/macro.html")
+
+<div class="cubeui-fluid">
+	<fieldset>
+        <legend>#i18nhtml('core.system.user.title.ASSIGNROLE', '分配角色')</legend>
+    </fieldset>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18nhtml('core.system.user.label.ROLE', '角色'):</label>
+            <div class="cubeui-input-block">
+            	<input type='hidden' name='userid' value='$!userid'/>
+                <input value='$!data.roleid' name="roleid" data-toggle="cubeui-combotreegrid"
+                       data-options="
+                       labelPosition:'top',
+                       singleSelect:true,
+                   data:$.extends.arrayToTree(#json_html($rolelist), 'ID', 'ROLE_PARENTID'),
+                   idField:'ID',
+                   treeField:'ROLENAME',
+                   columns:[[
+                   		{field:'ROLEID',title:'',checkbox:true},
+                       {field:'ROLENAME',title:'#i18nhtml('core.system.user.label.ROLENAME', '角色名称')',  width:200},
+                       {field:'ROLE_DEMO',title:'#i18nhtml('core.system.user.label.ROLE_DEMO', '备注')',   width:400}
+                   ]]">
+            </div>
+        </div>
+    </div>
+</div>
+

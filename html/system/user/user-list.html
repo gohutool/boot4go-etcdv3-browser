@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+	#parse("/WEB-INF/include/cude/public/global.evn.html")
+	#parse("/WEB-INF/include/cude/public/macro.html")
+	#parse("/WEB-INF/include/cude/public/head.html")
+</head>
+
+<body>
+<table id="userDg"></table>
+
+<!-- 表格工具栏开始 -->
+<div id="userDg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'datagrid',
+           id:'userDg'
+       }">
+    
+   
+    #showhref("#i18n('core.common.title.add', '新增')" 'javascript:void(0)' 'USER_MAN|COMPANY_ADMIN' "id='add1' data-toggle='cubeui-menubutton' data-options=""{
+            method: 'openDialog',
+            extend: '#userDg-toolbar',
+            btnCls: 'cubeui-btn-orange',
+            iconCls: 'fa fa-plus',
+            dialog: {
+                id: 'userAddDialog',
+                title: '#i18n('core.system.user.title.add', '添加新用户')',
+                href: contextpath + '/system/user/detail/new',
+                buttonsGroup: [
+                    {
+                        text: '#i18n('core.common.title.save', '保存')',
+                        url: contextpath + '/system/user/detail/save',
+                        iconCls: 'fa fa-plus',
+                        handler: 'ajaxForm',
+                        btnCls: 'cubeui-btn-brown'
+                    }
+                ]
+            }
+        }""")
+        
+    #showhref("#i18n('core.common.title.edit', '编辑')" 'javascript:void(0)' 'USER_MAN|COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{method: 'openDialog',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-pencil',
+            btnCls: 'cubeui-btn-green',
+            dialog: {
+                title:'#i18n('core.system.user.title.edit', '编辑用户')',
+                height: 400,
+                height: 400,
+                href: contextpath + '/system/user/detail/{ID}',
+                
+                buttonsGroup: [
+                    {
+                        text: '#i18n('core.common.title.save', '保存')',
+                        url: contextpath + '/system/user/detail/save',
+                        iconCls: 'fa fa-save',
+                        handler: 'ajaxForm',
+                        btnCls: 'cubeui-btn-green'
+                    }
+                ]
+            }
+          }""")
+            
+    #showhref("#i18n('core.common.title.remove', '删除')" 'javascript:void(0)' 'USER_MAN|COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-trash',
+            btnCls: 'cubeui-btn-brown',
+            confirmMsg: '#i18n('core.system.user.message.confirmdelete', '确定需要删除勾选的{0}个用户？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                uncheckedMsg: '#i18n('core.system.user.message.unchecked', '请先勾选要删除的用户')'
+            },
+            url: contextpath + '/system/user/detail/remove'
+        }""")
+      
+    #showhref("#i18n('core.common.title.active', '激活')" 'javascript:void(0)' 'USER_MAN|COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-chain',
+            btnCls: 'cubeui-btn-blue',
+            confirmMsg: '#i18n('core.system.user.message.confirmactive', '确定需要激活勾选的{0}个用户？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                uncheckedMsg: '#i18n('core.system.user.message.active_unchecked', '请先勾选要激活的用户')',
+                param: 'ID:ID,code:code'
+            },
+            url: contextpath + '/system/user/detail/active?flag=1'
+        }""")
+        
+    #showhref("#i18n('core.common.title.inactive', '禁用')" 'javascript:void(0)' 'USER_MAN|COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-unlink',
+            btnCls: 'cubeui-btn-black',
+            confirmMsg: '#i18n('core.system.user.message.confirminactive', '确定需要禁用勾选的{0}个用户？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                uncheckedMsg: '#i18n('core.system.user.message.inactive_unchecked', '请先勾选要禁用的用户')',
+                param: 'ID:ID,code:code'
+            },
+            url: contextpath + '/system/user/detail/active?flag=-1'
+        }""")
+        
+    #menubutton("#i18n('core.system.user.title.ASSIGNROLE', '分配角色')" 'javascript:void(0)' 'USER_MAN|COMPANY_ADMIN' "data-toggle='cubeui-menubutton'" 
+       "{method: 'openDialog',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-pencil',
+            btnCls: 'cubeui-btn-red',
+            
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                param: 'ID:ID'
+            },
+            dialog: {
+                title:'#i18n('core.system.user.title.ASSIGNROLE', '分配角色')',
+                height: 200,
+                width:800,
+                id:'assignroledialog',
+                href: contextpath + '/system/user/userrole/{ID}',
+                buttonsGroup: [
+                    {
+                        text: '#i18n('core.system.user.title.ASSIGNROLE', '分配角色')',
+                        param: 'ROLEID:ROLEID', 
+                        url: contextpath + '/system/user/userrole/save',
+                        iconCls: 'fa fa-save',
+                        handler1: 'ajaxForm',
+                        btnCls: 'cubeui-btn-green'
+                    }
+                ]
+            }}")   
+            
+    #menubutton("#i18n('core.system.user.title.RESETPASSWORD', '重置密码')" 'javascript:void(0)' 'USER_MAN|COMPANY_ADMIN' "data-toggle='cubeui-menubutton'" 
+       "{method: 'openDialog',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-pencil',
+            btnCls: 'cubeui-btn-purple',
+            
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                param: 'ID:ID'
+            },
+            dialog: {
+                title:'#i18n('core.system.user.title.RESETPASSWORD', '重置密码')',
+                height: 300,
+                width:400,
+                id:'resetpwddialog',
+                href: contextpath + '/system/user/detail/resetpwd?id={ID}',
+                buttonsGroup: [
+                    {
+                        text: '#i18n('core.system.user.title.RESETPASSWORD', '重置密码')',
+                        url: contextpath + '/system/user/detail/resetpwd?save=1',
+                        iconCls: 'fa fa-save',
+                        handler1: 'ajaxForm',
+                        btnCls: 'cubeui-btn-green'
+                    }
+                ]
+            }}")
+    <form id="queryForm" class="search-box">
+    	<input type="text" name="email" data-toggle="cubeui-textbox"
+               data-options="id:'email',prompt:'#i18n('core.system.user.message.EMAIL_QUERY_prompt', '注册邮件模糊查询')',width:200">
+        <input type="text" name="name" data-toggle="cubeui-textbox"
+               data-options="id:'name',prompt:'#i18n('core.system.user.message.NAME_QUERY_prompt', '名称模糊查询')',width:200">
+        <a href="javascript:void(0)"
+           data-toggle="cubeui-menubutton"
+           data-options="method:'query',
+           iconCls:'fa fa-search',
+           btnCls:'cubeui-btn-blue',
+           form:{id:'queryForm'},
+           grid:{type:'datagrid','id':'userDg'}">#i18n('core.common.title.search', '查询')</a>
+    </form>
+</div>
+<!-- 表格工具栏结束 -->
+
+<!-- 表格行编辑窗口 -->
+<form id="editDialog"></form>
+
+<script>
+
+    jquery(function () {
+        
+        $("#userDg").iDatagrid({
+            url: contextpath + '/system/user/listjson',
+            idField:'ID',
+            sortName:'EMAIL',
+            sortOrder:"asc",
+            columns: [[
+				{field: 'ID', title: '', checkbox: true},
+                {field: 'FIRSTNAME', title: '#i18nhtml('core.system.user.label.USERNAME', '用户姓名')',formatter:$.iGrid.templateformatter('{FIRSTNAME}{LASTNAME}'), sortable: true},
+                {field: 'EMAIL', title: '#i18nhtml('core.system.user.label.ACCOUNT', '登录账号')',width1:'80px', sortable: true},
+                {field: 'SEX', title: '性别',formatter:$.iGrid.checkedformatter(1, '#i18nhtml('core.system.user.label.SEX_MALE', '男')', '#i18nhtml('core.system.user.label.SEX_FEMALE', '女')'),align:'center', sortable: false},
+                {field: 'TELL', title: '#i18nhtml('core.system.user.label.TELL', '联系电话')', sortable: false},
+                {field: 'ADDRESS', title: '#i18nhtml('core.system.user.label.ADDRESS', '地址')', sortable: false},
+                {field: 'LASTLOGINIP', title: '#i18nhtml('core.system.user.label.LOGINIP', '登录IP')', sortable: false},
+                {field: 'LASTLOGINTIME', title: '#i18nhtml('core.system.user.label.LOGINTIME', '登录时间')', sortable: false},
+                {field: 'STATUS', title: '#i18nhtml('core.common.title.STATUS', '状态')', sortable: false,formatter:$.iGrid.checkedformatter2([1],['#i18nhtml('core.common.title.active', '正常')','#i18nhtml('core.common.title.inactive', '禁用')'])},
+                {field: 'REGTIME', title: '#i18nhtml('core.system.user.label.REGTIME', '注册时间')', sortable: false}
+            ]]
+        });
+    });
+    
+</script>
+</body>
+</html>

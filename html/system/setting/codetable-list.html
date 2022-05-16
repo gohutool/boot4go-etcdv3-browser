@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+	#parse("/WEB-INF/include/cude/public/global.evn.html")
+	#parse("/WEB-INF/include/cude/public/macro.html")
+	#parse("/WEB-INF/include/cude/public/head.html")
+</head>
+
+<body>
+
+<div data-toggle="cubeui-layout" data-options="fit:true">
+	<div data-options="
+						region:'west',title:'#i18nhtml('core.system.setting.title.CODETABLE_LIST','数据字典列表')',
+						split:true,border:false,width:'500px',
+						iconCls:'fa fa-book',
+						headerCls:'border_right',bodyCls:'border_right'">
+		<table id="codetypeDg"></table>
+		<!-- 表格工具栏开始     -->
+		<!-- 
+		<div id="codetypeDg-toolbar" class="cubeui-toolbar"
+		     data-options="grid:{
+		           type:'datagrid',
+		           id:'codetypeDg'
+		       }">
+		</div>
+		-->         
+		    
+		
+	</div>
+	
+	<div data-options="
+					region:'center',iconCls:'fa fa-book',
+					titleformat:'{0}-#i18nhtml('core.system.setting.title.CODETABLE_ITEM_LIST','字典项列表')', title:'#i18nhtml('core.system.setting.title.CODETABLE_ITEM_LIST','字典项列表')',
+					split:true,border:false,bodyCls:'border_left'">
+		<table id="codetableDg"></table>
+		
+		<div id="codetableDg-toolbar" class="cubeui-toolbar"
+		     data-options="grid:{
+		           type:'datagrid',
+		           id:'codetableDg'
+		       }">
+		         
+    	#showhref("#i18n('core.common.title.add', '新增')" 'javascript:void(0)' 'TYPE_MAN|COMPANY_ADMIN' "id='add' data-toggle='cubeui-menubutton' data-options=""{
+            onClick:addrow,
+            disabled:true,
+            btnCls: 'cubeui-btn-green',
+            iconCls: 'fa fa-plus'
+         }""")  
+         
+    	#showhref("#i18n('core.common.title.save', '保存')" 'javascript:void(0)' 'TYPE_MAN|COMPANY_ADMIN' "id='save' data-toggle='cubeui-menubutton' data-options=""{
+            onClick: save,
+            disabled:true,
+            btnCls: 'cubeui-btn-blue',
+            iconCls: 'fa fa-save'
+         }""") 
+		    
+    	#showhref("#i18n('core.common.title.cancel', '取消')" 'javascript:void(0)' 'TYPE_MAN|COMPANY_ADMIN' "id='cancel' data-toggle='cubeui-menubutton' data-options=""{
+            onClick:cancel,
+            disabled:true,
+            btnCls: 'cubeui-btn-black',
+            iconCls: 'fa fa-close'
+         }""")
+         
+    	#showhref("#i18n('core.common.title.remove', '删除')" 'javascript:void(0)' 'TYPE_MAN|COMPANY_ADMIN' "id='remove' data-toggle='cubeui-menubutton' data-options=""{
+            onClick:deleterow,
+            disabled:true,
+            btnCls: 'cubeui-btn-red',
+            iconCls: 'fa fa-trash'
+         }""")
+         
+    	<!-- 
+    	#showhref('过滤' 'javascript:void(0)' 'TYPE_MAN|COMPANY_ADMIN' "id='filter' data-toggle='cubeui-menubutton' data-options=""{
+            extend:'#codetableDg-toolbar',
+            method:'filter',
+            btnCls: 'cubeui-btn-orange',
+            iconCls: 'fa fa-filter'
+         }""") 
+         -->
+		</div>
+	
+	</div>
+</div>
+
+<script>
+
+	var issystem = #ifdo($system,'true','false');
+
+    jquery(function () {
+        
+        $("#codetypeDg").datagrid({
+            data:{rows:#json($types)},
+            idField:'TYPECODE',
+            sortName:'TEXT',
+            singleSelect:true,
+            remoteSort:false,
+            pagination:false,
+            sortOrder:"asc",
+            onSelect:function(idx, row){
+            	$.app.debug(idx);
+            	$.app.debug(row);
+            	
+            	$("#codetableDg").datagrid('options').codetabletype = row.TYPECODE;
+            	$("#codetableDg").datagrid('options').url = contextpath + '/system/setting/type/#ifdo($system, 'system', 'company')/listjson';
+            	$("#codetableDg").datagrid('load', {codetype:row.TYPECODE});
+            	
+            	if(row.SYSTEMTAG==1){
+            		$('#add').linkbutton('disable');
+            		$('#save').linkbutton('disable');
+            		$('#remove').linkbutton('disable');
+            		$('#cancel').linkbutton('disable');
+            		
+
+            		$("#codetableDg").datagrid('options').onDblClickRow = function(){};
+            	}else
+           		{
+            		$('#add').linkbutton('enable');
+            		$('#save').linkbutton('enable');
+            		$('#remove').linkbutton('enable');
+            		$('#cancel').linkbutton('enable');
+            		
+            		$("#codetableDg").datagrid('options').onDblClickRow = $.iGrid.EdatagridHandle.rowEditRowEventHanle(function(idx, row, colopts){
+                    	$.app.debug(arguments);
+                    	
+                    	if(row.SYSTEMTAG==1)
+                    		return false;
+                    	
+                    	#if(!$system)##
+                    	if(row.COMPANYID=='0')
+                    		return false;
+                    	#end##
+                    });
+           		}
+            },
+            /* childGrid:{
+                param:'codetype:TYPECODE,TEXT',
+                grid:[
+                    {type:'datagrid',id:'codetableDg'}
+                ]
+            }, */
+            columns: [[
+				/* {field: 'NO', title: '', checkbox: true}, */
+                {field: 'TEXT', title: '#i18n('core.system.setting.label.CODETABLENAME', '字典名称')', width:100,sortable: true, formatter:$.iGrid.tooltipformatter()},
+                {field: 'TYPECODE', title: '#i18n('core.system.setting.label.CODETABLECODE', '字典代码')', width:130,sortable: true, formatter:$.iGrid.tooltipformatter()},
+                {field: 'SYSTEMTAG', title: '#i18n('core.system.department.label.DEPARTMENT_SYSTEMTAG', '系统保留')', width:90, sortable: false,formatter:$.iGrid.checkedformatter(1, '<span class="cube-label cube-label-blue">#i18nhtml('core.common.title.SYSTEM_DEFINED', '系统设定')</span>', '')},
+                {field: 'CREATETIME', title: '#i18n('core.common.title.CREATETIME', '创建日期')', width:110,sortable: false}
+            ]]
+        });
+        
+        
+        $("#codetableDg").iDatagrid({
+            
+            idField:'ID',
+            sortName:'TEXT',
+            sortOrder:"asc",
+            saveUrl:'',
+            singleSelect:true,
+            columns: [[
+				{field: 'ID', title: '', checkbox: true}, 
+                {field: 'TEXT', title: '#i18n('core.system.setting.label.CODETABLE_ITMENAME','字典项名称')', editor:{type:'textbox',options:{required:true}}, sortable: true, formatter:$.iGrid.tooltipformatter('{NO}')},
+                {field: 'CODE', title: '#i18n('core.system.setting.label.CODETABLE_ITMECODE', '字典项代码')', sortable: true, editor:{type:'textbox',options:{required:true}}, editor2:{type:'combobox',options:{onSelect:function(){
+                	$.app.debug(arguments);
+                },required:true, textField:'name', valueField:'id', data:[{"id":1,"name":'JAVA'},{"id":2,"name":'C#'},{"id":3,"name":'PHP'},{"id":4,"name":'PERL'}]}}},
+                {field: 'DISPLAYORDER', title: '#i18n('core.common.label.DISPLAYORDER','显示顺序')', editor:{type:'numberspinner',options:{required:true}}, sortable: true},
+                {field: 'SYSTEMTAG', title: '#i18n('core.system.department.label.DEPARTMENT_SYSTEMTAG', '系统保留')', sortable: false,formatter:$.iGrid.evalconditionformatter(['rowData.SYSTEMTAG==1'], ['<span class="cube-label cube-label-blue">#i18nhtml('core.common.title.SYSTEM_DEFINED', '系统设定')</span>'], ' ')},
+                {field: 'COMPANYID', title: '#i18n('core.common.label.OWNERTO','隶属')', sortable: false,formatter:$.iGrid.checkedformatter('0', '<span class="cube-label cube-label-blue">#i18n('core.common.label.LEVEL_SYSTEM','系统')</span>', '<span class="cube-label cube-label-blue">#i18n('core.common.label.LEVEL_COMPANY','公司')</span>')},
+                {field: 'CREATETIME', title: '#i18n('core.common.title.CREATETIME', '创建日期')', sortable: false}
+            ]]
+        });
+        
+    });
+    
+    function canDo(opts){
+    	if(opts.codetabletype==null){
+    		$.app.show('#i18n('core.system.setting.message.CODETABLE_SELECT_CODETABLE_ATFIRST', '请先点击选中左侧的数据字典列表中需要操作的字典，在进行项目的操作！')');
+    		return false;
+    	}
+    	return true;
+    }
+    
+    addrow = $.iGrid.EdatagridHandle.addRowHandle('#codetableDg', function(){
+    	return canDo(this);
+    }, function(){
+    	return {TEXT:'', DISPLAYORDER:'1', SYSTEMTAG:0, COMPANYID:#ifdo($system, 0, $!session.face_user.user_company.id)};
+    });
+    
+    deleterow = $.iGrid.EdatagridHandle.removeRowHandle('#codetableDg', function(){
+    	var rows = $('#codetableDg').datagrid('getChecked');
+    	
+    	for(var idx =0; idx < rows.length; idx ++){
+    		if(rows[idx].SYSTEMTAG == 1){
+    			$.app.showerror('#i18n('core.system.setting.message.CODETABLE_NOTALLOW_INSYSTEMLEVEL','系统保留的字典项目不能进行操作！')');
+    			return false;
+    		}#if(!$system)
+    		else if(rows[idx].COMPANYID == 0){
+    			$.app.showerror('#i18n('core.system.setting.message.CODETABLE_NOTALLOW_4SYSTEMLEVEL','隶属于系统的字典项目不能进行操作！')');
+    			return false;
+    		}#end##
+    	}
+    	
+    	return canDo(this);
+    }, function(rows, success){
+    	$.app.debug('remove rows:')
+    	$.app.debug(rows);
+    	
+    	if(rows && rows.length==1){
+    		if(rows[0].ID==null){
+    			success.apply();
+    			return ;
+    		}
+    	}
+    	
+    	var d = [];
+    	$.each(rows, function(idx, row){
+    		d.push(row.ID);
+    	});
+    	
+    	d = {id:d.join(','), codetype:this.codetabletype}
+    	
+    	$.app.post(contextpath + '/system/setting/type/#ifdo($system, 'system', 'company')/remove', d, function(data){
+    		success.apply();
+    		$('#codetableDg').datagrid('reload');
+			$.app.defaultOnsuccess(data);
+		}, null, '#i18n('core.common.message.IN_PROGESS','数据处理中')');
+    	
+    });
+    
+    save = $.iGrid.EdatagridHandle.saveHandle('#codetableDg', function(){
+    	return canDo(this);
+    }, function(cs, success){
+    	$.app.debug('save');
+    	
+    	var d = [];
+		$.each(cs, function(idx, row){
+			var o = {};
+			o.id = row.ID;
+			o.TEXT = row.TEXT;
+			o.CODE = row.CODE;
+			o.DISPLAYORDER = row.DISPLAYORDER;
+			d.push(o);
+		});
+		
+		var d = {datas:$.extends.json.tostring(d), codetype:this.codetabletype};
+		$.app.post(contextpath + '/system/setting/type/#ifdo($system, 'system', 'company')/save', d, function(data){
+			success.apply();
+			$('#codetableDg').datagrid('reload');
+			$.app.defaultOnsuccess(data);
+		}, null, '#i18n('core.common.message.IN_PROGESS','数据处理中')');
+		
+    	
+    });
+    
+    cancel = $.iGrid.EdatagridHandle.rollbackHandle('#codetableDg', function(){
+    	return canDo(this);
+    }, function(cs, success){
+    	success.apply();
+    }, true);
+</script>
+</body>
+</html>

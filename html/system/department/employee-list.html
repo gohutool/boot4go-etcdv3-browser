@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	#parse("/WEB-INF/include/cude/public/global.evn.html")
+	#parse("/WEB-INF/include/cude/public/macro.html")
+	#parse("/WEB-INF/include/cude/public/head.html")
+</head>
+
+<body>
+
+<table id="employeeDg"></table>
+
+<div id="employeeDg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'datagrid',
+           id:'employeeDg'
+       }">
+         
+  	#showhref('新增' 'javascript:void(0)' 'DEPARTMENT_MAN|COMPANY_ADMIN' "id='add' data-toggle='cubeui-menubutton' data-options=""{
+          onClick:addrow,
+          btnCls: 'cubeui-btn-green',
+          iconCls: 'fa fa-plus'
+       }""")  
+       
+  	#showhref('保存' 'javascript:void(0)' 'DEPARTMENT_MAN|COMPANY_ADMIN' "id='save' data-toggle='cubeui-menubutton' data-options=""{
+          onClick: save,
+          btnCls: 'cubeui-btn-blue',
+          iconCls: 'fa fa-save'
+       }""") 
+    
+  	#showhref('取消' 'javascript:void(0)' 'DEPARTMENT_MAN|COMPANY_ADMIN' "id='cancel' data-toggle='cubeui-menubutton' data-options=""{
+          onClick:cancel,
+          btnCls: 'cubeui-btn-black',
+          iconCls: 'fa fa-close'
+       }""")
+       
+  	#showhref('删除' 'javascript:void(0)' 'DEPARTMENT_MAN|COMPANY_ADMIN' "id='remove' data-toggle='cubeui-menubutton' data-options=""{
+          onClick:deleterow,
+          btnCls: 'cubeui-btn-red',
+          iconCls: 'fa fa-trash'
+       }""")
+ 	<form id="queryForm" class="search-box">
+    	<input type="text" name="namelike" data-toggle="cubeui-textbox"
+               data-options="id:'namelike',
+               prompt:'按员工名称，编号，手机号模糊查找',width:250">
+        <a href="javascript:void(0)"
+           data-toggle="cubeui-menubutton"
+           data-options="method:'query',
+           iconCls:'fa fa-search',
+           btnCls:'cubeui-btn-blue',
+           form:{id:'queryForm'},
+           grid:{type:'datagrid','id':'employeeDg'}">查询</a>
+    </form>
+</div>
+
+
+<script>
+
+	
+    jquery(function () {
+        
+        $("#employeeDg").iDatagrid({
+
+			fitColumns:false,
+            idField:'ID',
+            sortName:'NAME',
+            sortOrder:"asc",
+            url:contextpath + '/system/employee/listjson',
+            singleSelect:true,
+            onDblClickRow:$.iGrid.EdatagridHandle.rowEditRowEventHanle(function(idx, row, colopts){
+            	
+            }),
+            columns: [[
+				{field: 'ID', title: '', checkbox: true}, 
+                {field: 'NAME', title: '#i18n('core.system.department.label.EMPLOYEENAME', '员工名称')',width:150, editor:{type:'textbox',options:{required:true}}, sortable: true, formatter:$.iGrid.tooltipformatter()},
+                {field: 'NO', title: '#i18n('core.system.department.label.EMPLOYEENO', '员工编号')',width:150, editor:{type:'textbox',options:{required:true}}, sortable: true, formatter:$.iGrid.tooltipformatter()},
+                {field: 'PHONE', title: '#i18n('core.system.department.label.EMPLOYEETEL', '手机号码')',width:150, editor:{type:'textbox',options:{required:true}}, sortable: true, formatter:$.iGrid.tooltipformatter()},
+                {field: 'DEPARTMENT', title: '#i18n('core.system.department.label.EMPLOYEEDEP', '所属部门')',width:150,sortable: false,
+                	editor:{type:'combogrid',options:{
+                	   prompt:'#i18n('core.system.department.label.EMPLOYEEDEP2', '员工所属部门')',
+                	   width:250,
+ 		               idField:'DEPARTMENTNAME',
+ 		               textField:'DEPARTMENTNAME',
+ 		               data:{rows:#json($departments)},
+ 		               panelWidth:400,
+ 		               
+ 		               columns:[[
+ 		                       {field: 'DEPARTMENTNAME', title: '#i18n('core.system.department.label.DEPARTMENTNAME', '部门名称')', width:200},
+ 		                       {field: 'DEPARTMENT_DEMO', title: '#i18n('core.system.department.label.DEPARTMENT_DEMO', '备注')', width:200}
+ 		                   ]]
+                	}}},
+                {field: 'CREATETIME', title: '#i18n('core.common.title.CREATETIME', '创建日期')', sortable: false, width:240}
+            ]]
+        });
+        
+    });
+  
+    addrow = $.iGrid.EdatagridHandle.addRowHandle('#employeeDg', function(){
+  
+    }, function(){
+    	return {NAME:'', NO:'', PHONE:''};
+    });
+    
+    deleterow = $.iGrid.EdatagridHandle.removeRowHandle('#employeeDg', function(){
+ 
+    	
+    }, function(rows, success){
+    	$.app.debug('remove rows:')
+    	$.app.debug(rows);
+    	
+    	if(rows && rows.length==1){
+    		if(rows[0].ID==null){
+    			success.apply();
+    			return ;
+    		}
+    	}
+    	
+    	var d = [];
+    	$.each(rows, function(idx, row){
+    		d.push(row.ID);
+    	});
+    	
+    	d = {id:d.join(',')};
+    	
+    	$.app.post(contextpath + '/system/employee/remove', d, function(data){
+    		success.apply();
+    		$('#employeeDg').datagrid('reload');
+			$.app.defaultOnsuccess(data);
+		}, null, '正在保存数据中......');
+    	
+    });
+    
+    save = $.iGrid.EdatagridHandle.saveHandle('#employeeDg', function(){
+    	
+    }, function(cs, success){
+    	$.app.debug('save');
+    	
+    	var d = [];
+		$.each(cs, function(idx, row){
+			var o = {};
+			o.ID = row.ID;
+			o.NAME = row.NAME;
+			o.NO = row.NO;
+			o.DEPARTMENT = row.DEPARTMENT;
+			o.PHONE = row.PHONE;
+			d.push(o);
+		});
+		
+		var d = {datas:$.extends.json.tostring(d)};
+		
+		$.app.post(contextpath + '/system/employee/save', d, function(data){
+			success.apply();
+			$('#employeeDg').datagrid('reload');
+			$.app.defaultOnsuccess(data);
+		}, null, '正在保存数据中......');
+		
+    	
+    });
+    
+    cancel = $.iGrid.EdatagridHandle.rollbackHandle('#employeeDg', function(){
+    	
+    }, function(cs, success){
+    	success.apply();
+    }, true);
+</script>
+</body>
+</html>

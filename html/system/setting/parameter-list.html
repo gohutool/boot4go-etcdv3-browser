@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	#parse("/WEB-INF/include/cude/public/global.evn.html")
+	#parse("/WEB-INF/include/cude/public/macro.html")
+	#parse("/WEB-INF/include/cude/public/head.html")
+</head>
+
+<body>
+<table id="userDg"></table>
+<!-- 表格工具栏开始     -->
+<div id="userDg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'datagrid',
+           id:'userDg'
+       }">
+    #showhref("#i18n('core.common.title.remove', '删除')" 'javascript:void(0)' "#ifdo($system, 'SYSPARAMETER_MAN|SYSTEM_ADMIN', 'PARAMETER_MAN|COMPANY_ADMIN')" "data-toggle='cubeui-menubutton'
+       data-options=""{
+       		disabled:true,
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-trash',
+            btnCls: 'cubeui-btn-brown',
+            confirmMsg: '#i18nhtml('core.common.message.confirminactive','确定需要删除勾选的{0}个记录？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                uncheckedMsg: '#i18nhtml('core.common.message.inactive_unchecked','请先勾选要删除的记录')'
+            },
+            url: contextpath + '/system/log/companywork/remove'
+        }""")
+        
+    #showhref("#i18nhtml('core.common.title.SAVE_MODIFICATION', '保存修改')" 'javascript:void(0)' "#ifdo($system, 'SYSPARAMETER_MAN|SYSTEM_ADMIN', 'PARAMETER_MAN|COMPANY_ADMIN')" "data-toggle='cubeui-menubutton'
+       data-options=""{
+            onClick: save,
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-save',
+            btnCls: 'cubeui-btn-blue'
+        }""")
+     
+     #showhref("#i18nhtml('core.common.title.ROLLBACK_MODIFICATION','撤销修改')" 'javascript:void(0)' "#ifdo($system, 'SYSPARAMETER_MAN|SYSTEM_ADMIN', 'PARAMETER_MAN|COMPANY_ADMIN')" "data-toggle='cubeui-menubutton'
+       data-options=""{
+            onClick: rollback,
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-mail-reply',
+            btnCls: 'cubeui-btn-orange'
+        }""")     
+    <form id="queryForm" class="search-box">               
+	    <input type="text" name="no" data-toggle="cubeui-textbox"
+		               data-options="prompt:'#i18nhtml('core.system.setting.message.PARAMETER_NAME_QUERY_PROMPT','参数名或参数代码模糊查询')',width:200">
+		#if($system)              
+	    <input type="text" name="systemtag" data-toggle="cubeui-combobox"
+		               data-options="
+		               prompt:'#i18nhtml('core.system.setting.label.PARAMETER_LEVEL_QUERY','级别查询')',width:200,panelHeight:100,
+		               data:[{value:-1,text:'#i18nhtml('core.system.setting.label.PARAMETER_LEVEL_ALL','所有级别')'}, {value:1,text:'#i18nhtml('core.system.setting.label.PARAMETER_LEVEL_SYSTEM','系统级别')'},{value:2,text:'#i18nhtml('core.system.setting.label.PARAMETER_LEVEL_COMPANY','公司级别')'}]">
+       #end
+        <a href="javascript:void(0)"
+           data-toggle="cubeui-menubutton"
+           data-options="method:'query',
+           iconCls:'fa fa-search',
+           btnCls:'cubeui-btn-blue',
+           form:{id:'queryForm'},
+           grid:{type:'datagrid','id':'userDg'}">#i18n('core.common.title.search', '查询')</a>
+    </form>
+</div>
+<!-- 表格工具栏结束 -->
+
+<!-- 表格行编辑窗口 -->
+<form id="editDialog"></form>
+<!-- 
+url:#ifdo($system, "contextpath + '/system/setting/parameter/system/listjson'", "contextpath + '/system/setting/parameter/company/listjson'");
+ -->
+<script>
+
+    jquery(function () {
+        
+        $("#userDg").iDatagrid({
+            url: #ifdo($system, "contextpath + '/system/setting/parameter/system/listjson'", "contextpath + '/system/setting/parameter/company/listjson'"),
+            idField:'NO',
+            sortName:'NAME',
+            sortOrder:"asc",
+            onClickCell:$.iGrid.EdatagridHandle.cellClickHanle(
+                	function(col, row, editor, index, field){
+            			$.app.debug(arguments);
+            			
+            			if(field!='VALUE')
+            				return editor;
+            			
+            			if(row.TYPE==1){ // input 
+            				return {type:'textbox',options:{height:30,required:true}};
+            			}
+            			else if(row.TYPE==5){ // singlecheckbox 
+            				return {type:'switchbutton',options:{width:20,on:'1',off:'0',onText:'#i18n('core.common.label.YES','是')',offText:'#i18n('core.common.label.NO','否')'}};
+            			}
+            			else
+            			{
+            			
+            			}	
+            	}),
+            onEndEdit: doend,
+            onAfterEdit:doafter,
+            columns: [[
+				/* {field: 'NO', title: '', checkbox: true}, */
+                {field: 'NO', title: '#i18n('core.system.setting.label.PARAMETERCODE','参数代码')', sortable: true, formatter:$.iGrid.templateformatter('{NO}')},
+                {field: 'NAME', title: '#i18n('core.system.setting.label.PARAMETERNAME','参数名')', sortable: true},
+                #if($system){field: 'SYSTEMTAG', title: '#i18n('core.system.setting.label.PARAMETERLEVEL','参数级别')', sortable: true,formatter:$.iGrid.checkedformatter(1, '#i18n('core.system.setting.label.PARAMETER_LEVEL_SYSTEM','系统级')', '#i18n('core.system.setting.label.PARAMETER_LEVEL_COMPANY','公司级')')},#end
+                {field: 'DESC', title: '#i18n('core.system.setting.label.PARAMETERDESC','参数描述')', width:300,sortable: false,formatter:$.iGrid.tooltipformatter()},
+                {field: 'VALUE', title: '#i18n('core.system.setting.label.PARAMETERVALUE','参数值(点击对应值进行编辑)')', width1:200,sortable: false,formatter:formatter},
+                {field: 'MAINKEY', title: '#i18n('core.system.setting.label.PARAMETERMAINKEY','')', sortable: false}
+            ]]
+        });
+        
+        
+        
+    });
+    
+    function doend(index,row,changes){
+    	$.app.debug('do end');
+    	$.app.debug(arguments);
+    }
+    
+	function doafter(index,row,changes){
+    	$.app.debug('do after');
+    	$.app.debug(arguments);
+    	
+    	if(changes.length>0){
+    		
+    	}
+    }
+	
+	function rollback(){
+		$.iGrid.EditCell.rollback('#userDg', null, true);
+	}
+	
+	function save(){
+		
+		$.iGrid.EditCell.save('#userDg', function(cs, success){
+			var d = [];
+			$.each(cs, function(idx, row){
+				var o = {};
+				o.id = row.ID;
+				o.value = row.VALUE;
+				o.no = row.NO;
+				o.type = row.TYPE;
+				d.push(o);
+			});
+			
+			var d = {datas:$.extends.json.tostring(d)};
+			$.app.post(contextpath + '/system/setting/parameter/#ifdo($system, 'system', 'company')/save', d, function(data){
+				success.apply();
+				$.app.defaultOnsuccess(data);
+			}, null, '#i18n('core.common.message.IN_PROGESS','数据处理中')');
+		});
+	}
+	
+	function formatter(value, rowData, rowIndex){
+
+		if(rowData.TYPE==1){ // input 
+			return $.iGrid.tooltipformatter()(value, rowData, rowIndex);
+		}
+		else if(rowData.TYPE==5){ // singlecheckbox 
+			return $.iGrid.checkedformatter(1, '#i18n('core.common.label.YES','是')', '#i18n('core.common.label.NO','否')')(value, rowData, rowIndex);
+		}
+		else
+		{
+			return $.iGrid.tooltipformatter()(value, rowData, rowIndex);
+		}
+	}
+</script>
+</body>
+</html>

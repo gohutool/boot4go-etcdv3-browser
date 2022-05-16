@@ -1,0 +1,82 @@
+#parse("/WEB-INF/include/cude/public/global.evn.html")
+#parse("/WEB-INF/include/cude/public/macro.html")
+<div style="margin: 0px;">
+</div>
+
+<div class="cubeui-fluid">
+    <fieldset>
+        <legend>#i18nhtml('core.common.title.baseinfo_mandatory', '基本信息(必填)')</legend>
+    </fieldset>
+    <input type='hidden' id='id' name='id' value='$!data.id'/>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18nhtml('core.system.user.label.ACCOUNT', '登录账号'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" id="email" name="email" value='$!data.email' data-toggle="cubeui-textbox" data-options="validType:['email','length[6, 40]'],required:true,prompt:'#i18nhtml('core.system.user.message.EMAIL_prompt', '用户的登录标识，用邮件标识，必须填写')'">
+            </div>
+        </div>
+    </div> 
+    
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18nhtml('core.system.user.label.FIRSTNAME', '姓'):</label>
+            <div class="cubeui-input-block">
+                <input type="text"  id="firstname" name="firstname" value='$!data.firstname' data-toggle="cubeui-textbox" data-options="validType:['length[1, 15]'],required:true,prompt:'#i18nhtml('core.system.user.message.FIRSTNAME_prompt', '用户的姓，必须填写')'">
+            </div>
+        </div>
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18nhtml('core.system.user.label.LASTNAME', '名'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" id="lastname" name="lastname" value='$!data.lastname' data-toggle="cubeui-textbox" data-options="validType:['length[1, 50]'],required:true,prompt:'#i18nhtml('core.system.user.message.LASTNAME_prompt', '用户的名，必须填写')'">
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18nhtml('core.system.user.label.SEX', '性别'):</label>
+            <div class="cubeui-input-block">
+                <input id='sex' name='sex' data-toggle="cubeui-switchbutton" #if(${data.sex}==1) checked #end
+                	data-options="onText:'#i18nhtml('core.system.user.label.SEX_MALE', '男')',offText:'#i18nhtml('core.system.user.label.SEX_FEMALE', '女')'">
+            </div>
+        </div>
+        
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18nhtml('core.system.user.label.TELL', '联系电话'):</label>
+            <div class="cubeui-input-block">
+                <input value='$!data.tell'  type="text" id="tell" name="tell"  data-toggle="cubeui-textbox"
+                       data-options="required:true,prompt:'#i18nhtml('core.system.user.message.TELL_prompt', '用户的联系电话,必须填写')',validType:['telephone']">
+            </div>
+        </div>
+    </div>
+    
+    <fieldset>
+        <legend>#i18nhtml('core.common.title.extrainfo_optional', '扩展信息(选填)')</legend>
+    </fieldset>
+    <!-- -->
+    <div class="cubeui-row">
+    	<div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">所属部门:</label>
+            <div class="cubeui-input-block">
+            	<input id="department" name="department" value="$!{data.department}"
+                       data-toggle="cubeui-combobox"
+                       data-options="required:true,prompt:'用户所属部门',
+                       valueField:'ID',
+                       textField:'DEPARTMENTNAME',
+                       data:#maplist2json_html($departments ['id', 'departmentname'])
+                       "/>
+            </div>
+        </div>
+    </div>
+     
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18nhtml('core.system.user.label.ADDRESS', '地址'):</label>
+            <div class="cubeui-input-block">
+                <input value='$!data.address' type="text" id="address" name="address"  data-toggle="cubeui-textbox" 
+                		data-options="validType:[length[0,200]]">
+            </div>
+        </div>
+    </div> 
+</div>

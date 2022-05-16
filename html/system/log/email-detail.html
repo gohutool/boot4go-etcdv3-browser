@@ -1,0 +1,63 @@
+#parse("/WEB-INF/include/cude/public/global.evn.html")
+#parse("/WEB-INF/include/cude/public/macro.html")
+<div style="margin: 0px;">
+</div>
+
+<div class="cubeui-fluid" dialogtitle="#html($!data.title)">
+ <fieldset>
+        <legend></legend>
+    </fieldset>
+    <input type='hidden' id='id' name='id' value='$!data.id'/>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18n('core.system.log.label.NOTIFY_MAIL_MAILTITLE','标题'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" id="title" readonly name=""title"" value='$!data.title' data-toggle="cubeui-textbox" data-options="readonly:true">
+            </div>
+        </div>
+    </div> 
+    
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_FROM','发件人'):</label>
+            <div class="cubeui-input-block">
+                <input type="text"  id="sendemail" readonly name="sendemail" value='$!data.sendemail' data-toggle="cubeui-textbox" data-options="readonly:true">
+            </div>
+        </div>
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_TO','收件人'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" id="receemail" readonly name="receemail" value='$!data.receemail' data-toggle="cubeui-textbox" data-options="readonly:true">
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_CREATETIME','创建日期'):</label>
+            <div class="cubeui-input-block">
+                <input value='$!data.createtime' readonly type="text" name="createtime"  data-toggle="cubeui-datetimebox"
+                       data-options="readonly:true">
+            </div>
+        </div>
+        
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_SENDTIME','发送日期'):</label>
+            <div class="cubeui-input-block">
+                <input value='$!data.sendtime'  readonly type="text" name="sendtime"  data-toggle="cubeui-datetimebox"
+                       data-options="readonly:true">
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_CONTENT','内容'):</label>
+            <div class="cubeui-input-block">
+                <input value='#html($!data.content)' type="text" id="content" name="content" data-toggle="cubeui-textarea" data-options="readonly:true,height:200">
+            </div>
+        </div>
+    </div> 
+</div>

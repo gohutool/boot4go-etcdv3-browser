@@ -1,0 +1,103 @@
+#parse("/WEB-INF/include/cude/public/global.evn.html")
+#parse("/WEB-INF/include/cude/public/macro.html")
+<input type='hidden' id='id' name='id' value='$!data.id'/>
+<input type="hidden" name="pid" value="$!pid">
+
+<div data-toggle="cubeui-layout" data-options="fit:true">
+    <div data-options="region:'center',title:'',fit:true,border:false,bodyCls:'border_right_bottom'">
+        <div data-toggle="cubeui-tabs" data-options="fit:true,border:false">
+            <div title="#i18nhtml('core.common.title.baseinfo','基本信息')" data-options="iconCls:'fa fa-th'">
+                <div class="cubeui-fluid">
+                    <fieldset>
+                        <legend>#i18nhtml('core.common.title.mandatory','必填信息')</legend>
+                    </fieldset>
+                    <div class="cubeui-row">
+                        <div class="cubeui-col-sm12">
+                            <label class="cubeui-form-label">#i18nhtml('core.system.role.label.ROLENAME','角色名称'):</label>
+                            <div class="cubeui-input-block">
+                                <input type="text" value='$!data.rolename' name="rolename" data-toggle="cubeui-textbox"
+                                       data-options="required:true,validType:['length[2,20]']">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cubeui-row">
+                        <div class="cubeui-col-sm12">
+                            <label class="cubeui-form-label">#i18nhtml('core.system.role.label.ROLE_DEMO','备注'):</label>
+                            <div class="cubeui-input-block">
+                                <input type="text" name="role_demo" value='#html($!data.role_demo)' data-toggle="cubeui-textarea"
+                                data-options="height:180,validType:['length[0,200]']">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 
+            <div title="角色权限" data-options="iconCls:'fa fa-th'">
+                <div class="cubeui-fluid">
+            		<fieldset>
+                        <legend>角色权限</legend>
+                    </fieldset>
+                    <div class="cubeui-row">
+                        <div class="cubeui-col-sm6">
+                            <label class="cubeui-form-label">上架日期</label>
+                            <div class="cubeui-input-block">
+                                <input type="text" name="sjdate" data-toggle="cubeui-datebox">
+                            </div>
+                        </div>
+                        <div class="cubeui-col-sm6">
+                            <label class="cubeui-form-label">销售单价</label>
+                            <div class="cubeui-input-block">
+                                <input type="text" name="sale_price" data-toggle="cubeui-numberspinner"
+                                       data-options="precision:2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cubeui-row">
+                        <div class="cubeui-col-sm12">
+                            <label class="cubeui-form-label">备注信息</label>
+                            <div class="cubeui-input-block">
+                                <input type="text" name="content" data-toggle="cubeui-textarea">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            -->
+            
+            <!-- 
+            <div title="相关用户" data-options="iconCls:'fa fa-th'">
+                <div class="cubeui-fluid">
+            		<fieldset>
+                        <legend>角色相关用户</legend>
+                    </fieldset>
+                    <div class="cubeui-row">
+                        <div class="cubeui-col-sm6">
+                            <label class="cubeui-form-label">上架日期</label>
+                            <div class="cubeui-input-block">
+                                <input type="text" name="sjdate" data-toggle="cubeui-datebox">
+                            </div>
+                        </div>
+                        <div class="cubeui-col-sm6">
+                            <label class="cubeui-form-label">销售单价</label>
+                            <div class="cubeui-input-block">
+                                <input type="text" name="sale_price" data-toggle="cubeui-numberspinner"
+                                       data-options="precision:2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cubeui-row">
+                        <div class="cubeui-col-sm12">
+                            <label class="cubeui-form-label">备注信息</label>
+                            <div class="cubeui-input-block">
+                                <input type="text" name="content" data-toggle="cubeui-textarea">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            -->
+            
+        </div>
+    </div>
+</div>

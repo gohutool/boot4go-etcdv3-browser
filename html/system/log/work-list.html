@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	#parse("/WEB-INF/include/cude/public/global.evn.html")
+	#parse("/WEB-INF/include/cude/public/macro.html")
+	#parse("/WEB-INF/include/cude/public/head.html")
+</head>
+
+<body>
+<table id="userDg"></table>
+
+<!-- 表格工具栏开始 -->
+<div id="userDg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'datagrid',
+           id:'userDg'
+       }">
+    
+   
+            
+    #showhref("#i18n('core.common.title.remove', '删除')" 'javascript:void(0)' 'USER_MAN|COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-trash',
+            btnCls: 'cubeui-btn-brown',
+            confirmMsg: '#i18nhtml('core.common.message.confirminactive','确定需要删除勾选的{0}个记录？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                param: 'ID:ID',
+                uncheckedMsg: '#i18nhtml('core.common.message.inactive_unchecked','请先勾选要删除的记录')'
+            },
+            url: contextpath + '/system/log/work/remove'
+        }""")
+      
+    <form id="queryForm" class="search-box">
+	    <input type="text" name="email" data-toggle="cubeui-textbox"
+		               data-options="prompt:'#i18nhtml('core.system.user.label.ACCOUNT', '登录账户')',width:200">
+		<input type="text" name="host" data-toggle="cubeui-textbox"
+		               data-options="prompt:'#i18nhtml('core.system.log.label.LOG_OPERIP', '操作IP')',width:150">
+		               
+		<input type="text" name="action" data-toggle="cubeui-textbox"
+		               data-options="prompt:'#i18nhtml('core.system.log.label.LOG_ACTIONNAME', '动作')',width:100">
+    	<input type="text" name="startdate" data-toggle="cubeui-datetimebox"
+               data-options="width:150,prompt:'#i18nhtml('core.common.label.STARTTIME', '起始时间')'">
+        <input type="text" name="enddate" data-toggle="cubeui-datetimebox"
+               data-options="width:150,prompt:'#i18nhtml('core.common.label.ENDTIME', '结束时间')'">
+        <a href="javascript:void(0)"
+           data-toggle="cubeui-menubutton"
+           data-options="method:'query',
+           iconCls:'fa fa-search',
+           btnCls:'cubeui-btn-blue',
+           form:{id:'queryForm'},
+           grid:{type:'datagrid','id':'userDg'}">#i18n('core.common.title.search', '查询')</a>
+    </form>
+</div>
+<!-- 表格工具栏结束 -->
+
+<!-- 表格行编辑窗口 -->
+<form id="editDialog"></form>
+
+<script>
+
+    jquery(function () {
+        
+        $("#userDg").iDatagrid({
+            url: contextpath + '/system/log/work/listjson',
+            idField:'ID',
+            sortName:'CREATETIME',
+            sortOrder:"desc",
+            columns: [[
+				{field: 'ID', title: '', checkbox: true},
+                {field: 'OPERNAME', title: '#i18n('core.system.user.label.USERNAME','用户姓名')', sortable: false},
+                {field: 'MODULE', title: '#i18n('core.common.label.MODULENAME','模块')', sortable: false},
+                {field: 'ACTION', title: '#i18n('core.system.log.label.LOG_ACTIONNAME','动作')', sortable: false},
+                {field: 'MAINKEY', title: '#i18n('core.system.log.label.LOG_RELATED_OBEJCT', '关联对象')', sortable: false},
+                {field: 'CONTENT', title: '#i18n('core.system.log.label.LOG_DETAIL', '详情')', width:400,sortable: false, formatter:$.iGrid.tooltipformatter()},
+                {field: 'HOST', title: '#i18n('core.system.log.label.LOG_OPERIP','操作IP')', sortable: false},
+                {field: 'BROWSER', title: '#i18n('core.system.user.label.BROWSER','浏览器')', width:150,sortable: false, formatter:$.iGrid.tooltipformatter()},
+                {field: 'CREATETIME', title: '#i18n('core.system.log.label.LOG_OPERTIME','操作时间')', sortable: true}
+            ]]
+        });
+    });
+    
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	#parse("/WEB-INF/include/cude/public/global.evn.html")
+	#parse("/WEB-INF/include/cude/public/macro.html")
+	#parse("/WEB-INF/include/cude/public/head.html")
+</head>
+
+<body>
+<table id="userDg"></table>
+
+<!-- 表格工具栏开始 -->
+<div id="userDg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'datagrid',
+           id:'userDg'
+       }">
+    
+   
+    #showhref("#i18nhtml('core.common.title.view', '查看')" 'javascript:void(0)' 'COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'openDialog',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-search',
+            btnCls: 'cubeui-btn-orange',
+            dialog: {
+                id: 'userAddDialog',
+                title: '#i18nhtml('core.common.title.view', '查看')',
+            	href:contextpath + '/system/notify/email/detail-{ID}'
+            },
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                uncheckedMsg: '#i18nhtml('core.common.message.confirmview', '请先勾选要查看的记录')'
+            }
+        }""")
+            
+    #showhref("#i18nhtml('core.system.log.title.MAIL_RESEND', '重新发送')" 'javascript:void(0)' 'COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-envelope',
+            btnCls: 'cubeui-btn-green',
+            confirmMsg: '#i18nhtml('core.system.log.message.NOTIFY_MAIL_LOG_RESEND_CONFIRM', '确定需要重新发送勾选的{0}个记录？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                param: 'ID:ID',
+                uncheckedMsg: '#i18nhtml('core.system.log.message.NOTIFY_MAIL_LOG_RESEND_UNSELECT', '请先勾选要重新发送的记录')'
+            },
+            url: contextpath + '/system/notify/email/resend'
+        }""")
+            
+    #showhref("#i18n('core.common.title.remove', '删除')" 'javascript:void(0)' 'COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#userDg-toolbar',
+            iconCls: 'fa fa-trash',
+            btnCls: 'cubeui-btn-brown',
+            confirmMsg: '#i18n('core.system.log.message.NOTIFY_MAIL_LOG_REMOVE_CONFIRM', '确定需要删除勾选的{0}个记录？')',
+            grid: {
+                type: 'datagrid',
+                id: 'userDg',
+                param: 'ID:ID',
+                uncheckedMsg: '#i18nhtml('core.system.log.message.NOTIFY_MAIL_LOG_REMOVE_UNSELEC', '请先勾选要删除的记录')'
+            },
+            url: contextpath + '/system/notify/email/remove'
+        }""")
+      
+    <form id="queryForm" class="search-box">
+	    <input type="text" name="title" data-toggle="cubeui-textbox"
+	               data-options="prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_TITLE_QUERY_PROMPT', '标题，内容模糊搜索')',width:150">
+	    
+		<input type="text" name="sendemail" data-toggle="cubeui-textbox"
+		               data-options="prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_FORM_QUERY_PROMPT', '发件人模糊搜索')',width:150">
+		               
+		<input type="text" name="receemail" data-toggle="cubeui-textbox"
+		               data-options="prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_TO_QUERY_PROMPT', '收件人模糊搜索')',width:150">
+		               
+    	<input type="text" name="startdate" data-toggle="cubeui-datetimebox"
+               data-options="width:150,prompt:'#i18nhtml('core.common.label.STARTTIME', '起始时间')'">
+        <input type="text" name="enddate" data-toggle="cubeui-datetimebox"
+               data-options="width:150,prompt:'#i18nhtml('core.common.label.ENDTIME', '结束时间')'">
+               
+        <a id='querybtn' href="javascript:void(0)"
+           data-toggle="cubeui-menubutton"
+           data-options="method:'query',
+           iconCls:'fa fa-search',
+           btnCls:'cubeui-btn-blue',
+           form:{id:'queryForm'},
+           grid:{type:'datagrid','id':'userDg'}">#i18n('core.common.title.search', '查询')</a>
+           
+        
+    </form>
+</div>
+<!-- 表格工具栏结束 -->
+
+<!-- 表格行编辑窗口 -->
+<form id="editDialog"></form>
+
+<script>
+
+    jquery(function () {
+        
+        $("#userDg").iDatagrid({
+            url: contextpath + '/system/notify/email/listjson',
+            idField:'ID',
+            sortName:'CREATETIME',
+            sortOrder:"desc",
+            columns: [[
+				{field: 'ID', title: '', checkbox: true},
+                {field: 'TITLE', title: '#i18n('core.system.log.label.NOTIFY_MAIL_MAILTITLE','标题')', width:100, sortable: true, formatter:$.iGrid.tooltipformatter()},
+                {field: 'CONTENT', title: '#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_CONTENT','内容')', width:400, sortable: false, formatter:$.iGrid.tooltipformatter()},
+                {field: 'SENDEMAIL', title: '#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_FROM','发件人')', sortable: false},
+                {field: 'RECEEMAIL', title: '#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_TO','收件人')', sortable: false},
+                {field: 'STATUS', title: '#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_STATUS','状态')', sortable: false,formatter:$.iGrid.checkedformatter(1, '已发送', '未发送')},
+                {field: 'CREATETIME', title: '#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_CREATETIME','创建日期')', sortable: true},
+                {field: 'SENDTIME', title: '#i18n('core.system.log.label.NOTIFY_MAIL_MAIL_SENDTIME','发送日期')', sortable: true}
+            ]]
+        });
+    });
+    
+</script>
+</body>
+</html>

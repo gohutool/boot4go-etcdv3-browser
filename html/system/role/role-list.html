@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+	#parse("/WEB-INF/include/cude/public/global.evn.html")
+	#parse("/WEB-INF/include/cude/public/macro.html")
+	#parse("/WEB-INF/include/cude/public/head.html")
+</head>
+
+<body>
+<table  style="margin: 10px;" data-toggle="cubeui-treegrid"
+               data-options="id:'roleTg',
+			   idField:'ID',
+			   singleSelect:true,
+			   checkOnSelect:true,
+			   selectOnCheck:true,
+			   treeField:'ROLENAME',
+			   loadFilter:function(data,parentId){
+			   		var v = $.extends.arrayToTree(data, 'ID', 'ROLE_PARENTID');
+			   		return v;
+			   },
+			   checkbox:false,
+			   url:contextpath+'/system/role/listjson'">
+    <thead>
+    <tr>
+    	<th data-options="field:'ID',title:'',checkbox:true"></th>
+        <th data-options="field:'ROLENAME',title:'#i18nhtml('core.system.role.label.ROLENAME', '角色名称')',width:150"></th>
+        <th data-options="field:'ROLE_DEMO',title:'#i18nhtml('core.system.role.label.ROLE_DEMO', '备注')',width:400"></th>
+        <th data-options="field:'ROLE_SYSTEMTAG',title:'#i18nhtml('core.common.title.RESERVERED', '系统保留')',align:'center',width:90,formatter:$.iGrid.checkedformatter(1, '<span class=&quot;cube-label cube-label-blue&quot;>#i18nhtml('core.common.title.SYSTEM_DEFINED', '系统设定')</span>', '  ')"></th>
+        <th data-options="field:'operate',title:'#i18nhtml('core.common.title.OPERATION','操作')',formatter:operateFormatter"></th>
+    </tr>
+    </thead>
+</table>
+
+<!-- 表格工具栏开始 -->
+<div id="roleTg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'treegrid',
+           id:'roleTg'
+       }">
+    
+    
+    #showhref('新增角色' 'javascript:void(0)' 'ROLE_MAN|COMPANY_ADMIN' "id='add1' data-toggle='cubeui-menubutton' data-options=""{
+            onClick: openNewDiag,
+            btnCls: 'cubeui-btn-orange',
+            iconCls: 'fa fa-plus'
+        }""")
+   
+    #showhref('刷新' 'javascript:void(0)' 'ROLE_MAN|COMPANY_ADMIN' "id='refresh' data-toggle='cubeui-menubutton' data-options=""{
+            onClick: refresh,
+            btnCls: 'cubeui-btn-blue',
+            iconCls: 'fa fa-refresh'
+        }""")
+        
+            
+</div>
+<!-- 表格工具栏结束 -->
+
+<!-- 表格行编辑窗口 -->
+<form id="editDialog"></form>
+
+<script>
+
+function operateFormatter(value, row, index) {
+	var htmlstr = "";
+	var disabled = '';
+	var disabledclass = '';
+	
+	if(row.ROLE_SYSTEMTAG){
+		disabled = ' disabled ';
+		disabledclass = 'layui-btn-disabled';
+	}
+		
+	
+	htmlstr += '<button class="layui-btn layui-btn-xs" onclick="openUserDiag(\'' + row.ID + '\')">#i18nhtml('core.system.role.title.ASSIGNED_USER', '授权用户')</button>';
+	htmlstr += '<button class="layui-btn layui-btn-xs" onclick="openNewDiag(\'' + row.ID + '\')">#i18nhtml('core.system.role.title.ADD_CHILDROLE', '添加子角色')</button>';
+	
+	htmlstr += '<button ' + disabled+ 'class="layui-btn '+ disabledclass +' layui-btn-xs" onclick="openEditDiag(\'' + row.ID + '\')">#i18nhtml('core.common.title.edit', '编辑')</button>';
+	htmlstr += '<button ' + disabled+ 'class="layui-btn '+ disabledclass +' layui-btn-xs" onclick="openPrivDiag(\'' + row.ID + '\')">#i18nhtml('core.system.role.label.ROLE_PERMISSION', '权限')</button>';
+	htmlstr += '<button ' + disabled+ 'class="layui-btn '+ disabledclass +' layui-btn-xs layui-btn-danger" onclick="openMoveDiag(\'' + row.ID + '\')">#i18nhtml('core.common.title.move', '移动')</button>';
+    
+	if(row.children && row.children.length>0){
+		disabled = ' disabled ';
+		disabledclass = 'layui-btn-disabled';
+	}
+	
+	htmlstr += '<button ' + disabled+ 'class="layui-btn '+ disabledclass +' layui-btn-xs layui-btn-danger" onclick="deleteRow(\'' + row.ID + '\')">#i18nhtml('core.common.title.remove', '删除')</button>';
+
+    return htmlstr;
+}
+
+var reloadcfg = [{type:'treegrid', id:'roleTg', keepcheck:1}];
+
+function refresh(){
+	$('#roleTg').treegrid('reload');
+}
+
+function openNewDiag(pid){
+	pid = pid || '0';
+	
+	$.iDialog.openDialog({
+        title: '#i18n('core.system.role.title.ADD_ROLE', '添加角色')',
+		width: 750,
+		height: 450,
+        cache: false,
+        href: contextpath + '/system/role/detail/new?pid='+pid,
+        buttonsGroup: [{
+            text: '#i18n('core.common.title.save', '保存')',
+            iconCls: 'fa fa-save',
+            btnCls: 'cubeui-btn-blue',
+            handler:'ajaxForm',
+            reload:reloadcfg,
+            url:contextpath + '/system/role/detail/save'
+        }]
+    })
+}
+
+function openEditDiag(id){
+	$.iDialog.openDialog({
+        title: '#i18n('core.system.role.title.MODIFY_ROLE', '编辑角色')',
+		width: 750,
+		height: 450,
+        cache: false,
+        href: contextpath + '/system/role/detail/'+id,
+        buttonsGroup: [{
+            text: '#i18n('core.common.title.save', '保存')',
+            iconCls: 'fa fa-save',
+            reload:reloadcfg,
+            btnCls: 'cubeui-btn-blue',
+            handler:'ajaxForm',
+            url:contextpath + '/system/role/detail/save'
+        }]
+    });
+}
+ 
+function openMoveDiag(id){
+	$.iDialog.openDialog({
+        title: '#i18n('core.system.role.title.MOVE_ROLE', '移动角色')',
+		width: 800,
+		height: 450,
+        cache: false,
+        href: contextpath + '/system/role/detail/moveselect?id='+id,
+        buttonsGroup: [{
+            text: '#i18n('core.common.title.move', '移动')',
+            iconCls: 'fa fa-save',
+            btnCls: 'cubeui-btn-blue',
+            handler: function(){
+            	var btnobj = this;
+            	
+            	$.app.debug(this);
+            	var d = $.iGrid.checkedRowDatas2Array('roleselectTg', 'ID');
+            	
+            	var digid = $.iDialog.findDialogId4Button(btnobj);
+            	
+            	var id = $('#'+digid+' #id').val();
+            	
+            	$.app.confirm('#i18n('core.system.role.message.ARE_SURE_MOVE', '确定将移动到当前选中的角色。')', function(){
+
+            		$.app.post(contextpath + '/system/role/detail/move', 
+                			{pid:d.join(','), id:id}, function(data){
+                				$.app.closeDialog(digid);
+                				$.app.defaultOnsuccess(data);
+                				refresh();
+                				
+                			}, null, '#i18n('core.common.message.IN_PROGESS', '数据处理中.....')');
+                	
+            	});
+            	
+            	
+            }
+        }]
+    })
+}
+
+function openPrivDiag(id){
+	$.iDialog.openDialog({
+        title: '#i18n('core.system.role.title.ASSIGN_PERMISSION', '编辑角色功能权限')',
+		width: 800,
+		height: 450,
+        cache: false,
+        href: contextpath + '/system/role/detail/'+id +'?view=privs',
+        buttonsGroup: [{
+            text: '#i18n('core.system.role.title.SAVE_PERMISSION', '保存权限')',
+            iconCls: 'fa fa-save',
+            reload:reloadcfg,
+            btnCls: 'cubeui-btn-blue',
+            //handler1: 'ajaxForm',  // as the cascade checkbox can be deal, we implement the ajax by self.
+            //url1:contextpath + '/system/role/detail/saveprivs',
+            handler: function(){
+            	var btnobj = this;
+            	
+            	$.app.debug(this);
+            	var d = $.iGrid.checkedNodeDatas2Array('functionTg', 'FUNCTIONID');
+            	
+            	var digid = $.iDialog.findDialogId4Button(btnobj);
+            	
+            	var id = $('#'+digid+' #id').val();
+            	
+            	$.app.post(contextpath + '/system/role/detail/saveprivs', 
+            			{fid:d.join(','), id:id}, function(data){
+            				$.app.closeDialog(digid);
+            				$.app.defaultOnsuccess(data);
+            			}, null, '#i18n('core.common.message.IN_PROGESS', '数据处理中.....')');
+            	$.app.debug(d);
+            }
+        }]
+    });
+}
+
+function openUserDiag(id){
+	$.iDialog.openDialog({
+        title: '#i18n('core.system.role.title.ASSIGN_USER','授权用户列表')',
+		width: 800,
+		height: 450,
+        cache: false,
+        href: contextpath + '/system/role/detail/'+id +'?view=users'
+    });
+}
+
+function deleteRow(id){
+	$.app.confirm('#i18n('core.system.role.message.ARE_SURE_REMOVE', '确定删除已经选中的角色,删除后相关该角色的数据将不能访问。')', function(){
+
+		$.app.post(contextpath + '/system/role/detail/remove', 'id='+id, function(data){
+			$.app.defaultOnsuccess(data);
+			refresh();
+		}, null, #i18n('core.common.message.IN_PROGESS', '数据处理中.....'));
+	});
+}
+</script>
+</body>
+</html>

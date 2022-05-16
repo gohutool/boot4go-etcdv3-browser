@@ -1,0 +1,149 @@
+#parse("/WEB-INF/include/cude/public/global.evn.html")
+#parse("/WEB-INF/include/cude/public/macro.html")
+<div style="margin: 0px;">
+</div>
+
+<div class="cubeui-fluid">
+    <fieldset>
+        <legend>#i18nhtml('core.common.title.baseinfo','基本信息')</legend>
+    </fieldset>
+    <input type='hidden' id='id' name='id' value='$!data.id'/>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18nhtml('core.system.log.label.NOTIFY_MAIL_ACCOUNTNAME','账户名称'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" name="name" 
+	                value='$!data.name' 
+	                data-toggle="cubeui-textbox" 
+	                data-options="
+	                	validType:['length[2, 40]'],
+	                	required:true,
+	                	prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_ACCOUNTNAME_PROMPT','账户名称，必须填写')'">
+            </div>
+        </div>
+    </div> 
+    
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18nhtml('core.system.log.label.NOTIFY_MAIL_ACCOUNT_FROM', '邮件来自'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" name="title" 
+                	value='$!data.title' 
+                	data-toggle="cubeui-textbox" 
+                	data-options="
+                		validType:['email','length[6, 40]'],
+                		required:false,
+                		prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_ACCOUNT_FROM_PROMPT', '邮件来自(发送邮件的地址)，可选填写')'">
+            </div>
+        </div>
+    </div> 
+    
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">#i18nhtml('core.system.log.label.NOTIFY_MAIL_ACCOUNT_DEMO', '账户备注'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" name="demo" 
+                	value='$!data.demo' 
+                	data-toggle="cubeui-textbox" 
+                	data-options="
+                		validType:['length[1, 50]'],
+                		required:false,
+                		prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_ACCOUNT_DEMO_PROMPT', '账户备注，可选填写')'">
+            </div>
+        </div>
+    </div> 
+    
+    <fieldset>
+        <legend>#i18nhtml('core.system.log.label.NOTIFY_MAIL_SERVER_CONFIG', '邮件服务器账号配置')</legend>
+    </fieldset>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18nhtml('core.system.log.label.NOTIFY_MAIL_SERVER_ACCOUNT', '邮箱登录账户'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" name="account" 
+                	value='$!data.account' 
+                	data-toggle="cubeui-textbox" 
+                	data-options="
+                		validType:['length[1, 35]'],
+                		required:true,
+                		prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_SERVER_ACCOUNT_PROMPT', '邮箱登录账户，必须填写')'">
+            </div>
+        </div>
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18nhtml('core.system.log.label.NOTIFY_MAIL_SERVER_PASSWORD', '邮箱账户密码'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" name="password" 
+                	value='$!data.password' 
+                	data-toggle="cubeui-passwordbox" 
+                	data-options="
+                		validType:['length[1, 35]'],
+                		required:true,
+                		prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_SERVER_PASSWORD_PROMPT', '邮箱登录密码，必须填写')'">
+            </div>
+        </div>
+    </div>
+    
+    <fieldset>
+        <legend>#i18nhtml('core.system.log.label.NOTIFY_MAIL_SMTPSERVER_CONFIG', '邮件发送服务器')</legend>
+    </fieldset>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18nhtml('core.system.log.label.NOTIFY_MAIL_SMTPSERVER_IP', '服务器地址'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" name="smtpserver" 
+                	value='$!data.smtpserver' 
+                	data-toggle="cubeui-textbox" 
+                	data-options="
+                		validType:['length[1, 35]'],
+                		required:true,
+                		prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_SMTPSERVER_IP_PROMPT', '发送服务器地址，必须填写')'">
+            </div>
+        </div>
+        
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18nhtml('core.system.log.label.NOTIFY_MAIL_SMTPSERVER_PORT', '端口'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" name="smtpport" 
+                	value='#isNull($!data.smtpport,'25')' 
+                	data-toggle="cubeui-numberspinner" 
+                	data-options="
+                		min:1,max:60000,
+                		required:true,
+                		prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_SMTPSERVER_PORT_PROMPT', '端口，输入范围1到60000之间')'">
+            </div>
+        </div>
+    </div>
+    
+    <fieldset>
+        <legend>#i18nhtml('core.system.log.label.NOTIFY_MAIL_POPSERVER_CONFIG', '邮件接收服务器')</legend>
+    </fieldset>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18nhtml('core.system.log.label.NOTIFY_MAIL_POPSERVER_IP', '服务器地址'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" name="popserver" 
+                	value='$!data.popserver' 
+                	data-toggle="cubeui-textbox" 
+                	data-options="
+                		validType:['length[1, 35]'],
+                		required:true,
+                		prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_POPSERVER_IP_PROMPT', '接收服务器地址，必须填写')'">
+            </div>
+        </div>
+        
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">#i18nhtml('core.system.log.label.NOTIFY_MAIL_POPSERVER_PORT', '端口'):</label>
+            <div class="cubeui-input-block">
+                <input type="text" name="popport" 
+                	value='#isNull($!data.popport,'143')' 
+                	data-toggle="cubeui-numberspinner" 
+                	data-options="
+                		min:1,max:60000,
+                		required:true,
+                		prompt:'#i18nhtml('core.system.log.message.NOTIFY_MAIL_POPSERVER_PORT_PROMPT', '端口，输入范围1到60000之间')'">
+            </div>
+        </div>
+    </div>
+    
+
+</div>

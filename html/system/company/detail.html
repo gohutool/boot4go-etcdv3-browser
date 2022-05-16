@@ -1,0 +1,122 @@
+<div style="margin: 0px;">
+</div>
+
+<div class="cubeui-fluid" id="company-detail-form">
+    <fieldset>
+        <legend>基本信息(必填)</legend>
+    </fieldset>
+    <input type='hidden' id='id' name='id' value1='$!data.id'/>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">企业标识:</label>
+            <div class="cubeui-input-block">
+                <input type="text" id="companyno" name="companyno" value1='$!data.companyno' data-toggle="cubeui-textbox" data-options="required:true,prompt:'公司的标识，必须填写'">
+            </div>
+        </div>
+    </div> 
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">企业名称:</label>
+            <div class="cubeui-input-block">
+                <input type="text" data-toggle="cubeui-textbox" id="companyname" name="companyname" value1='#html($!data.companyname)' data-options="required:true,prompt:'公司的名称，必须填写'">
+            </div>
+        </div>
+    </div> 
+
+    <div class="cubeui-row">
+        <label class="cubeui-form-label">开通系统:</label>
+            <div class="cubeui-input-block">
+            	<input type="text" id="modules" name="modules" value1=""  data-toggle="cubeui-tagbox"
+                       data-options="required:true,
+                       		   prompt:'企业开通的系统',
+                               hasDownArrow:true,
+                               textField:'NAME',
+                               limitToList: true,
+                               valueField:'ID',
+                               data:[]">
+             <!--                   
+                <input  id="modules" name="modules" value1='$!{data.modules}"
+                       data-toggle="cubeui-combobox"
+                       data-options="prompt:'企业开通的注册类型',multiple:true,required:true,valueField:'ID',textField:'NAME',value:#split2json_html($!{data.modules}),data:#maplist2json_html($moduletypes ['id', 'NAME'])"/>
+                        -->
+         </div>
+    </div> 
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">开户类型:</label>
+            <div class="cubeui-input-block">
+            
+            <input id="registertype" name="registertype" value1=''
+                       data-toggle="cubeui-combobox"
+                       data-options="prompt:'企业开通的注册类型',required:true,valueField:'code',data:[{code:'1', text:'网络版用户'},{code:'2', text:'单机版用户'},{code:'3', text:'演示'},{code:'-1', text:'系统用户'}]"/>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">注册邮箱:</label>
+            <div class="cubeui-input-block">
+                <input value1='$!data.email' type="text"  id="email" name="email" data-toggle="cubeui-textbox" data-options="required:true,validType:['email']">
+            </div>
+        </div>
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">有效日期:</label>
+            <div class="cubeui-input-block">
+                <input value='$!data.getDateStr("enddate","")' type="text" id="enddate" name="enddate" data-toggle="cubeui-datebox" data-options="prompt:'企业有效期到期日',required:true">
+            </div>
+        </div>
+    </div>
+    
+    <!-- -->
+    <fieldset>
+        <legend>扩展信息(选填)</legend>
+    </fieldset>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">网站地址:</label>
+            <div class="cubeui-input-block">
+                <input type="text" id="website" name="website" data-toggle="cubeui-textbox" data-options="validType:['url']">
+            </div>
+        </div>
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">办公地址:</label>
+            <div class="cubeui-input-block">
+                <input value1='$!data.address' type="text" id="address" name="address"  data-toggle="cubeui-textbox">
+            </div>
+        </div>
+    </div>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">联系人:</label>
+            <div class="cubeui-input-block">
+                <input value1='#html($!data.contact)' type="text" id="contact" name="contact"
+                       data-toggle="cubeui-textbox">
+            </div>
+        </div>
+        <div class="cubeui-col-sm6">
+            <label class="cubeui-form-label">联系电话:</label>
+            <div class="cubeui-input-block">
+                <input value='{{:test}}'  type="text" id="telphone" name="telphone"  data-toggle="cubeui-textbox"
+                       data-options="validType:['telephone']">
+            </div>
+        </div>
+    </div>
+    <div class="cubeui-row">
+        <div class="cubeui-col-sm12">
+            <label class="cubeui-form-label">备注信息</label>
+            <div class="cubeui-input-block">
+                <input value1='#html($!data.company_demo)' type="text" id="company_demo" name="company_demo" data-toggle="cubeui-textarea">
+            </div>
+        </div>
+    </div>
+</div>
+<template-func>
+
+    console.log("url : " + window.location.href)
+    console.log("id : " + getUrlParam("id"))
+
+    renderHandler.render({test:"Hello world"})
+
+    $("#userAddDialog").dialog('setTitle', "11111111111111111111")
+</template-func>

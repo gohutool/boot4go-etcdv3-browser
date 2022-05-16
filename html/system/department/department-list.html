@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+	#parse("/WEB-INF/include/cude/public/global.evn.html")
+	#parse("/WEB-INF/include/cude/public/macro.html")
+	#parse("/WEB-INF/include/cude/public/head.html")
+</head>
+
+<body>
+<table id="departmentDg"></table>
+
+<!-- 表格工具栏开始 -->
+<div id="departmentDg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'datagrid',
+           id:'departmentDg'
+       }">
+    
+   
+    #showhref("#i18n('core.common.title.add', '新增')" 'javascript:void(0)' 'DEPARTMENT_MAN|COMPANY_ADMIN' "id='add1' data-toggle='cubeui-menubutton' data-options=""{
+            method: 'openDialog',
+            extend: '#departmentDg-toolbar',
+            btnCls: 'cubeui-btn-orange',
+            iconCls: 'fa fa-plus',
+            dialog: {
+                id: 'userAddDialog',
+                title: '#i18n('core.system.department.title.add', '添加新部门')',
+                href: contextpath + '/system/department/detail/new',
+                buttonsGroup: [
+                    {
+                        text: '#i18n('core.common.title.save', '保存')',
+                        url: contextpath + '/system/department/detail/save',
+                        iconCls: 'fa fa-plus',
+                        handler: 'ajaxForm',
+                        btnCls: 'cubeui-btn-brown'
+                    }
+                ]
+            }
+        }""")
+        
+    #showhref("#i18n('core.common.title.edit', '编辑')" 'javascript:void(0)' 'DEPARTMENT_MAN|COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{method: 'openDialog',
+            extend: '#departmentDg-toolbar',
+            iconCls: 'fa fa-pencil',
+            btnCls: 'cubeui-btn-green',
+            dialog: {
+                title:'#i18n('core.system.department.title.edit', '编辑部门')',
+                height: 400,
+                height: 400,
+                href: contextpath + '/system/department/detail/{ID}',
+                
+                buttonsGroup: [
+                    {
+                        text: '#i18n('core.common.title.save', '保存')',
+                        url: contextpath + '/system/department/detail/save',
+                        iconCls: 'fa fa-save',
+                        handler: 'ajaxForm',
+                        btnCls: 'cubeui-btn-green'
+                    }
+                ]
+            }
+          }""")
+            
+    #showhref("#i18n('core.common.title.remove', '删除')" 'javascript:void(0)' 'DEPARTMENT_MAN|COMPANY_ADMIN' "data-toggle='cubeui-menubutton'
+       data-options=""{
+            method: 'doAjax',
+            extend: '#departmentDg-toolbar',
+            iconCls: 'fa fa-trash',
+            btnCls: 'cubeui-btn-brown',
+            confirmMsg: '#i18n('core.system.department.message.confirmdelete', '确定需要删除勾选的{0}家部门？')',
+            grid: {
+                type: 'datagrid',
+                id: 'departmentDg',
+                uncheckedMsg: '#i18n('core.system.department.message.unchecked', '请先勾选要删除的部门')'
+            },
+            url: contextpath + '/system/department/detail/remove'
+        }""")
+      
+       
+    <form id="queryForm" class="search-box">
+        <input type="text" name="departmentname" data-toggle="cubeui-textbox"
+               data-options="id:'departmentname',prompt:'#i18n('core.system.department.message.name_filter_prompt', '部门名称模糊查询')',width:200">
+        <a href="javascript:void(0)"
+           data-toggle="cubeui-menubutton"
+           data-options="method:'query',
+           iconCls:'fa fa-search',
+           btnCls:'cubeui-btn-blue',
+           form:{id:'queryForm'},
+           grid:{type:'datagrid','id':'departmentDg'}">#i18n('core.common.title.search', '查询')</a>
+    </form>
+</div>
+<!-- 表格工具栏结束 -->
+
+<!-- 表格行编辑窗口 -->
+<form id="editDialog"></form>
+
+<script>
+
+    jquery(function () {
+        
+        $("#departmentDg").iDatagrid({
+            url: contextpath + '/system/department/listjson',
+            idField:'ID',
+            sortName:'DEPARTMENTNAME',
+            sortOrder:"asc",
+            columns: [[
+				{field: 'ID', title: '', checkbox: true},
+                {field: 'DEPARTMENTNAME', title: '#i18n('core.system.department.label.DEPARTMENTNAME', '部门名称')',sortable: true, width:'240px'},
+                {field: 'DEPARTMENT_DEMO', title: '#i18n('core.system.department.label.DEPARTMENT_DEMO', '备注')',width:'100px', sortable: true},
+                {field: 'DEPARTMENT_SYSTEMTAG', title: '#i18n('core.system.department.label.DEPARTMENT_SYSTEMTAG', '系统保留')',formatter:$.iGrid.checkedformatter(),align:'center', sortable: false, width:'100px'},
+                {field: 'DEPARTMENT_CREATETIME', title: '#i18n('core.common.title.CREATETIME', '创建日期')', sortable: false, width:240}
+            ]]
+        });
+    });
+    
+</script>
+</body>
+</html>

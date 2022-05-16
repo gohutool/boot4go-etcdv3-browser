@@ -1,0 +1,42 @@
+#parse("/WEB-INF/include/cude/public/global.evn.html")
+#parse("/WEB-INF/include/cude/public/macro.html")
+<!-- <fieldset style='margin-top: 10px!important;'>
+        <legend>基本信息(必填)</legend>
+    </fieldset> -->
+
+
+   
+	<table dialogtitle="#i18nhtml('core.system.company.title.permission','设定公司权限')-#html($!data.companyname)" style="margin: 10px;" data-toggle="cubeui-treegrid"
+               data-options="id:'functionTg',
+			   idField:'FUNCTIONID',
+			   treeField:'FUNCTIONNAME',
+			   checkbox:function(row){
+			   	if(row.FUNCTION_ISSYS==1||row.FUNCTION_SYSTEMTAG==1)
+			   		return false;
+			   	else
+			   		return true;
+			   },
+			   checkedNodes:#json_html($selectedlist),
+			   data:$.extends.arrayToTree(#json_html($nodes) , 'FUNCTIONID', 'FUNCTION_PID')">
+            <thead>
+            <tr>
+                <th data-options="field:'FUNCTIONNAME',title:'#i18nhtml('core.system.company.label.FUNCTIONNAME','功能名称')',width:400,formatter:$.iGrid.templateformatter('{FUNCTIONNAME2}')"></th>
+                <th data-options="field:'FUNCTION_ISSYS',title:'#i18nhtml('core.system.company.label.RESERVERED','系统保留')',width:200,formatter:$.iGrid.evalconditionformatter(['rowData.FUNCTION_ISSYS==1', 'rowData.FUNCTION_SYSTEMTAG==1'], ['<span class=&quot;cube-label cube-label-red&quot;>#i18nhtml('core.common.title.SYSTEM_LEVEL','系统级别')</span>','<span class=&quot;cube-label cube-label-green&quot;>#i18nhtml('core.common.title.SYSTEM_DEFINED', '系统设定')</span>'],'  ')"></th>
+            </tr>
+            </thead>
+        </table>
+
+  <input type='hidden' id='id' name='id' value='$data.id'/>
+    
+<!-- 
+$!{selected}
+
+$!{selectedlist}
+
+$!{disabled}
+
+$!{disabledlist}
+
+#json($fh.getChilds($fh.rootNode()))
+
+ -->
