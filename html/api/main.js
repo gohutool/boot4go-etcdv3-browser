@@ -565,7 +565,8 @@ function groupDg(data){
             if($.extends.isEmpty(data.id)){
                 $(this).dialog('setTitle', '新增集合')
             }else{
-                $(this).dialog('setTitle', '新增集合'+data.group_name.jsEncode())
+                //$(this).dialog('setTitle', '修改集合'+data.group_name.jsEncode())
+                $(this).dialog('setTitle', '修改集合')
             }
         },
         leftButtonsGroup:[{
@@ -597,21 +598,27 @@ function groupDg(data){
                 o.ajaxData = $.extends.json.param2json(o.ajaxData);
                 let info = o.ajaxData
 
-                let msg = $.v3browser.model.addGroup2Node(
+                let msg = $.v3browser.model.saveGroup2Node(
                     $.v3browser.menu.getCurrentOpenMenuNodeId(), info);
 
-                if($.extends.isEmpty(msg)){
-                    $.app.show("添加集合成功");
-                    $('#databaseDg').treegrid('append', {
-                        parent: $.v3browser.menu.getCurrentOpenMenuRow().id,
-                        data:[$.v3browser.model.convert.Group2Data(info)]
-                    });
-
-                    //$('#databaseDg').treegrid('refresh', getCurrentOpenMenuRow().id);
-                    $('#databaseDg').treegrid('expand', $.v3browser.menu.getCurrentOpenMenuRow().id);
-                    $.iDialog.closeOutterDialog($(this))
+                if(typeof msg == 'string'){
+                    $.app.show("不能添加集合，"+msg);
                 }else{
-                    $.app.show("不能添加集合，"+info);
+                    if(msg < 0){
+                        $('#databaseDg').treegrid('append', {
+                            parent: $.v3browser.menu.getCurrentOpenMenuRow().id,
+                            data:[$.v3browser.model.convert.Group2Data(info)]
+                        });
+                        $('#databaseDg').treegrid('expand', $.v3browser.menu.getCurrentOpenMenuRow().id);
+                    }else{
+                        let old = $('#databaseDg').treegrid('find',info.id);
+                        old.text = info.group_name;
+                        old.data = info;
+
+                        $('#databaseDg').treegrid('refresh', old.id);
+                    }
+                    $.app.show("添加集合成功");
+                    $.iDialog.closeOutterDialog($(this))
                 }
 
                 return false
@@ -629,6 +636,11 @@ function removeGroup(){
         $('#databaseDg').treegrid('remove', row.id)
         $('#databaseDg').treegrid('refresh', pid)
     })
+}
+
+function editGroupDg(){
+    let data = $.v3browser.menu.getCurrentOpenMenuRow().data;
+    groupDg(data);
 }
 
 function createGroupDg(){

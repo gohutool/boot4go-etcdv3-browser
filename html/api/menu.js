@@ -99,12 +99,14 @@ $.v3browser.menu = {
     },
     getCurrentOpenMenuNodeId: function() {
         let row = CURRENT_OPEN_MENU_ROW;
-        let dbId = row.id.substring(0, row.id.indexOf("_"));
-        return dbId;
+
+        if(row.type=='db')
+            return row.id;
+
+        return row.node_id;
     },
     getCurrentOpenMenuNode: function() {
-        let row = CURRENT_OPEN_MENU_ROW;
-        let dbId = row.id.substring(0, row.id.indexOf("_"));
+        let dbId = $.v3browser.menu.getCurrentOpenMenuNodeId();
 
         let idx = $.v3browser.model.findLocalNode(dbId)
         if(idx<0)

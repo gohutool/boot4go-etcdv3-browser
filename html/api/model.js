@@ -133,18 +133,8 @@ $.v3browser.model = {
      * @param etcdID
      * @param group   group_name, group_prefix, group_demo
      */
-    addGroup2Node: function (etcdID, group) {
+    saveGroup2Node: function (etcdID, group) {
         let node = $.v3browser.model.getLocalNode(etcdID);
-
-        if(node==null){
-            return '节点不存在';
-        }
-
-        group.id = Math.uuid();
-        group.group_id = group.id;
-        group.node_id = etcdID;
-        let date = new Date()
-        group.createtime = date.Format('yyyy-MM-dd HH:mm:ss');
 
         let groups = node.group;
 
@@ -152,10 +142,44 @@ $.v3browser.model = {
             groups = [];
         }
 
-        groups.push($.extend({}, group));
-        node.group = groups;
+        if(node==null){
+            return '节点不存在';
+        }
 
-        $.v3browser.model.saveLocalConfig()
+        let idx = findIdx(node.group, group.group_id);
+
+        if($.extends.isEmpty(group.group_id)||idx<0){
+            group.id = Math.uuid();
+            group.group_id = group.id;
+            group.node_id = etcdID;
+            let date = new Date()
+            group.createtime = date.Format('yyyy-MM-dd HH:mm:ss');
+
+            groups.push($.extend({}, group));
+            node.group = groups;
+            $.v3browser.model.saveLocalConfig();
+
+            return -1;
+        }else{
+            let one = groups[idx];
+
+            //one.id = group.id;
+            one.group_id = node.id;
+            one.group_prefix = group.group_prefix;
+            one.group_demo = group.group_demo;
+            one.group_name = group.group_name;
+
+            let date = new Date()
+            node.updatetime = date.Format('yyyy-MM-dd HH:mm:ss');
+            groups[idx] = one;
+
+            node.group = groups;
+            $.v3browser.model.saveLocalConfig();
+
+            $.extend(group, one);
+
+            return idx;
+        }
     },
     saveAuthorization: function(id, token){
         let idx = $.v3browser.model.findLocalNode(id);

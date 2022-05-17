@@ -18,3 +18,15 @@ function copyArray(list){
 
     return rtn;
 }
+
+function findIdx(list, id){
+    let rtn = -1;
+    $.each(list, function (idx,v){
+        if(id == v.id){
+            rtn = idx;
+            return false;
+        }
+    })
+
+    return rtn;
+}
