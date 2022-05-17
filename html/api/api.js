@@ -9,6 +9,9 @@ let V3_VERSION = '/version'
 let V3_AUTH_USER_LIST = '/v3/auth/user/list'
 let V3_AUTH_ROLE_LIST = '/v3/auth/role/list'
 
+
+let V3_CLUSTER_MEMBER_LIST = '/v3/cluster/member/list'
+
 // function
 $.app.beforeRequest = function (options){
     console.log("$.app.beforeRequest")
@@ -194,6 +197,16 @@ $.etcd.request = {
         role_list: function (fn, serverInfo){
             $.etcd.request.execute(serverInfo, function (node) {
                 $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_AUTH_ROLE_LIST, {}, function (response) {
+                    fn(node, response)
+                    // $.app.show(response)
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        }
+    },
+    cluster:{
+        member_list:function (fn, serverInfo){
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_CLUSTER_MEMBER_LIST, {}, function (response) {
                     fn(node, response)
                     // $.app.show(response)
                 }, $.etcd.request.buildTokenHeader(serverInfo))

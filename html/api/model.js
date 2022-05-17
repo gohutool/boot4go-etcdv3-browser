@@ -245,6 +245,17 @@ $.v3browser.model = {
             row.iconCls = 'fa fa-user';
             row.mm = 'roleMm';
             return row;
+        },
+        Member2Data:function(member, node_id){
+            let row = {};
+            row.text = member.peerURLs[0];
+            row.node_id = node_id;
+            row.type='cluster-info';
+            row.id = node_id + '_' + member.ID;
+            //row.id = node_id + '_' + username;
+            row.iconCls = 'fa fa-server';
+            row.mm = 'memberMm';
+            return row;
         }
     }
 
