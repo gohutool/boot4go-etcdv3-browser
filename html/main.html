@@ -163,6 +163,18 @@ $(this).menu('options').node=null;
     <div data-options="iconCls:'fa fa-refresh'" onclick="refreshNodes()">刷新</div>
 </div>
 
+<div id="createEtcMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div data-options="iconCls:'fa fa-plus'">
+        <span>新建连接</span>
+        <div style="width:150px;">
+            <div data-options="iconCls:'fa fa-share-square-o'" onclick='importEtcd()'><b>导入...</b></div>
+            <div class="menu-sep"></div>
+            <div data-options="iconCls:'fa fa-html5'" onclick='createEtcd()'><b>Etcd数据库...</b></div>
+            <div class="menu-sep"></div>
+            <div data-options="iconCls:'fa fa-print',disabled:true">打印</div>
+        </div>
+    </div>
+</div>
 
 <div id="groupRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
     <div onclick="createGroupDg()" data-options="iconCls:'fa fa-plus-circle'">新建集合...</div>
@@ -198,8 +210,9 @@ $(this).menu('options').node=null;
             js: [
                 ROOT_RES_URL + "/static/module/index.js",
                 ROOT_RES_URL + "/api/api.js",
-                ROOT_RES_URL + "/api/main.js",
                 ROOT_RES_URL + "/api/model.js",
+                ROOT_RES_URL + "/api/menu.js",
+                ROOT_RES_URL + "/api/main.js",
             ],
             render: function () {
                 stop = true

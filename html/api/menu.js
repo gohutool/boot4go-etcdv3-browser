@@ -1,0 +1,116 @@
+let CURRENT_OPEN_MENU_ROW = null;
+
+$.v3browser = $.extend({}, $.v3browser);
+
+$.v3browser.menu = {
+    openMenu : function(e, row){
+        CURRENT_OPEN_MENU_ROW = row;
+
+        switch (row.type){
+            case "kv":
+                break
+            case "lease":
+                break
+            case "lock":
+                break
+            case "user":
+                break
+            case "role":
+                break
+            case "alarm":
+                break
+            case "cluster":
+                break
+            case "db":
+                if(row.open){
+                    $.v3browser.menu.openOpenMenu(e, row)
+                }else{
+                    $.v3browser.menu.openCloseMenu(e, row)
+                }
+                break
+            default:
+                if(row.mm){
+                    let dbRow = $('#nodemm').menu('options').node;
+
+                    if($.isFunction(row.mm)){
+                        let mm = row.mm.call(row, dbRow, $('#databaseDg'));
+                        if(mm){
+                            $(mm).menu('show', {
+                                left: e.pageX,
+                                top: e.pageY
+                            });
+                        }
+                    }else{
+                        $('#'+row.mm).menu('show', {
+                            left: e.pageX,
+                            top: e.pageY
+                        });
+                    }
+                }
+                break
+        }
+    },
+    createEtcdMenu:function (e, row){
+        $('#createEtcMm').menu('show', {
+            left: e.pageX,
+            top: e.pageY
+        });
+    },
+    openOpenMenu : function (e, row){
+
+        $('#nodemm').menu('options').node = row;
+        let m = $('#nodemm').menu('getItem',  $('#menuitem01')[0]);
+
+        $('#nodemm').menu('setText', {
+            target: m.target,
+            text: "关闭连接"
+        });
+        $('#nodemm').menu('setIcon', {
+            target: $('#menuitem01')[0],
+            iconCls: "fa fa-undo"
+        });
+
+        $('#nodemm').menu('show', {
+            left: e.pageX,
+            top: e.pageY
+        });
+    },
+    openCloseMenu:function (e, row){
+        $('#nodemm').menu('options').node = row;
+        let m = $('#nodemm').menu('getItem',  $('#menuitem01')[0]);
+
+        $('#nodemm').menu('setText', {
+            target: m.target,
+            text: "打开连接"
+        });
+
+        $('#nodemm').menu('setIcon', {
+            target: m.target,
+            iconCls: "fa fa-folder-open-o"
+        });
+
+        $('#nodemm').menu('show', {
+            left: e.pageX,
+            top: e.pageY
+        });
+    },
+    getCurrentOpenMenuRow: function () {
+        return CURRENT_OPEN_MENU_ROW;
+    },
+    getCurrentOpenMenuNodeId: function() {
+        let row = CURRENT_OPEN_MENU_ROW;
+        let dbId = row.id.substring(0, row.id.indexOf("_"));
+        return dbId;
+    },
+    getCurrentOpenMenuNode: function() {
+        let row = CURRENT_OPEN_MENU_ROW;
+        let dbId = row.id.substring(0, row.id.indexOf("_"));
+
+        let idx = $.v3browser.model.findLocalNode(dbId)
+        if(idx<0)
+            return null;
+
+        return CONFIG.nodes[idx];
+    }
+}
+

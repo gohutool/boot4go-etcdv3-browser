@@ -1,52 +1,85 @@
+function newEtcdNode(nodeId){
+    return {
+        nodes:[
+            {id: nodeId+"_1", node_id: nodeId, text:'键值', type:"kv", iconCls:"fa fa-table",state:"closed", children:[
+                    {id: nodeId+"_1"+"_1", node_id: nodeId, text:'集合', type:"group", iconCls:"fa fa-object-group",
+                        event:function(row){
+                            console.log(row);
+                            if(row.children!=null){
+                                $('#databaseDg').treegrid('toggle', row.id)
+                            }else{
+                                let ds = [];
+                                let node = $.v3browser.model.getLocalNode(row.node_id);
 
-let CURRENT_OPEN_MENU_ROW = null
+                                if(node.group){
+                                    $.each(node.group, function (idx,v){
+                                        ds.push($.v3browser.model.convert.Group2Data(v))
+                                    });
+                                }
 
-function openMenu(e, row){
-    CURRENT_OPEN_MENU_ROW = row;
+                                $('#databaseDg').treegrid('append', {
+                                    parent:row.id,
+                                    data:ds
+                                });
 
-    switch (row.type){
-        case "kv":
-            break
-        case "lease":
-            break
-        case "lock":
-            break
-        case "user":
-            break
-        case "role":
-            break
-        case "alarm":
-            break
-        case "cluster":
-            break
-        case "db":
-            if(row.open){
-                openOpenMenu(e, row)
-            }else{
-                openCloseMenu(e, row)
-            }
-            break
-        default:
-            if(row.mm){
-                let dbRow = $('#nodemm').menu('options').node;
+                                $('#databaseDg').treegrid('expand', row.id)
+                            }
+                        }, mm:"groupRootMm"},
+                    {id: nodeId+"_1"+"_2", node_id: nodeId, text:'查询', type:"group-search", iconCls:"fa fa-navicon",
+                        event:function(row){
 
-                if($.isFunction(row.mm)){
-                    let mm = row.mm.call(row, dbRow, $('#databaseDg'));
-                    if(mm){
-                        $(mm).menu('show', {
-                            left: e.pageX,
-                            top: e.pageY
-                        });
-                    }
-                }else{
-                    $('#'+row.mm).menu('show', {
-                        left: e.pageX,
-                        top: e.pageY
-                    });
-                }
-            }
-            break
+                        }},
+                ]},
+            {id: nodeId+"_2", text:'租约', node_id: nodeId, type:"lease", iconCls:"fa fa-plug",state:"closed", children:[
+                    {id: nodeId+"_2"+"_1", node_id: nodeId, text:'租约', type:"lease-object", iconCls:"fa fa-ticket",
+                        event:function(row){
+
+                        }}
+                ]},
+            {id: nodeId+"_3", text:'对象锁', node_id: nodeId, type:"lock", iconCls:"fa fa-lock",state:"closed", children:[
+                    {id: nodeId+"_3"+"_1", node_id: nodeId, text:'锁对象', type:"lock-object", iconCls:"fa fa-server",
+                        event:function(row){
+
+                        }}
+                ]},
+            {id: nodeId+"_4", text:'用户', node_id: nodeId, type:"user", iconCls:"fa fa-user-circle-o",state:"closed", children:[
+                    {id: nodeId+"_4"+"_1", node_id: nodeId, text:'用户', type:"user-object", iconCls:"fa fa-user-circle",
+                        event:function(row){
+
+                        }}
+                ]},
+            {id: nodeId+"_5", text:'角色', node_id: nodeId, type:"role", iconCls:"fa fa-user-o",state:"closed", children:[
+                    {id: nodeId+"_4"+"_1", node_id: nodeId, text:'角色', type:"role-object", iconCls:"fa fa-users",
+                        event:function(row){
+
+                        }}
+                ]},
+            {id: nodeId+"_6", text:'警报器', node_id: nodeId, type:"alarm", iconCls:"fa fa-podcast",state:"closed", children:[
+                    {id: nodeId+"_4"+"_1", node_id: nodeId, text:'警报器', type:"alarm-object", iconCls:"fa fa-bell-o",
+                        event:function(row){
+
+                        }}
+                ]},
+            {id: nodeId+"_7", text:'集群', node_id: nodeId, type:"cluster", iconCls:"fa fa-server",state:"closed", children:[
+                    {id: nodeId+"_4"+"_1", node_id: nodeId, text:'集群信息', type:"cluster-info", iconCls:"fa fa-mixcloud",
+                        event:function(row){
+
+                        }}
+                ]},
+        ]
     }
+}
+
+function buildTreeDatas(){
+    let datas = [];
+
+    $.each(CONFIG.nodes, function (idx, val) {
+        let rowData = $.v3browser.model.convert.Node2Data(val);
+        rowData.node = newEtcdNode(rowData.id);
+        datas.push(rowData)
+    })
+
+    return datas;
 }
 
 function openClose(){
@@ -55,55 +88,14 @@ function openClose(){
     if(row){
         if(row.open){
             console.log("Close now")
-            row.open = false
             closeNode(row)
         }else{
             console.log("Open now")
-            row.open = true;
             openNode(row);
         }
     }
 }
 
-function openOpenMenu(e, row){
-
-    $('#nodemm').menu('options').node = row;
-    let m = $('#nodemm').menu('getItem',  $('#menuitem01')[0]);
-
-    $('#nodemm').iMenu('setText', {
-        target: m.target,
-        text: "关闭连接"
-    });
-    $('#nodemm').iMenu('setIcon', {
-        target: $('#menuitem01')[0],
-        iconCls: "fa fa-undo"
-    });
-
-    $('#nodemm').menu('show', {
-        left: e.pageX,
-        top: e.pageY
-    });
-}
-
-function openCloseMenu(e, row){
-    $('#nodemm').menu('options').node = row;
-    let m = $('#nodemm').menu('getItem',  $('#menuitem01')[0]);
-
-    $('#nodemm').iMenu('setText', {
-        target: m.target,
-        text: "打开连接"
-    });
-
-    $('#nodemm').iMenu('setIcon', {
-        target: m.target,
-        iconCls: "fa fa-folder-open-o"
-    });
-
-    $('#nodemm').menu('show', {
-        left: e.pageX,
-        top: e.pageY
-    });
-}
 
 function removeChildrenNode(row){
     if(row.node && row.node.nodes){
@@ -117,9 +109,12 @@ function removeChildrenNode(row){
 }
 
 function closeNode(row){
+    row.open = false
+
     removeChildrenNode(row)
 
     $('#databaseDg').iTreegrid('collapse',row.id)
+    row.open = false;
     row.state = "closed";
     delete  row.state;
     $('#databaseDg').treegrid('refresh',row.id);
@@ -128,9 +123,10 @@ function closeNode(row){
 function openNode(row){
     removeChildrenNode(row)
 
-    connectEtcdServer(row.data, function (data) {
+    $.etcd.request.connect(row.data, function (data) {
 
         if(data.status ==0 ){
+            row.node = newEtcdNode(row.id);
 
             if(row.node.nodes){
                 let children = [];
@@ -149,17 +145,16 @@ function openNode(row){
 
                 row.open = true;
                 $.app.show("连接etcd服务器"+row.data.node_host+":"+row.data.node_port+"成功");
-
-                if(row.data.authorized_enabled=='1'){
-                    saveAuthorization(row.data.id, data.token);
-                }
-
-
+                row.open = true;
             }else{
+                row.open = false;
                 $.app.show("错误的节点不能打开")
             }
 
         }else{
+
+            row.open = false;
+
             if($.extends.isEmpty(data.resp_msg)){
                 data.resp_msg = "服务器失去响应"
             }
@@ -178,8 +173,9 @@ function loadTreeDg(){
         showHeader:false,
         animate:true,
         onDblClickRow:function (row) {
-            if(row == null)
+            if(row == null){
                 return ;
+            }
 
             if(row.event){
                 $.easyui.debug.breakpoint(row)
@@ -204,10 +200,12 @@ function loadTreeDg(){
             console.log(row)
             e.preventDefault();
 
-            if(row == null)
+            if(row == null){
+                $.v3browser.menu.createEtcdMenu(e, row);
                 return ;
+            }
 
-            openMenu(e, row)
+            $.v3browser.menu.openMenu(e, row)
         },
         //data:[{"id":"2","creatorId":"admin","creator":"系统管理员","createTime":"2016-10-06 13:31:38","modifierId":"admin","modifier":"系统管理员","modifyTime":"2018-06-08 08:44:15","creatorOrgId":0,"typeValue":"公司企业","typeText":"1","id":2,"pid":1,"node_name":"192.168.56.101:32379","checked":null,"state":"closed","attributes":null,"levelId":1,"sort":1,"code":"ginghan","status":"1","isDel":0,"leaderId":"ginghan000001","iconCls":null}],
         data:buildTreeDatas(),
@@ -258,6 +256,13 @@ function openNodeDg(data){
                 $("#authorized_enabled").switchbutton('uncheck')
             }
 
+            if($.extends.isEmpty(data.id)){
+                $(this).dialog('setTitle', 'Etcd-新建连接');
+            }else{
+                //$(this).dialog('setTitle', 'Etcd-编辑连接\''+data.node_name.jsEncode()+'\'');
+                $(this).dialog('setTitle', 'Etcd-编辑连接');
+            }
+
         },
         leftButtonsGroup:[{
             text: '测试连接',
@@ -269,7 +274,7 @@ function openNodeDg(data){
                 o.ajaxData = $.extends.json.param2json(o.ajaxData);
                 let info = o.ajaxData
                 //
-                connectEtcdServer(info, function (data) {
+                $.etcd.request.connect(info, function (data) {
                     if(data.status ==0 ){
                         $.app.alert("连接etcd服务器成功")
                     }else{
@@ -296,7 +301,7 @@ function openNodeDg(data){
                 console.log(o.ajaxData);
                 let info = o.ajaxData;
 
-                let rtn = saveNode2Local(info)
+                let rtn = $.v3browser.model.saveNode2Local(info)
 
                 if(typeof rtn == 'string'){
                     $.app.alert(rtn)
@@ -306,14 +311,18 @@ function openNodeDg(data){
                         if(old){
                             old.data = info;
                             old.text = info.node_name;
+                            closeNode(old)
                             $('#databaseDg').treegrid('refresh',info.id);
                         }
                     }else{
+                        let rowData = $.v3browser.model.convert.Node2Data(info);
+                        //rowData.node = newEtcdNode(rowData.id);
+
                         $('#databaseDg').treegrid('append', {
-                            data: [Node2Data(info)]
+                            data: [rowData]
                         })
 
-                        $('#databaseDg').treegrid('find',info.id).children = newEtcdNode(info.id);
+                        //$('#databaseDg').treegrid('find',info.id).children = newEtcdNode(info.id);
 
                     }
 
@@ -328,7 +337,7 @@ function openNodeDg(data){
 
 
 function modifyUserPwd() {
-    var opts = {
+    let opts = {
         id: 'pwdDialog',
         title: message.core.login.changepwd,
         width: 600,
@@ -364,7 +373,7 @@ function deleteNode(){
     let row = $('#nodemm').menu('options').node;
     
     $.app.confirm("删除连接", "确认需要删除etcd连接\'"+row.text.jsEncode()+"\'?", function () {
-        removeNode2Local(row.id);
+        $.v3browser.model.removeNode2Local(row.id);
         $('#databaseDg').treegrid('remove', row.id);
     })
 }
@@ -387,7 +396,7 @@ function openEtcdAs() {
 }
 
 function refreshNodes() {
-    loadLocalConfig()
+    $.v3browser.model.loadLocalConfig()
     $('#databaseDg').treegrid('loadData',buildTreeDatas());
 }
 
@@ -569,11 +578,11 @@ function groupDg(data){
                 o.ajaxData = $.extends.json.param2json(o.ajaxData);
                 let info = o.ajaxData
 
-                kvRange(function (node, response) {
-                    if(checkCommandResponse(response)){
+                $.etcd.request.kvRange(function (node, response) {
+                    if($.etcd.response.check(response)){
                         $.app.info('测试成功，记录条数为' + response.count)
                     }
-                }, getCurrentOpenMenuNodeId(), info.group_prefix, null, true, true, null, null);
+                }, $.v3browser.menu.getCurrentOpenMenuNode(), info.group_prefix, null, true, true, null, null);
 
                 return false
             },
@@ -588,16 +597,18 @@ function groupDg(data){
                 o.ajaxData = $.extends.json.param2json(o.ajaxData);
                 let info = o.ajaxData
 
-                let msg = addGroup2Node(getCurrentOpenMenuNodeId(), info);
+                let msg = $.v3browser.model.addGroup2Node(
+                    $.v3browser.menu.getCurrentOpenMenuNodeId(), info);
 
                 if($.extends.isEmpty(msg)){
                     $.app.show("添加集合成功");
                     $('#databaseDg').treegrid('append', {
-                        parent: getCurrentOpenMenuRow().id,
-                        data:[Group2Data(info)]
+                        parent: $.v3browser.menu.getCurrentOpenMenuRow().id,
+                        data:[$.v3browser.model.convert.Group2Data(info)]
                     });
+
                     //$('#databaseDg').treegrid('refresh', getCurrentOpenMenuRow().id);
-                    $('#databaseDg').treegrid('expand', getCurrentOpenMenuRow().id);
+                    $('#databaseDg').treegrid('expand', $.v3browser.menu.getCurrentOpenMenuRow().id);
                     $.iDialog.closeOutterDialog($(this))
                 }else{
                     $.app.show("不能添加集合，"+info);
@@ -610,18 +621,18 @@ function groupDg(data){
 }
 
 function removeGroup(){
-    let row = getCurrentOpenMenuRow()
+    let row = $.v3browser.menu.getCurrentOpenMenuRow()
     let pid = $('#databaseDg').treegrid('getParent', row.id).id
 
     $.app.confirm("确定删除集合'"+row.text.jsEncode()+"'", function (){
-        removeGroupFromLocal(row.node_id, row.id)
+        $.v3browser.model.removeGroupFromLocal(row.node_id, row.id)
         $('#databaseDg').treegrid('remove', row.id)
         $('#databaseDg').treegrid('refresh', pid)
     })
 }
 
 function createGroupDg(){
-    let dbId = getCurrentOpenMenuNodeId();
+    let dbId = $.v3browser.menu.getCurrentOpenMenuNodeId();
     let data = {};
     data.db_id = dbId;
     groupDg(data)
