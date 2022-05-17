@@ -40,7 +40,14 @@ function newEtcdNode(nodeId){
 
                                 if(node.group){
                                     $.each(node.group, function (idx,v){
-                                        ds.push($.v3browser.model.convert.Group2Data(v))
+                                        let one = $.v3browser.model.convert.Group2Data(v);
+                                        one.event = function(r){
+                                            let node = $.v3browser.model.getLocalNode(r.node_id)
+
+                                            let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+                                            $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt');
+                                        }
+                                        ds.push(one);
                                     });
                                 }
 
