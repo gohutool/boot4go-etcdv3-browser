@@ -1,3 +1,30 @@
+function removeSubTree(id){
+    let nodes = $('#databaseDg').treegrid('getChildren', id);
+    if(nodes==null)
+        return ;
+    $.each(nodes, function (idx, v) {
+        $('#databaseDg').treegrid('remove', v.id);
+    })
+}
+
+function toggleRow(row, initExpandFn){
+    if(row.children!=null){
+        $('#databaseDg').treegrid('toggle', row.id)
+    }else{
+
+        let datas = initExpandFn.call(row, row);
+
+        if(datas !== false){
+            $('#databaseDg').treegrid('append', {
+                parent:row.id,
+                data:datas
+            });
+
+            $('#databaseDg').treegrid('expand', row.id)
+        }
+    }
+}
+
 function newEtcdNode(nodeId){
     return {
         nodes:[
@@ -42,30 +69,42 @@ function newEtcdNode(nodeId){
 
                         }}
                 ]},
-            {id: nodeId+"_4", text:'用户', node_id: nodeId, type:"user", iconCls:"fa fa-user-circle-o",state:"closed", children:[
-                    {id: nodeId+"_4"+"_1", node_id: nodeId, text:'用户', type:"user-object", iconCls:"fa fa-user-circle",
-                        event:function(row){
-
-                        }}
-                ]},
-            {id: nodeId+"_5", text:'角色', node_id: nodeId, type:"role", iconCls:"fa fa-user-o",state:"closed", children:[
-                    {id: nodeId+"_4"+"_1", node_id: nodeId, text:'角色', type:"role-object", iconCls:"fa fa-users",
-                        event:function(row){
-
-                        }}
-                ]},
-            {id: nodeId+"_6", text:'警报器', node_id: nodeId, type:"alarm", iconCls:"fa fa-podcast",state:"closed", children:[
-                    {id: nodeId+"_4"+"_1", node_id: nodeId, text:'警报器', type:"alarm-object", iconCls:"fa fa-bell-o",
-                        event:function(row){
-
-                        }}
-                ]},
-            {id: nodeId+"_7", text:'集群', node_id: nodeId, type:"cluster", iconCls:"fa fa-server",state:"closed", children:[
-                    {id: nodeId+"_4"+"_1", node_id: nodeId, text:'集群信息', type:"cluster-info", iconCls:"fa fa-mixcloud",
-                        event:function(row){
-
-                        }}
-                ]},
+            {id: nodeId+"_4", text:'用户', node_id: nodeId, type:"user", iconCls:"fa fa-user-circle-o",state:"closed",
+                event:function(row){
+                    toggleRow(row, function (){
+                        refreshUsers(row);
+                        return false;
+                    });
+                }, mm:"userRootMm"},
+            {id: nodeId+"_5", text:'角色', node_id: nodeId, type:"role", iconCls:"fa fa-user-o",state:"closed",
+                event:function(row){
+                    toggleRow(row, function (){
+                        refreshRoles(row);
+                        return false;
+                    });
+                }, mm:"roleRootMm"},
+            {id: nodeId+"_6", text:'警报', node_id: nodeId, type:"alarm", iconCls:"fa fa-podcast",state1:"closed",
+                // children:[
+                //     {id: nodeId+"_4"+"_1", node_id: nodeId, text:'警报', type:"alarm-object", iconCls:"fa fa-bell-o",
+                //         event:function(row){
+                //
+                //         }}
+                // ]
+            },
+            {id: nodeId+"_7", text:'集群', node_id: nodeId, type:"cluster", iconCls:"fa fa-server",state:"closed",
+                event:function(row){
+                    toggleRow(row, function (){
+                        refreshRoles(row);
+                        return false;
+                    });
+                }, mm:"memberRootMm"
+                // children:[
+                //     {id: nodeId+"_4"+"_1", node_id: nodeId, text:'集群信息', type:"cluster-info", iconCls:"fa fa-mixcloud",
+                //         event:function(row){
+                //
+                //         }}
+                // ]
+            },
         ]
     }
 }
@@ -579,7 +618,7 @@ function groupDg(data){
                 o.ajaxData = $.extends.json.param2json(o.ajaxData);
                 let info = o.ajaxData
 
-                $.etcd.request.kvRange(function (node, response) {
+                $.etcd.request.kv.range(function (node, response) {
                     if($.etcd.response.check(response)){
                         $.app.info('测试成功，记录条数为' + response.count)
                     }
@@ -648,4 +687,91 @@ function createGroupDg(){
     let data = {};
     data.db_id = dbId;
     groupDg(data)
+}
+
+function createUserDg(){
+    let dbId = $.v3browser.menu.getCurrentOpenMenuNodeId();
+    let data = {};
+    data.db_id = dbId;
+    groupDg(data)
+}
+
+function refreshUsers(row){
+    let node;
+    let dbId;
+
+    if(row == null){
+        node = $.v3browser.menu.getCurrentOpenMenuNode();
+        dbId = node.id;
+    }else{
+        node = $.v3browser.model.getLocalNode(row.node_id);
+        dbId = node.id;
+    }
+
+    let userRowId = dbId + '_4';
+
+    $.etcd.request.auth.user_list(function (node, response) {
+
+        if($.etcd.response.check(response)){
+            $.app.show('刷新用户成功，用户个数为' + response.users.length);
+
+            let datas = [];
+            $.each(response.users, function (idx, user) {
+                datas.push($.v3browser.model.convert.User2Data(user, dbId))
+            })
+
+            removeSubTree(userRowId);
+            $('#databaseDg').treegrid('append', {
+                parent:userRowId,
+                data: datas
+            });
+
+            $('#databaseDg').treegrid('refresh', userRowId);
+            $('#databaseDg').treegrid('expand', userRowId);
+
+        }else{
+
+        }
+    }, node)
+}
+
+function refreshRoles(row){
+    let node;
+    let dbId=null;
+
+    if(row == null){
+        node = $.v3browser.menu.getCurrentOpenMenuNode();
+        dbId = node.id;
+    }else{
+        node = $.v3browser.model.getLocalNode(row.node_id);
+        dbId = node.id;
+    }
+
+    let roleRowId = dbId + '_5';
+
+    $.etcd.request.auth.role_list(function (node, response) {
+
+        if($.etcd.response.check(response)){
+            $.app.show('刷新角色成功，角色个数为' + response.roles.length);
+
+            let datas = [];
+            $.each(response.roles, function (idx, role) {
+                datas.push($.v3browser.model.convert.Role2Data(role, dbId))
+            })
+
+            removeSubTree(roleRowId);
+            $('#databaseDg').treegrid('append', {
+                parent:roleRowId,
+                data: datas
+            });
+
+            $('#databaseDg').treegrid('refresh', roleRowId);
+            $('#databaseDg').treegrid('expand', roleRowId);
+
+        }else{
+
+        }
+    }, node)
+
+
 }

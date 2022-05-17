@@ -6,6 +6,27 @@ $.v3browser.menu = {
     openMenu : function(e, row){
         CURRENT_OPEN_MENU_ROW = row;
 
+        if(row.mm){
+            let dbRow = $('#nodemm').menu('options').node;
+
+            if($.isFunction(row.mm)){
+                let mm = row.mm.call(row, dbRow, $('#databaseDg'));
+                if(mm){
+                    $(mm).menu('show', {
+                        left: e.pageX,
+                        top: e.pageY
+                    });
+                }
+            }else{
+                $('#'+row.mm).menu('show', {
+                    left: e.pageX,
+                    top: e.pageY
+                });
+            }
+
+            return ;
+        }
+
         switch (row.type){
             case "kv":
                 break
@@ -29,24 +50,6 @@ $.v3browser.menu = {
                 }
                 break
             default:
-                if(row.mm){
-                    let dbRow = $('#nodemm').menu('options').node;
-
-                    if($.isFunction(row.mm)){
-                        let mm = row.mm.call(row, dbRow, $('#databaseDg'));
-                        if(mm){
-                            $(mm).menu('show', {
-                                left: e.pageX,
-                                top: e.pageY
-                            });
-                        }
-                    }else{
-                        $('#'+row.mm).menu('show', {
-                            left: e.pageX,
-                            top: e.pageY
-                        });
-                    }
-                }
                 break
         }
     },

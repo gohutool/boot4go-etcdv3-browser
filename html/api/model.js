@@ -224,6 +224,28 @@ $.v3browser.model = {
 
             return row;
         },
+        User2Data:function(username, node_id){
+            let row = {};
+            row.text = username;
+            row.node_id = node_id;
+            row.type='user-object';
+            row.id = node_id + '_' + Math.uuid();
+            //row.id = node_id + '_' + username;
+            row.iconCls = 'fa fa-user-circle';
+            row.mm = 'userMm';
+            return row;
+        },
+        Role2Data:function(rolename, node_id){
+            let row = {};
+            row.text = rolename;
+            row.node_id = node_id;
+            row.type='role-object';
+            row.id = node_id + '_' + Math.uuid();
+            //row.id = node_id + '_' + username;
+            row.iconCls = 'fa fa-user';
+            row.mm = 'roleMm';
+            return row;
+        }
     }
 
 }

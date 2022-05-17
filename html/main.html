@@ -179,10 +179,50 @@ $(this).menu('options').node=null;
 <div id="groupRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
     <div onclick="createGroupDg()" data-options="iconCls:'fa fa-plus-circle'">新建集合...</div>
 </div>
+
 <div id="groupMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
     <div onclick="editGroupDg()" data-options="iconCls:'fa fa-pencil'">编辑集合...</div>
     <div class="menu-sep"></div>
     <div onclick="removeGroup()" data-options="iconCls:'fa fa-plus-circle'">删除集合</div>
+</div>
+
+<div id="userRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="createUserDg()" data-options="iconCls:'fa fa-user-plus'">新建用户...</div>
+    <div class="menu-sep"></div>
+    <div onclick="refreshUsers()" data-options="iconCls:'fa fa-refresh'">刷新</div>
+</div>
+
+<div id="userMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="editPwdDg()" data-options="iconCls:'fa fa-pencil'">修改密码...</div>
+    <div onclick="editUserDg()" data-options="iconCls:'fa fa-delicious'">授权角色...</div>
+    <div class="menu-sep"></div>
+    <div onclick="removeUser()" data-options="iconCls:'fa fa-plus-circle'">删除用户</div>
+</div>
+
+<div id="roleRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="createRoleDg()" data-options="iconCls:'fa fa-user-o'">新建角色...</div>
+    <div class="menu-sep"></div>
+    <div onclick="refreshRoles()" data-options="iconCls:'fa fa-refresh'">刷新</div>
+</div>
+
+<div id="roleMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="editRoleDg()" data-options="iconCls:'fa fa-delicious'">授权权限...</div>
+    <div class="menu-sep"></div>
+    <div onclick="removeRole()" data-options="iconCls:'fa fa-plus-circle'">删除角色</div>
+</div>
+
+<div id="memberRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="addMemberDg()" data-options="iconCls:'fa fa-server'">添加服务成员...</div>
+    <div class="menu-sep"></div>
+    <div onclick="refreshMembers()" data-options="iconCls:'fa fa-refresh'">刷新</div>
+</div>
+
+<div id="memberMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="editRoleDg()" data-options="iconCls:'fa fa-delicious'">授权权限...</div>
+    <div onclick="editRoleDg()" data-options="iconCls:'fa fa-arrow-circle-up'">提升节点</div>
+    <div onclick="editRoleDg()" data-options="iconCls:'fa fa-retweet'">更新节点</div>
+    <div class="menu-sep"></div>
+    <div onclick="removeRole()" data-options="iconCls:'fa fa-chain-broken'">从集群移除</div>
 </div>
 </script>
 </body>

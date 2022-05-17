@@ -6,6 +6,9 @@ let V3_RANGE = '/v3/kv/range'
 let V3_AUTH = '/v3/auth/authenticate'
 let V3_VERSION = '/version'
 
+let V3_AUTH_USER_LIST = '/v3/auth/user/list'
+let V3_AUTH_ROLE_LIST = '/v3/auth/role/list'
+
 // function
 $.app.beforeRequest = function (options){
     console.log("$.app.beforeRequest")
@@ -148,34 +151,54 @@ $.etcd.request = {
             console.log(response)
         })
     },
-    kvRange: function (fn, serverInfo, key, range, withPrefix, count_only, sort_order, sort_target){
-        $.etcd.request.execute(serverInfo, function (node) {
-            let data = {};
+    kv:{
+        range: function (fn, serverInfo, key, range, withPrefix, count_only, sort_order, sort_target){
+            $.etcd.request.execute(serverInfo, function (node) {
+                let data = {};
 
-            data['key']=Base64.encode(key);
-            if(withPrefix){
-                data['range_end']=Base64.encode($.etcd.request.prefixFormat(key));
-            }else{
-                data['range_end']=range;
-            }
+                data['key']=Base64.encode(key);
+                if(withPrefix){
+                    data['range_end']=Base64.encode($.etcd.request.prefixFormat(key));
+                }else{
+                    data['range_end']=range;
+                }
 
-            if(sort_order!=null){
-                data['sort_order']=Base64.encode(sort);
-            }else{
-                data['sort_order']='NONE';
-            }
+                if(sort_order!=null){
+                    data['sort_order']=Base64.encode(sort);
+                }else{
+                    data['sort_order']='NONE';
+                }
 
-            if(sort_target!=null)
-                data['sort_target']='NONE';
+                if(sort_target!=null)
+                    data['sort_target']='NONE';
 
-            if(count_only)
-                data['count_only']=true;
+                if(count_only)
+                    data['count_only']=true;
 
-            $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE, data, function (response) {
-                fn(node, response)
-                // $.app.show(response)
-            }, $.etcd.request.buildTokenHeader(serverInfo))
-        })
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE, data, function (response) {
+                    fn(node, response)
+                    // $.app.show(response)
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            })
+        }
+    },
+    auth:{
+        user_list: function (fn, serverInfo){
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_AUTH_USER_LIST, {}, function (response) {
+                    fn(node, response)
+                    // $.app.show(response)
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        },
+        role_list: function (fn, serverInfo){
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_AUTH_ROLE_LIST, {}, function (response) {
+                    fn(node, response)
+                    // $.app.show(response)
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        }
     }
 };
 
