@@ -45,7 +45,7 @@ function newEtcdNode(nodeId){
                                             let node = $.v3browser.model.getLocalNode(r.node_id)
 
                                             let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
-                                            $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt');
+                                            $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
                                         }
                                         ds.push(one);
                                     });

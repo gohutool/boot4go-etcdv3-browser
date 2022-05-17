@@ -155,7 +155,8 @@ $.etcd.request = {
         })
     },
     kv:{
-        range: function (fn, serverInfo, key, range, withPrefix, count_only, sort_order, sort_target){
+        range: function (fn, serverInfo, key, range, withPrefix, count_only, sort_order, sort_target, limit,
+                         min_create_revision, min_mod_revision){
             $.etcd.request.execute(serverInfo, function (node) {
                 let data = {};
 
@@ -177,6 +178,15 @@ $.etcd.request = {
 
                 if(count_only)
                     data['count_only']=true;
+
+                if(limit!=null)
+                    data['limit']=limit;
+
+                if(min_create_revision!=null)
+                    data['min_create_revision']=min_create_revision;
+
+                if(min_mod_revision!=null)
+                    data['min_mod_revision']=min_mod_revision;
 
                 $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE, data, function (response) {
                     fn(node, response)

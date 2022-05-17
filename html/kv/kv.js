@@ -1,6 +1,5 @@
 function load(){
     $(function(){
-
         $("#groupDg").iDatagrid({
             idField: 'key',
             sortOrder:'asc',
@@ -26,7 +25,7 @@ function load(){
                 {
                     field: 'version',
                     title: '版本',
-                    sortable: true,
+                    sortable: false,
                     width: 70,
                     halign:'right',
                     align:'right',
@@ -61,4 +60,13 @@ function operateFormatter(value, row, index) {
     htmlstr += '<button class="cubeui-btn-gray layui-btn layui-btn-xs" onclick="delKey(\'' + row.id + '\')">删除</button>';
 
     return htmlstr;
+}
+
+function queryKv(prefix, sort, order, start, count){
+
+}
+
+function openEditDiag() {
+    let node = $.v3browser.menu.getCurrentTabAttachNode();
+    console.log(node)
 }

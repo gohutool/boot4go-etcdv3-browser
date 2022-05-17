@@ -117,9 +117,9 @@ $.v3browser.menu = {
 
         return CONFIG.nodes[idx];
     },
-    addOneTabAndRefresh:function (title, src, iconCls) {
-        var iframe = '<iframe src="' + src + '" frameborder="0" style="border:0;width:100%;height:100%;"></iframe>';
-        var t = parent.$('#index_tabs');
+    addOneTabAndRefresh:function (title, src, iconCls, etcdNode, data) {
+        let iframe = '<iframe src="' + src + '" frameborder="0" style="border:0;width:100%;height:100%;"></iframe>';
+        let t = parent.$('#index_tabs');
 
         if(t.tabs('exists', title)){
             t.tabs('close', title);
@@ -133,5 +133,23 @@ $.v3browser.menu = {
             iconCls: iconCls||'fa fa-th',
             border: true
         });
+
+        let ct = t.tabs('getTab', title);
+        ct.attachNode = etcdNode;
+        ct.attachData=data;
+
+    },
+    getCurrentTab:function (){
+        let t = parent.$('#index_tabs');
+        let tab = t.tabs('getSelected');
+        return tab;
+    },
+    getCurrentTabAttachNode:function (){
+        let tab = $.v3browser.menu.getCurrentTab();
+        return tab.attachNode;
+    },
+    getCurrentTabAttachData:function (){
+        let tab = $.v3browser.menu.getCurrentTab();
+        return tab.attachData;
     }
 }
