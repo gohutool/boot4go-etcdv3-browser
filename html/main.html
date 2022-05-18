@@ -223,6 +223,18 @@ $(this).menu('options').node=null;
     <div class="menu-sep"></div>
     <div onclick="removeMember()" data-options="iconCls:'fa fa-chain-broken'">从集群移除</div>
 </div>
+
+<div id="searchRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="addSearch()" data-options="iconCls:'fa fa-server'">添加查询...</div>
+    <div class="menu-sep"></div>
+    <div onclick="refreshSearch()" data-options="iconCls:'fa fa-refresh'">刷新</div>
+</div>
+
+<div id="searchMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="openSearch()" data-options="iconCls:'fa fa-folder-open-o'">打开查询...</div>
+    <div class="menu-sep"></div>
+    <div onclick="removeSearch()" data-options="iconCls:'fa fa-plus-circle'">删除查询</div>
+</div>
 </script>
 </body>
 

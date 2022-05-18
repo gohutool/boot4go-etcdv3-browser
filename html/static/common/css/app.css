@@ -480,3 +480,229 @@ body{
     -ms-user-select:none;
     user-select:none;
 }
+
+
+
+.layui-btn-green {
+    border: 0;
+    background-color: #009688;
+    color: #fff
+}
+
+.layui-btn-green:hover {
+    color: #fff;
+    background-color: #009688
+}
+
+.layui-btn-brown {
+    border: 0;
+    background-color: brown;
+    color: #fff
+}
+
+.layui-btn-brown:hover {
+    color: #fff;
+    background-color: brown
+}
+
+.layui-btn-black {
+    border: 0;
+    background-color: #2F4056;
+    color: #fff
+}
+
+.layui-btn-black:hover {
+    color: #fff;
+    background-color: #2F4056
+}
+
+.layui-btn-blue {
+    border: 0;
+    background-color: #1E9FFF;
+    color: #fff
+}
+
+.layui-btn-blue:hover {
+    color: #fff;
+    background-color: #1E9FFF
+}
+
+.layui-btn-orange {
+    border: 0;
+    background-color: #FFB800;
+    color: #fff
+}
+
+.layui-btn-orange:hover {
+    color: #fff;
+    background-color: #FFB800
+}
+
+.layui-btn-red {
+    border: 0;
+    background-color: #FF5722;
+    color: #fff
+}
+
+.layui-btn-red:hover {
+    color: #fff;
+    background-color: #FF5722
+}
+
+.layui-btn-purple {
+    border: 0;
+    background-color: purple;
+    color: #fff
+}
+
+.checkbox,.radiobutton {
+    border: 2px solid #C3C3C3
+}
+
+.layui-btn-purple:hover {
+    color: #fff;
+    background-color: purple
+}
+
+
+.layui-btn-gray {
+    color: #fff;
+    background-color: #808080;
+}
+
+.layui-btn-gray:hover {
+    color: #fff;
+    background-color: #808080
+}
+
+.layui-btn-ivory {
+    border: 0;
+    background-color: #6495ED;
+    color: #fff
+}
+
+.layui-btn-ivory:hover {
+    color: #fff;
+    background-color: #6495ED
+}
+
+.layui-btn-olive {
+    border: 0;
+    background-color: #808000;
+    color: #fff
+}
+
+.layui-btn-olive:hover {
+    color: #fff;
+    background-color: #808000
+}
+
+.layui-btn-pink {
+    border: 0;
+    background-color: #FF69B4;
+    color: #fff
+}
+
+.layui-btn-pink:hover {
+    color: #fff;
+    background-color: #FF69B4
+}
+
+.layui-btn-maroon {
+    border: 0;
+    background-color: #800000;
+    color: #fff
+}
+
+.layui-btn-maroon:hover {
+    color: #fff;
+    background-color: #800000
+}
+
+.layui-btn-silver {
+    border: 0;
+    background-color: #20B2AA;
+    color: #fff
+}
+
+.layui-btn-silver:hover {
+    color: #fff;
+    background-color: #20B2AA
+}
+
+.layui-btn-slateblue {
+    border: 0;
+    background-color: #6A5ACD;
+    color: #fff
+}
+
+.layui-btn-slateblue:hover {
+    color: #fff;
+    background-color: #6A5ACD
+}
+
+.layui-btn-violet {
+    border: 0;
+    background-color: #EE82EE;
+    color: #fff
+}
+
+.layui-btn-violet:hover {
+    color: #fff;
+    background-color: #EE82EE
+}
+
+.layui-btn-navy {
+    border: 0;
+    background-color: #6B8E23;
+    color: #fff
+}
+
+.layui-btn-navy:hover {
+    color: #fff;
+    background-color: #6B8E23
+}
+
+.layui-btn-gray {
+    border: 0;
+    background-color: #3CB371;
+    color: #fff
+}
+
+.layui-btn-gray:hover {
+    color: #fff;
+    background-color: #3CB371
+}
+
+.layui-btn-yellowgreen {
+    border: 0;
+    background-color: #9ACD32;
+    color: #fff
+}
+
+.layui-btn-yellowgreen:hover {
+    color: #fff;
+    background-color: #9ACD32
+}
+
+.layui-btn-limegreen {
+    border: 0;
+    background-color: #32CD32;
+    color: #fff
+}
+
+.layui-btn-limegreen:hover {
+    color: #fff;
+    background-color: #32CD32
+}
+
+.layui-btn-dodgerblue {
+    border: 0;
+    background-color: #1E90FF;
+    color: #fff
+}
+
+.layui-btn-dodgerblue:hover {
+    color: #fff;
+    background-color: #1E90FF
+}

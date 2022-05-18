@@ -206,6 +206,51 @@ $.v3browser.model = {
         $.v3browser.model.saveNode2Local(node);
     },
     convert: {
+        Text2Node: function (json) {
+
+            let newOne = null;
+
+            try{
+                newOne = $.extends.json.toobject2(json);
+                console.log(newOne)
+            }catch (err){
+                return "json文件格式不正确"
+            }
+
+            if($.extends.isEmpty(newOne.node_name)){
+                return "json文件缺少名字"
+            }
+            if($.extends.isEmpty(newOne.node_host)){
+                return "json文件缺少主机地址"
+            }
+            if($.extends.isEmpty(newOne.node_port)){
+                return "json文件缺少端口"
+            }
+
+
+            let date = new Date()
+            date = date.Format('yyyy-MM-dd HH:mm:ss');
+
+            let newId = Math.uuid();
+
+            newOne.id = newId;
+            newOne.createtime = date;
+            delete newOne['updatetime'];
+
+            if(newOne.group){
+                $.each(newOne.group, function (idx, g){
+                    let gId = Math.uuid();
+                    g.id = gId;
+                    g.group_id = gId;
+                    g.node_id=newId;
+                    g.db_id = newId;
+                    g.createtime = date;
+                    delete g['updatetime'];
+                })
+            }
+
+            return newOne
+        },
         Node2Data: function(node){
             let row = {};
             let rowData = $.extend({}, node);
@@ -231,6 +276,23 @@ $.v3browser.model = {
             row.type='group';
             row.mm = "groupMm";
             row.prefix = group.group_prefix;
+
+            return row;
+        },
+        // group group_name/group_prefix/group_demo/id/node_id/group_id
+        Search2Data: function(search){
+            let row = {};
+            let rowData = $.extend({}, search);
+            row.id = search.id;
+            row.search_id = search.id;
+            row.node_id = search.node_id;
+            row.data = rowData;
+            row.text = search.search_name;
+            // row.state = 'closed';
+            row.iconCls = 'fa fa-search';
+            row.type='search';
+            row.mm = "searchMm";
+            row.param = search.param;
 
             return row;
         },
@@ -266,11 +328,26 @@ $.v3browser.model = {
             row.iconCls = 'fa fa-server';
             row.mm = 'memberMm';
             return row;
+        },
+        EmptySearch:function(node_id){
+            return {
+                param:{},
+                node_id:node_id,
+                id:'',
+            }
         }
     },
     title:{
         group:function(group, node){
             let title = group.group_name.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+            return title;
+        },
+        search:function(search, node){
+            let title = search.search_name.jsEncode()+'@'+node.node_name.jsEncode()+'-查询';
+            return title;
+        },
+        newSearch:function(node){
+            let title = '新建@'+node.node_name.jsEncode()+'-查询';
             return title;
         }
     }

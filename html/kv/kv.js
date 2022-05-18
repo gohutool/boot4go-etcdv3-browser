@@ -6,7 +6,7 @@ function load(){
             sortName:'key',
             frozenColumns:[[
                 // {field: 'id', title: '', checkbox: true},
-                {field: 'op', title: '操作', sortable: false, width: 120, formatter:operateFormatter},
+                {field: 'op', title: '操作', sortable: false, halign:'center',align:'center', width: 140, formatter:operateFormatter},
                 {field: 'key', title: '键', sortable: true,
                     formatter:$.iGrid.templateformatter('{key}'),
                     width: 400},
@@ -58,8 +58,8 @@ function load(){
 function operateFormatter(value, row, index) {
     let htmlstr = "";
 
-    htmlstr += '<button class="cubeui-btn-blue layui-btn layui-btn-xs" onclick="editKey(\'' + row.id + '\')">修改</button>';
-    htmlstr += '<button class="cubeui-btn-gray layui-btn layui-btn-xs" onclick="delKey(\'' + row.id + '\')">删除</button>';
+    htmlstr += '<button class="layui-btn-blue layui-btn layui-btn-normal layui-btn-xs" onclick="editKey(\'' + row.id + '\')">修改</button>';
+    htmlstr += '<button class="layui-btn-gray layui-btn layui-btn-xs" onclick="delKey(\'' + row.id + '\')">删除</button>';
 
     return htmlstr;
 }

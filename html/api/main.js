@@ -29,10 +29,38 @@ function newEtcdNode(nodeId){
     return {
         nodes:[
             {id: nodeId+"_1", node_id: nodeId, text:'键值', type:"kv", iconCls:"fa fa-table",state:"closed", children:[
-                    {id: nodeId+"_1"+"_1", node_id: nodeId, text:'集合', type:"group", iconCls:"fa fa-object-group",
+                    {id: nodeId+"_1"+"_1", node_id: nodeId, text:'集合', type:"groups", iconCls:"fa fa-object-group",
                         event:function(row){
                             console.log(row);
-                            if(row.children!=null){
+                            toggleRow(row, function (){
+
+                                let ds = [];
+                                let node = $.v3browser.model.getLocalNode(row.node_id);
+
+                                if(node.group){
+                                    $.each(node.group, function (idx,v){
+                                        let one = $.v3browser.model.convert.Group2Data(v);
+                                        one.event = function(r){
+                                            let node = $.v3browser.model.getLocalNode(r.node_id)
+
+                                            //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+                                            let title = $.v3browser.model.title.group(v, node)
+                                            $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
+                                        }
+                                        ds.push(one);
+                                    });
+                                }
+
+                                $('#databaseDg').treegrid('append', {
+                                    parent:row.id,
+                                    data:ds
+                                });
+
+                                $('#databaseDg').treegrid('expand', row.id)
+
+                                return false;
+                            });
+                            /*if(row.children!=null){
                                 $('#databaseDg').treegrid('toggle', row.id)
                             }else{
                                 let ds = [];
@@ -58,12 +86,37 @@ function newEtcdNode(nodeId){
                                 });
 
                                 $('#databaseDg').treegrid('expand', row.id)
-                            }
+                            }*/
                         }, mm:"groupRootMm"},
-                    {id: nodeId+"_1"+"_2", node_id: nodeId, text:'查询', type:"group-search", iconCls:"fa fa-navicon",
+                    {id: nodeId+"_1"+"_2", node_id: nodeId, text:'查询', type:"searches", iconCls:"fa fa-navicon",
                         event:function(row){
+                            console.log(row);
+                            toggleRow(row, function (){
+                                let ds = [];
+                                let node = $.v3browser.model.getLocalNode(row.node_id);
+                                if(node.search){
+                                    $.each(node.search, function (idx,v){
+                                        let one = $.v3browser.model.convert.Search2Data(v);
+                                        one.event = function(r){
+                                            let node = $.v3browser.model.getLocalNode(r.node_id)
 
-                        }},
+                                            //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+                                            let title = $.v3browser.model.title.search(v, node)
+                                            $.v3browser.menu.addOneTabAndRefresh(title, './kv/search.html', 'fa fa-navicon', node, r);
+                                        }
+                                        ds.push(one);
+                                    });
+                                }
+
+                                $('#databaseDg').treegrid('append', {
+                                    parent:row.id,
+                                    data:ds
+                                });
+
+                                $('#databaseDg').treegrid('expand', row.id)
+                                return false;
+                            });
+                        }, mm:"searchRootMm"},
                 ]},
             {id: nodeId+"_2", text:'租约', node_id: nodeId, type:"lease", iconCls:"fa fa-plug",state:"closed", children:[
                     {id: nodeId+"_2"+"_1", node_id: nodeId, text:'租约', type:"lease-object", iconCls:"fa fa-ticket",
@@ -325,12 +378,12 @@ function openNodeDg(data){
                 //
                 $.etcd.request.connect(info, function (data) {
                     if(data.status ==0 ){
-                        $.app.alert("连接etcd服务器成功")
+                        $.app.show("连接etcd服务器成功")
                     }else{
                         if($.extends.isEmpty(data.resp_msg)){
                             data.resp_msg = "服务器失去响应"
                         }
-                        $.app.alert("连接etcd服务器失败, " + data.resp_msg)
+                        $.app.show("连接etcd服务器失败, " + data.resp_msg)
                     }
 
                     console.log(data)
@@ -353,7 +406,7 @@ function openNodeDg(data){
                 let rtn = $.v3browser.model.saveNode2Local(info)
 
                 if(typeof rtn == 'string'){
-                    $.app.alert(rtn)
+                    $.app.show(rtn)
                 }else{
                     if(rtn >=0){
                         let old = $('#databaseDg').treegrid('find',info.id);
@@ -477,9 +530,9 @@ function exportEtcd(){
                 let info = o.ajaxData;
 
                 $.extends.copyToClipBoard(info.json, function (){
-                    $.app.alert("复制成功")
+                    $.app.show("复制成功")
                 }, function () {
-                    $.app.alert("复制失败")
+                    $.app.show("复制失败")
                 })
 
 
@@ -518,24 +571,24 @@ function importEtcd(){
                 try{
                     newOne = $.extends.json.toobject(info.json)
                 }catch (err){
-                    $.app.alert("json文件格式不正确")
+                    $.app.show("json文件格式不正确")
                     return false
                 }
 
                 if($.extends.isEmpty(newOne.node_name)){
-                    $.app.alert("json文件缺少名字")
+                    $.app.show("json文件缺少名字")
                     return false
                 }
                 if($.extends.isEmpty(newOne.node_host)){
-                    $.app.alert("json文件缺少主机地址")
+                    $.app.show("json文件缺少主机地址")
                     return false
                 }
                 if($.extends.isEmpty(newOne.node_port)){
-                    $.app.alert("json文件缺少端口")
+                    $.app.show("json文件缺少端口")
                     return false
                 }
 
-                $.app.alert("数据格式校验正确")
+                $.app.show("数据格式校验正确")
                 return false
             },
         }],
@@ -549,6 +602,40 @@ function importEtcd(){
                 o.ajaxData = $.extends.json.param2json(o.ajaxData);
                 console.log(o.ajaxData);
                 let info = o.ajaxData;
+
+
+                let msg = $.v3browser.model.convert.Text2Node(info.json)
+
+                if(typeof msg == 'string'){
+                    $.app.show('导入失败，' + msg);
+                    return ;
+                }else{
+                    msg.node_name = msg.node_name+'(导入)';
+                    let rtn = $.v3browser.model.saveNode2Local(msg);
+
+                    if(rtn >=0){
+                        let old = $('#databaseDg').treegrid('find',msg.id);
+                        if(old){
+                            old.data = msg;
+                            old.text = msg.node_name;
+                            closeNode(old)
+                            $('#databaseDg').treegrid('refresh',msg.id);
+                        }
+                    }else{
+                        let rowData = $.v3browser.model.convert.Node2Data(msg);
+
+                        $('#databaseDg').treegrid('append', {
+                            data: [rowData]
+                        })
+
+                        //$('#databaseDg').treegrid('find',info.id).children = newEtcdNode(info.id);
+
+                    }
+
+                    $.app.show('导入新连接\''+msg.node_name.jsEncode()+'\'成功，');
+
+                    $.iDialog.closeOutterDialog($(this))
+                }
 
                 return false
             },
@@ -633,7 +720,7 @@ function groupDg(data){
 
                 $.etcd.request.kv.range(function (response) {
                     if($.etcd.response.check(response)){
-                        $.app.info('测试成功，记录条数为' + response.count)
+                        $.app.show('测试成功，记录条数为' + response.count)
                     }
                 }, $.v3browser.menu.getCurrentOpenMenuNode(), info.group_prefix, null, true, true, null, null);
 
@@ -863,4 +950,35 @@ function refreshMembers(row){
 
         }
     }, node)
+}
+
+function removeSearch(){
+    let row = $.v3browser.menu.getCurrentOpenMenuRow()
+    let pid = $('#databaseDg').treegrid('getParent', row.id).id
+
+    $.app.confirm("确定删除查询'"+row.text.jsEncode()+"'", function (){
+        let title = $.v3browser.model.title.search(row.data, $.v3browser.model.getLocalNode(row.node_id))
+        $.v3browser.menu.closeTab(title);
+
+        $.v3browser.model.removeGroupFromLocal(row.node_id, row.id)
+        $('#databaseDg').treegrid('remove', row.id)
+        $('#databaseDg').treegrid('refresh', pid);
+
+    })
+}
+
+function openSearch() {
+
+}
+
+function addSearch() {
+    let node = $.v3browser.menu.getCurrentOpenMenuNode();
+    let title = $.v3browser.model.title.newSearch(node)
+
+    $.v3browser.menu.addOneTabAndRefresh(title, './kv/search.html', 'fa fa-navicon', node,
+        $.v3browser.model.convert.EmptySearch(node.id));
+}
+
+function _openSearch(data) {
+
 }
