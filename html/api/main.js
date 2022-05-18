@@ -662,13 +662,13 @@ function groupDg(data){
                             let node = $.v3browser.model.getLocalNode(r.node_id)
 
                             //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
-                            let title = $.v3browser.model.title.group(v, node)
+                            let title = $.v3browser.model.title.group(info, node)
                             $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
                         }
 
                         $('#databaseDg').treegrid('append', {
                             parent: $.v3browser.menu.getCurrentOpenMenuRow().id,
-                            data:one
+                            data:[one]
                         });
                         $('#databaseDg').treegrid('expand', $.v3browser.menu.getCurrentOpenMenuRow().id);
                     }else{
