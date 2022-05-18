@@ -1367,6 +1367,15 @@ $.extend($.fn.datagrid.methods, {
 	getLocalRows:function(jq){
 		return $(jq).datagrid('options').localRows;
 	},
+	setPagerOptions:function(jq, options){
+		let pageTarget = $(jq).datagrid('getPager');
+		if( pageTarget.isNull()){
+			return
+		}else{
+			let ops = pageTarget.pagination("options");
+			$.extend(ops, options)
+		}
+	},
 	setLocalPage:function(jq){
 		let pageTarget = $(jq).datagrid('getPager');
 		if( pageTarget.isNull()){

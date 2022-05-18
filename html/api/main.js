@@ -44,7 +44,8 @@ function newEtcdNode(nodeId){
                                         one.event = function(r){
                                             let node = $.v3browser.model.getLocalNode(r.node_id)
 
-                                            let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+                                            //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+                                            let title = $.v3browser.model.title.group(v, node)
                                             $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
                                         }
                                         ds.push(one);
@@ -164,6 +165,8 @@ function closeNode(row){
     row.state = "closed";
     delete  row.state;
     $('#databaseDg').treegrid('refresh',row.id);
+
+    $.v3browser.menu.closeTabs(row);
 }
 
 function openNode(row){
@@ -554,6 +557,9 @@ function importEtcd(){
 }
 
 function groupDg(data){
+
+    let isUpdate = !($.extends.isEmpty(data)||$.extends.isEmpty(data.id));
+
     $.iDialog.openDialog({
         title: '编辑',
         maximized1:true,
@@ -625,7 +631,7 @@ function groupDg(data){
                 o.ajaxData = $.extends.json.param2json(o.ajaxData);
                 let info = o.ajaxData
 
-                $.etcd.request.kv.range(function (node, response) {
+                $.etcd.request.kv.range(function (response) {
                     if($.etcd.response.check(response)){
                         $.app.info('测试成功，记录条数为' + response.count)
                     }
@@ -635,7 +641,7 @@ function groupDg(data){
             },
         }],
         buttonsGroup: [{
-            text: '添加',
+            text: isUpdate?'修改':'添加',
             iconCls: 'fa fa-plus-square-o',
             btnCls: 'cubeui-btn-orange',
             handler:'ajaxForm',
@@ -651,19 +657,54 @@ function groupDg(data){
                     $.app.show("不能添加集合，"+msg);
                 }else{
                     if(msg < 0){
+                        let one = $.v3browser.model.convert.Group2Data(info);
+                        one.event = function(r){
+                            let node = $.v3browser.model.getLocalNode(r.node_id)
+
+                            //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+                            let title = $.v3browser.model.title.group(v, node)
+                            $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
+                        }
+
                         $('#databaseDg').treegrid('append', {
                             parent: $.v3browser.menu.getCurrentOpenMenuRow().id,
-                            data:[$.v3browser.model.convert.Group2Data(info)]
+                            data:one
                         });
                         $('#databaseDg').treegrid('expand', $.v3browser.menu.getCurrentOpenMenuRow().id);
                     }else{
                         let old = $('#databaseDg').treegrid('find',info.id);
-                        old.text = info.group_name;
-                        old.data = info;
+                        let needOpen = false;
 
+                        let node = $.v3browser.menu.getCurrentOpenMenuNode();
+                        if(old.text!=info.group_name){
+                            let title = $.v3browser.model.title.group(old.data, node);
+                            if($.v3browser.menu.isTabExist(title)){
+                                $.v3browser.menu.closeTab(title);
+                                needOpen = true;
+                            }
+                        }
+
+                        if(old.data.group_prefix != info.group_prefix){
+                            let title = $.v3browser.model.title.group(old.data, node);
+                            if($.v3browser.menu.isTabExist(title)){
+                                $.v3browser.menu.closeTab(title);
+                                needOpen = true;
+                            }
+                        }
+
+                        old.text = info.group_name;
+                        old.prefix = info.group_prefix;
+                        old.data = info;
                         $('#databaseDg').treegrid('refresh', old.id);
+
+                        let title = $.v3browser.model.title.group(info, node);
+                        if(needOpen)
+                            $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, old);
+                        else{
+                            $.v3browser.menu.refreshTab(title)
+                        }
                     }
-                    $.app.show("添加集合成功");
+                    $.app.show(isUpdate?'修改集合成功':'添加集合成功');
                     $.iDialog.closeOutterDialog($(this))
                 }
 
@@ -678,9 +719,13 @@ function removeGroup(){
     let pid = $('#databaseDg').treegrid('getParent', row.id).id
 
     $.app.confirm("确定删除集合'"+row.text.jsEncode()+"'", function (){
+        let title = $.v3browser.model.title.group(row.data, $.v3browser.model.getLocalNode(row.node_id))
+        $.v3browser.menu.closeTab(title);
+
         $.v3browser.model.removeGroupFromLocal(row.node_id, row.id)
         $('#databaseDg').treegrid('remove', row.id)
-        $('#databaseDg').treegrid('refresh', pid)
+        $('#databaseDg').treegrid('refresh', pid);
+
     })
 }
 

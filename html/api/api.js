@@ -2,7 +2,6 @@ let V3_ENDPOINT = 'http://{node_host}:{node_port}'
 
 let V3_MTN = '/v3/maintenance/status'
 let V3_ECHO = '/v3/kv/range'
-let V3_RANGE = '/v3/kv/range'
 let V3_AUTH = '/v3/auth/authenticate'
 let V3_VERSION = '/version'
 
@@ -11,6 +10,11 @@ let V3_AUTH_ROLE_LIST = '/v3/auth/role/list'
 
 
 let V3_CLUSTER_MEMBER_LIST = '/v3/cluster/member/list'
+
+
+let V3_RANGE = '/v3/kv/range'
+let V3_RANGE_DEL = '/v3/kv/deleterange'
+let V3_RANGE_PUT = '/v3/kv/put'
 
 // function
 $.app.beforeRequest = function (options){
@@ -58,7 +62,7 @@ $.app.afterError = function (options, response){
 
 $.etcd = {}
 
-$.etcd.postJson = function(url, datastr, fn, requestHeader){
+$.etcd.postJson = function(url, datastr, fn, requestHeader, progressing){
 
     if(requestHeader == null){
         requestHeader = {};
@@ -70,11 +74,13 @@ $.etcd.postJson = function(url, datastr, fn, requestHeader){
         datastr = $.extends.json.tostring(datastr)
     }
 
-    $.app.ajax(url, datastr, 'POST', "json", fn, true, null, requestHeader);
+    $.app.ajax(url, datastr, 'POST', "json", fn, true, progressing, requestHeader);
 };
 
 $.etcd.callback = {
     authorizeRefreshed : function (token,response){
+    },
+    tokenInvalid: function (){
     }
 }
 
@@ -120,7 +126,17 @@ $.etcd.request = {
             }
         }
     },
-    connect: function(serverInfo, fn){
+    echo:function(serverInfo, fn){
+        let url = V3_ENDPOINT.format2(serverInfo) + V3_ECHO;
+        let data = {};
+        data.count_only = true;
+        data.key = Base64.encode('/test/');
+
+        $.etcd.postJson(url, data, function (response) {
+            fn.call(serverInfo, response)
+        }, $.etcd.request.buildTokenHeader(serverInfo))
+    },
+    connect: function(serverInfo, fn, progressing){
         let data = null;
         let url = null;
 
@@ -150,12 +166,76 @@ $.etcd.request = {
                 //saveAuthorization(etcdID, data.token);
             }
 
-            fn.call(serverInfo, response)
+            if(fn)
+                fn.call(serverInfo, response)
             console.log(response)
-        })
+        }, null, progressing)
     },
     kv:{
-        range: function (fn, serverInfo, key, range, withPrefix, count_only, sort_order, sort_target, limit,
+        del:function (fn, serverInfo, key, withPrefix){
+            let data = {};
+            data['key']=Base64.encode(key);
+            data['prev_kv']=false;
+
+            if(withPrefix){
+                data['range_end']=Base64.encode($.etcd.request.prefixFormat(key));
+            }
+
+            $.etcd.request.execute(serverInfo, function (node){
+
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE_DEL, data, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+
+                }, $.etcd.request.buildTokenHeader(serverInfo));
+
+            });
+        },
+        put:function (fn, serverInfo, key, value, leaseid, ignore_value, ignore_lease){
+            let data = {};
+
+            data['key']=Base64.encode(key);
+            data['value'] = Base64.encode(value);
+
+            if(!$.extends.isEmpty(leaseid)){
+                data['lease'] = parseInt(leaseid)
+            }
+
+            if(ignore_lease){
+                data['ignore_lease']=true;
+                delete data['lease'];
+            }
+
+            if(ignore_value){
+                data['ignore_value']=true;
+                delete data['value'];
+            }
+
+            data['prev_kv']=false;
+
+            $.etcd.request.execute(serverInfo, function (node){
+
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE_PUT, data, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+
+                }, $.etcd.request.buildTokenHeader(serverInfo));
+
+            });
+        },
+        range: function (fn, serverInfo, key, range, withPrefix, count_only, sort_order, sort_target, skip, count,
                          min_create_revision, min_mod_revision){
             $.etcd.request.execute(serverInfo, function (node) {
                 let data = {};
@@ -164,23 +244,21 @@ $.etcd.request = {
                 if(withPrefix){
                     data['range_end']=Base64.encode($.etcd.request.prefixFormat(key));
                 }else{
-                    data['range_end']=range;
+                    if(range!=null)
+                        data['range_end']=range;
                 }
 
                 if(sort_order!=null){
-                    data['sort_order']=Base64.encode(sort);
+                    data['sort_order']=sort_order;
                 }else{
                     data['sort_order']='NONE';
                 }
 
                 if(sort_target!=null)
-                    data['sort_target']='NONE';
+                    data['sort_target']=sort_target;
 
                 if(count_only)
                     data['count_only']=true;
-
-                if(limit!=null)
-                    data['limit']=limit;
 
                 if(min_create_revision!=null)
                     data['min_create_revision']=min_create_revision;
@@ -188,8 +266,54 @@ $.etcd.request = {
                 if(min_mod_revision!=null)
                     data['min_mod_revision']=min_mod_revision;
 
+                let limit = null;
+
+                if (skip == null || skip <=0)
+                    skip = 0;
+
+
+                if (count == null || count <=0){
+                    limit = null
+                }else{
+                    limit = skip + count
+                }
+
+                if(limit!=null)
+                    data['limit']=limit;
+
                 $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE, data, function (response) {
-                    fn(node, response)
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+
+                        if(response.kvs==null){
+                            response.kvs = [];
+                        }
+
+                        if(response.count==null){
+                            response.count = response.kvs.length;
+                        }
+
+                        let kvs = [];
+                        let endIndex = 0;
+
+                        if (count == null || count <=0)
+                            endIndex = response.kvs.length;
+                        else{
+                            endIndex = response.kvs.length>(skip+count)?(skip+count):response.kvs.length;
+                        }
+
+                        for(let idx = skip; idx < endIndex; idx ++){
+                            kvs.push(response.kvs[idx])
+                        }
+
+                        if(fn && $.isFunction(fn)){
+                            response.kvs = $.etcd.response.decodeKvs(kvs);
+                            fn.call(node, response)
+                        }
+                    }
+
                     // $.app.show(response)
                 }, $.etcd.request.buildTokenHeader(serverInfo))
             })
@@ -228,7 +352,7 @@ $.etcd.request = {
 $.etcd.response = {
     check: function (response){
         if(response&&response.code==16){
-            $.app.show('连接已经失效或者错误，请关闭连接重新进行连接');
+            $.app.show('连接已经失效或者错误，请重新进行请求');
             return false;
         }else if(response&&response.code){
             $.app.show('服务器错误信息:'+response.error);
@@ -237,7 +361,16 @@ $.etcd.response = {
 
         return true
     },
+    retoken:function(serverInfo, response){
+        if(response&&response.code==16){
+            $.etcd.request.connect(serverInfo, null, '连接已经失效或者错误，正在重新建立连接。')
+            $.app.show('连接已经失效或者错误，正在重新建立连接。');
 
+            return true;
+        }
+
+        return false;
+    },
     getClusterId : function (header){
         if(header==null){
             return '';
@@ -260,12 +393,25 @@ $.etcd.response = {
 
         return $.extends.isEmpty(header['revision'], '');
     },
-
     getRaftTerm: function (header){
         if(header==null){
             return '';
         }
         return $.extends.isEmpty(header['raft_term'], '');
     },
+    decodeKvs : function(kvs){
+        let rtn = [];
+
+        if(!$.extends.isEmpty(kvs)){
+            $.each(kvs, function (idx, v) {
+                let o = $.extend({}, v);
+                o.key = Base64.decode(v.key);
+                o.id = v.key;
+                o.value = Base64.decode(v.value);
+                rtn.push(o);
+            })
+        }
+        return rtn;
+    }
 
 }

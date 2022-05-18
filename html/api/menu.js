@@ -130,13 +130,15 @@ $.v3browser.menu = {
             iframe:true,
             content: iframe,
             closable: true,
+            attachNode: etcdNode,
+            attachData: data,
             iconCls: iconCls||'fa fa-th',
             border: true
         });
 
-        let ct = t.tabs('getTab', title);
-        ct.attachNode = etcdNode;
-        ct.attachData=data;
+        //let ct = t.tabs('getTab', title);
+        //ct.attachNode = etcdNode;
+        //ct.attachData=data;
 
     },
     getCurrentTab:function (){
@@ -144,12 +146,66 @@ $.v3browser.menu = {
         let tab = t.tabs('getSelected');
         return tab;
     },
-    getCurrentTabAttachNode:function (){
+    _getCurrentTabOptions:function (){
         let tab = $.v3browser.menu.getCurrentTab();
-        return tab.attachNode;
+        return $(tab).panel('options');
+    },
+    getCurrentTabOptions:function (){
+        return parent.window.$.v3browser.menu._getCurrentTabOptions();
+    },
+    getCurrentTabAttachNode:function (){
+        // let tab = $.v3browser.menu.getCurrentTab();
+        // return tab.attachNode;
+        let options = $.v3browser.menu.getCurrentTabOptions();
+        return options.attachNode;
     },
     getCurrentTabAttachData:function (){
-        let tab = $.v3browser.menu.getCurrentTab();
-        return tab.attachData;
+        // let tab = $.v3browser.menu.getCurrentTab();
+        // return tab.attachData;
+        let options = $.v3browser.menu.getCurrentTabOptions();
+        return options.attachData;
+    },
+    closeTab:function(title){
+        let t = parent.$('#index_tabs');
+        t.tabs('close', title);
+    },
+    isTabExist:function(title){
+        let t = parent.$('#index_tabs');
+        return t.tabs('exists', title)
+    },
+    _refreshTab:function(title){
+        let t = parent.$('#index_tabs');
+        let tab = t.tabs('getTab', title);
+
+        if(tab!=null){
+            t.tabs('select', title);
+            $(tab).panel('refresh');
+            return true;
+        }else{
+            return false;
+        }
+    },
+    refreshTab:function(title){
+        return parent.window.$.v3browser.menu._refreshTab(title);
+    },
+    closeTabs:function(nodeRow){
+        let name = nodeRow.text;
+
+        let t = parent.$('#index_tabs');
+        let tabs = t.tabs('tabs');
+
+        let removed = [];
+
+        $.each(tabs, function(idx, v){
+            let title = $(v).panel('options').title
+            if(title.indexOf('@'+name)>=0){
+                removed.push(title)
+            }
+        })
+
+        $.each(removed, function(idx, v){
+            t.tabs('close', v)
+        });
+
     }
 }

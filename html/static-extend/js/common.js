@@ -21,6 +21,10 @@ function copyArray(list){
 
 function findIdx(list, id){
     let rtn = -1;
+
+    if(list==null)
+        return rtn;
+
     $.each(list, function (idx,v){
         if(id == v.id){
             rtn = idx;

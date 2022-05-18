@@ -14,6 +14,7 @@ function debug(info) {
 String.prototype.jsEncode = function() {
 	let result = this;
 
+	result = result.replace('\\', '\\\\');
 	result = result.replace('\'', '\\\'');
 	result = result.replace('\"', '\\\"')
 

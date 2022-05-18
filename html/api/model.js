@@ -1,6 +1,15 @@
 let NODES_KEY = "etcd-v3-browser-config"
 let CONFIG = {}
 
+$.etcd.callback.authorizeRefreshed = function (token, response) {
+    console.log(this)
+    if(!$.extends.isEmpty(this.id)){
+        console.log("Token: " + token);
+        this.node_token = token;
+        $.v3browser.model.saveAuthorization(this.id, token);
+    }
+}
+
 $.v3browser = $.extend({}, $.v3browser);
 
 $.v3browser.model = {
@@ -94,7 +103,7 @@ $.v3browser.model = {
             nodeData.authorized_enabled = node.authorized_enabled;
             nodeData.node_username = node.node_username;
             nodeData.node_password = node.node_password;
-            nodeData.node_token = null;
+            nodeData.node_token = node.node_token;
 
             $.extend(node, nodeData)
 
@@ -221,6 +230,7 @@ $.v3browser.model = {
             row.iconCls = 'fa fa-list-alt';
             row.type='group';
             row.mm = "groupMm";
+            row.prefix = group.group_prefix;
 
             return row;
         },
@@ -257,19 +267,19 @@ $.v3browser.model = {
             row.mm = 'memberMm';
             return row;
         }
+    },
+    title:{
+        group:function(group, node){
+            let title = group.group_name.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+            return title;
+        }
     }
 
 }
 
 $.v3browser.model.loadLocalConfig()
 
-$.etcd.callback.authorizeRefreshed = function (token, response) {
-    console.log(this)
-    if(!$.extends.isEmpty(this.id)){
-        console.log("Token: " + token);
-        $.v3browser.model.saveAuthorization(this.id, token);
-    }
-}
+
 
 
 
