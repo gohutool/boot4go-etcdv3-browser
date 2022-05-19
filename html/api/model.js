@@ -540,6 +540,9 @@ $.v3browser.model = {
 
             let rtn = [];
 
+            if(row.type=='folder')
+                rtn.push(row);
+
             while(row.parentRow && row.parentRow=='folder'){
                 rtn.push(row.parentRow);
                 row = row.parentRow;

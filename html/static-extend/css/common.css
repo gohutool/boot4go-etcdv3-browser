@@ -1,0 +1,20 @@
+#west .fa{
+    font: normal normal normal 17px FontAwesome!important;
+}
+
+#west .tree-icon {
+    margin-top: 10px!important;
+}
+
+.tree-checkbox, .tree-collapsed, .tree-expanded, .tree-file, .tree-folder, .tree-indent {
+    margin: 0 0!important;
+}
+
+#west .tree-file {
+    overflow: hidden;
+    height: 30px!important;
+}
+
+#west .tree-title {
+    padding-left: 14px;
+}

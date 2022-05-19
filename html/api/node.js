@@ -268,8 +268,8 @@ function loadTreeDg(){
                     return false;
                 }
                 if(targetRow.type == 'group' || sourceRow.type == 'folder'){
-                    $.v3browser.model.exchangeGroup(sourceRow.node_id, sourceRow.id, targetRow.id, point);
-                    $.v3browser.model.saveLocalConfig();
+                    //$.v3browser.model.exchangeGroup(sourceRow.node_id, sourceRow.id, targetRow.id, point);
+                    //$.v3browser.model.saveLocalConfig();
                     return true;
                 }
             }
@@ -445,6 +445,7 @@ function deleteNode(){
 
     $.app.confirm("删除连接", "确认需要删除etcd连接\'"+row.text.jsEncode()+"\'?", function () {
         $.v3browser.model.removeNode2Local(row.id);
+        $.v3browser.menu.closeTabs(row);
         $('#databaseDg').treegrid('remove', row.id);
     })
 }
