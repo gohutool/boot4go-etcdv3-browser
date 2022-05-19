@@ -28,8 +28,8 @@ function toggleRow(row, initExpandFn){
 function newEtcdNode(nodeId){
     return {
         nodes:[
-            {id: nodeId+"_1", node_id: nodeId, text:'键值', type:"kv", iconCls:"fa fa-table",state:"closed", children:[
-                    {id: nodeId+"_1"+"_1", node_id: nodeId, text:'集合', type:"groups", iconCls:"fa fa-object-group",
+            {id: nodeId+"_1", node_id: nodeId, text:'键值', disableDnd: true, type:"kv", iconCls:"fa fa-table",state:"closed", children:[
+                    {id: nodeId+"_1"+"_1", node_id: nodeId, text:'集合', disableDnd: true, type:"groups", iconCls:"fa fa-object-group",
                         event:function(row){
                             console.log(row);
                             toggleRow(row, function (){
@@ -55,6 +55,8 @@ function newEtcdNode(nodeId){
                                     parent:row.id,
                                     data:ds
                                 });
+
+                                $('#databaseDg').treegrid('enableDndChildren', row.id)
 
                                 $('#databaseDg').treegrid('expand', row.id)
 
@@ -88,7 +90,7 @@ function newEtcdNode(nodeId){
                                 $('#databaseDg').treegrid('expand', row.id)
                             }*/
                         }, mm:"groupRootMm"},
-                    {id: nodeId+"_1"+"_2", node_id: nodeId, text:'查询', type:"searches", iconCls:"fa fa-navicon",
+                    {id: nodeId+"_1"+"_2", node_id: nodeId, text:'查询', disableDnd: true, type:"searches", iconCls:"fa fa-navicon",
                         event:function(row){
                             console.log(row);
                             toggleRow(row, function (){
@@ -118,33 +120,33 @@ function newEtcdNode(nodeId){
                             });
                         }, mm:"searchRootMm"},
                 ]},
-            {id: nodeId+"_2", text:'租约', node_id: nodeId, type:"lease", iconCls:"fa fa-plug",state:"closed", children:[
-                    {id: nodeId+"_2"+"_1", node_id: nodeId, text:'租约', type:"lease-object", iconCls:"fa fa-ticket",
+            {id: nodeId+"_2", text:'租约', node_id: nodeId, type:"lease", disableDnd: true, iconCls:"fa fa-plug",state:"closed", children:[
+                    {id: nodeId+"_2"+"_1", node_id: nodeId, text:'租约', disableDnd: true, type:"lease-object", iconCls:"fa fa-ticket",
                         event:function(row){
 
                         }}
                 ]},
-            {id: nodeId+"_3", text:'对象锁', node_id: nodeId, type:"lock", iconCls:"fa fa-lock",state:"closed", children:[
-                    {id: nodeId+"_3"+"_1", node_id: nodeId, text:'锁对象', type:"lock-object", iconCls:"fa fa-server",
+            {id: nodeId+"_3", text:'对象锁', node_id: nodeId, type:"lock", disableDnd: true, iconCls:"fa fa-lock",state:"closed", children:[
+                    {id: nodeId+"_3"+"_1", node_id: nodeId, text:'锁对象', disableDnd: true, type:"lock-object", iconCls:"fa fa-server",
                         event:function(row){
 
                         }}
                 ]},
-            {id: nodeId+"_4", text:'用户', node_id: nodeId, type:"user", iconCls:"fa fa-user-circle-o",state:"closed",
+            {id: nodeId+"_4", text:'用户', node_id: nodeId, type:"user", disableDnd: true, iconCls:"fa fa-user-circle-o",state:"closed",
                 event:function(row){
                     toggleRow(row, function (){
                         refreshUsers(row);
                         return false;
                     });
                 }, mm:"userRootMm"},
-            {id: nodeId+"_5", text:'角色', node_id: nodeId, type:"role", iconCls:"fa fa-user-o",state:"closed",
+            {id: nodeId+"_5", text:'角色', node_id: nodeId, type:"role", disableDnd: true, iconCls:"fa fa-user-o",state:"closed",
                 event:function(row){
                     toggleRow(row, function (){
                         refreshRoles(row);
                         return false;
                     });
                 }, mm:"roleRootMm"},
-            {id: nodeId+"_6", text:'警报', node_id: nodeId, type:"alarm", iconCls:"fa fa-podcast",state1:"closed",
+            {id: nodeId+"_6", text:'警报', node_id: nodeId, type:"alarm", disableDnd: true, iconCls:"fa fa-podcast",state1:"closed",
                 // children:[
                 //     {id: nodeId+"_4"+"_1", node_id: nodeId, text:'警报', type:"alarm-object", iconCls:"fa fa-bell-o",
                 //         event:function(row){
@@ -152,7 +154,7 @@ function newEtcdNode(nodeId){
                 //         }}
                 // ]
             },
-            {id: nodeId+"_7", text:'集群', node_id: nodeId, type:"cluster", iconCls:"fa fa-sitemap",state:"closed",
+            {id: nodeId+"_7", text:'集群', node_id: nodeId, disableDnd: true, type:"cluster", iconCls:"fa fa-sitemap",state:"closed",
                 event:function(row){
                     toggleRow(row, function (){
                         refreshMembers(row);
@@ -248,6 +250,9 @@ function openNode(row){
                 row.open = true;
                 $.app.show("连接etcd服务器"+row.data.node_host+":"+row.data.node_port+"成功");
                 row.open = true;
+
+                $('#databaseDg').treegrid('enableDndChildren', row.id);
+
             }else{
                 row.open = false;
                 $.app.show("错误的节点不能打开")
@@ -274,6 +279,68 @@ function loadTreeDg(){
         singleSelect:true,
         showHeader:false,
         animate:true,
+        onLoadSuccess:$.easyui.event.wrap($.fn.treegrid.defaults.onLoadSuccess,function (row) {
+            $(this).treegrid('enableDnd', row?row.id:null);
+        }),
+        onDragOver:function (targetRow, sourceRow, point) {
+
+            console.log(""+point)
+
+            if(sourceRow.type == 'db'){
+                if(targetRow==null || targetRow.type == 'db'){
+                    if(point == 'append'){
+                        return false
+                    }
+
+                    return true;
+                }
+                return false;
+            }
+
+            if(sourceRow.type == 'group'){
+                if(targetRow.type == 'group'){
+                    if(point == 'append'){
+                        return false
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            console.log(sourceRow)
+            console.log(targetRow)
+            return false
+        },
+        onBeforeDrop:function (targetRow,sourceRow,point) {
+
+            console.log(point)
+
+            if(sourceRow.type == 'db'){
+                if(targetRow==null || targetRow.type == 'db'){
+                    if(point == 'append' && targetRow!=null){
+                        return false
+                    }
+
+                    return true;
+                }
+                return false;
+            }
+
+            if(sourceRow.type == 'group'){
+                if(targetRow.type == 'group'){
+                    return true;
+                }
+                return false;
+            }
+
+            console.log(sourceRow)
+            console.log(targetRow)
+        },
+        onDrop:function (targetRow,sourceRow,point) {
+            console.log(sourceRow)
+            console.log(targetRow)
+            console.log(point)
+        },
         onDblClickRow:function (row) {
             if(row == null){
                 return ;
