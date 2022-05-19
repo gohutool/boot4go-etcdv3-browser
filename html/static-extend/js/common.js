@@ -35,6 +35,15 @@ function findIdx(list, id){
     return rtn;
 }
 
+function findObj(list, id){
+    let i = findIdx(list, id)
+
+    if(i<0)
+        return null;
+
+    return list[i];
+}
+
 function exchangeOrder(list, id1, id2){
     let idx1 = findIdx(list, id1);
 
@@ -73,4 +82,28 @@ function exchangeAfter(sid, list, tid) {
         idx2 = findIdx(list, tid);
     }
     list.splice(idx2+1, 0, one)
+}
+
+function exchangeTwoListAfter(sid, slist, tid, tlist) {
+    let idx1 = findIdx(slist, sid);
+    let one = slist[idx1];
+    slist.splice(idx1, 1)
+
+    let idx2 = tlist.length-1;
+    if(tid){
+        idx2 = findIdx(tlist, tid);
+    }
+    tlist.splice(idx2+1, 0, one)
+}
+
+function exchangeTwoListBefore(sid, slist, tid, tlist) {
+    let idx1 = findIdx(slist, sid);
+    let one = slist[idx1];
+    slist.splice(idx1, 1)
+
+    let idx2 = 0;
+    if(tid){
+        idx2 = findIdx(tlist, tid)
+    }
+    tlist.splice(idx2, 0, one)
 }

@@ -236,6 +236,9 @@ function loadTreeDg(){
                     return true;
                 }
                 if(targetRow && targetRow.type == 'folder'){
+                    if(sourceRow.parentRow!=null&&sourceRow.parentRow.id==targetRow.id)
+                        return false;
+
                     return true;
                 }
                 $.app.show('不能移动到连接节点外')

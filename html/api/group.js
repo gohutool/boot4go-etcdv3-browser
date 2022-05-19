@@ -415,3 +415,80 @@ function buildGroupTreeDatas(node, datas, parentRow){
     }
     return ds;
 }
+
+
+function exchangeGroup(nodeId, sourceRow, targetRow, point){
+
+    let node = $.v3browser.model.getLocalNode(nodeId);
+    let group = node.group || [];
+    node.group = group;
+
+    let sourceParentRow = sourceRow.parentRow;
+    let sourceData = null
+    let targetParentRow = targetRow.parentRow;
+    let targetData = null
+
+    if(sourceParentRow==null||sourceParentRow.type=='groups'){
+        sourceData = group
+    }
+
+    if(targetParentRow==null||targetParentRow.type=='groups'){
+        targetData = group
+    }
+
+    if(sourceRow.type == 'group'){
+        if(point=='append'){
+            if(targetRow.type == 'folder'){
+                targetData = findObj(targetData, targetRow.id)
+                exchangeTwoListAfter(sourceRow.id, sourceData, null, targetData)
+            }else{
+                return '不能Append到集合节点';
+            }
+        }else{
+            if(point=='top'){
+                exchangeTwoListBefore(sourceRow.id, sourceData, targetRow.id, targetData)
+            }
+            else{
+                exchangeTwoListAfter(sourceRow.id, sourceData, targetRow.id, targetData)
+            }
+            sourceRow.parentRow = targetParentRow
+
+            return null;
+        }
+    }else{ // folder
+
+        let parents = $.v3browser.model.util.findFolderAncestorList(targetRow);
+
+        if(parents==null)
+            parents=[];
+
+        let isloop = false;
+
+        $.each(parents, function (idx, v) {
+           if(v.id == sourceRow.id)
+               isloop = true;
+        });
+
+        if(isloop)
+            return '不能将folder移动到子对象里';
+
+        if(point=='append'){
+            if(targetRow.type == 'group'){
+                return '不能Append到集合节点';
+            }else{
+                targetData = findObj(targetData, targetRow.id)
+                exchangeTwoListAfter(sourceRow.id, sourceData, null, targetData)
+            }
+        }else{
+            if(point=='top')
+                exchangeTwoListBefore(sourceRow.id, sourceData, targetRow.id, targetData)
+            else
+                exchangeTwoListAfter(sourceRow.id, sourceData, targetRow.id, targetData)
+
+            sourceRow.parentRow = targetParentRow
+
+            return null;
+        }
+    }
+    return null;
+}
