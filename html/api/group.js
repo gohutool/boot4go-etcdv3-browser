@@ -378,3 +378,38 @@ function removeFolder(){
     })
 }
 /// For Folder end
+
+
+function buildGroupTreeDatas(node, datas, parentRow){
+    if(datas==null)
+        datas = [];
+
+    let ds = [];
+
+    if(datas){
+        $.each(datas, function (idx,data){
+            if($.v3browser.model.getDataType(data) == 'group'){
+                let one = $.v3browser.model.convert.Group2Data(data);
+                one.event = function(r){
+                    let node = $.v3browser.model.getLocalNode(r.node_id)
+
+                    let title = $.v3browser.model.title.group(r.data, node)
+                    $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
+                }
+                one.parentRow = parentRow;
+                ds.push(one);
+            }
+            else if($.v3browser.model.getDataType(data) == 'folder'){
+                let one = $.v3browser.model.convert.Folder2Data(data);
+                one.event = function(r){
+                    $('#databaseDg').treegrid('toggle', r.id);
+                    return ;
+                }
+                one.children = buildGroupTreeDatas(node, data.group, one);
+                one.parentRow = parentRow;
+                ds.push(one);
+            }
+        });
+    }
+    return ds;
+}

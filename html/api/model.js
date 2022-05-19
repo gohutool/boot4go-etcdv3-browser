@@ -187,8 +187,33 @@ $.v3browser.model = {
      * @param etcdID
      * @param group   group_name, group_prefix, group_demo
      */
-    saveGroup2Node: function (etcdID, group) {
+    saveGroup2Node: function (etcdID, group, row) {
+
         let node = $.v3browser.model.getLocalNode(etcdID);
+
+        if(row == null || row.type == 'groups'){
+            let groups = node.group;
+
+            if(groups==null){
+                groups = [];
+            }
+
+            if(node==null){
+                return '节点不存在';
+            }
+
+            let rtn = this._saveGroup2List(node, group, groups);
+
+            node.group = groups;
+            $.v3browser.model.saveLocalConfig();
+
+            return rtn;
+        }
+
+        if(row.type!='folder'){
+            $.app.show('不能在当前添加集合, 只有在目录或者集合根路径下才能添加集合')
+            return false;
+        }
 
         let groups = node.group;
 
@@ -196,26 +221,25 @@ $.v3browser.model = {
             groups = [];
         }
 
-        if(node==null){
-            return '节点不存在';
-        }
-
-        let rtn = this._saveGroup2List(node, group, groups);
-
         node.group = groups;
-        $.v3browser.model.saveLocalConfig();
 
-        return rtn;
-    },
-    saveGroup: function (etcdID, row, group) {
-        let node = $.v3browser.model.getLocalNode(etcdID);
+        let parents = this.util.findGroupRowParents(row);
 
-        if(row.type != 'groups' && row.type!='folder'){
-            $.app.show('不能在当前添加集合')
-            return false;
+        let parentGroup = node.group;
+
+        if(parents==null)
+            parents=[];
+
+        $.each(parents, function (idx, parent){
+            let currentParent = parent.idx
+        });
+
+        if($.extends.isEmpty(parents)){ // folder is root.
+
+            return ;
+        }else{
+
         }
-
-        let groups = row;
 
         if(groups==null){
             groups = [];
@@ -502,9 +526,46 @@ $.v3browser.model = {
             let title = '新建@'+node.node_name.jsEncode()+'-查询';
             return title;
         }
-    }
+    },
+    util:{
+        findGroupRowParents: function(row){
+            let node = $.v3browser.model.getLocalNode(row.node_id);
 
+            if(node.group==null)
+                return [];
+
+            let rtn = [];
+
+            while(row.parentRow && row.parentRow=='folder'){
+                rtn.push(row.parentRow);
+                row = row.parentRow;
+            }
+
+            rtn = rtn.reverse()
+
+            let idxRtn = []
+
+            let list = node.group;
+
+            $.each(rtn, function (i, val) {
+                let idx = findIdx(list, val.id);
+                if(idx>=0){
+                    if(val.type=='folder'){
+                        idxRtn.push({index:idx, row: val, data: list[idx]})
+                        list = list[idx].group || [];
+                    }else{
+                        return false;
+                    }
+                }
+                else
+                    return false;
+            });
+
+            return idxRtn;
+        },
+    }
 }
+
 
 $.v3browser.model.loadLocalConfig()
 
