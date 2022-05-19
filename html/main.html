@@ -185,13 +185,15 @@ $(this).menu('options').node=null;
 <div id="folderMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
     <div onclick="renameFolder()" data-options="iconCls:'fa fa-pencil-square-o'">重命名...</div>
     <div class="menu-sep"></div>
-    <div onclick="removeFolder()" data-options="iconCls:'fa fa-plus-circle'">删除目录</div>
+    <div onclick="removeFolder()" data-options="iconCls:'fa fa-trash'">删除目录</div>
+    <div class="menu-sep"></div>
+    <div onclick="createGroupDg()" data-options="iconCls:'fa fa-plus-circle'">新建集合...</div>
 </div>
 
 <div id="groupMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
     <div onclick="editGroupDg()" data-options="iconCls:'fa fa-pencil'">编辑集合...</div>
     <div class="menu-sep"></div>
-    <div onclick="removeGroup()" data-options="iconCls:'fa fa-plus-circle'">删除集合</div>
+    <div onclick="removeGroup()" data-options="iconCls:'fa fa-trash'">删除集合</div>
 </div>
 
 <div id="userRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
@@ -274,6 +276,13 @@ $(this).menu('options').node=null;
                 ROOT_RES_URL + "/api/model.js",
                 ROOT_RES_URL + "/api/menu.js",
                 ROOT_RES_URL + "/api/main.js",
+                ROOT_RES_URL + "/api/node.js",
+                ROOT_RES_URL + "/api/group.js",
+                ROOT_RES_URL + "/api/search.js",
+                ROOT_RES_URL + "/api/user.js",
+                ROOT_RES_URL + "/api/role.js",
+                ROOT_RES_URL + "/api/cluster.js",
+
                 ROOT_RES_URL + '/static/plugins/easyui/treegrid-dnd/treegrid-dnd.js'
             ],
             render: function () {

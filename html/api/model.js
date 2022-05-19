@@ -145,6 +145,23 @@ $.v3browser.model = {
             $.v3browser.model.saveLocalConfig()
         }
     },
+    removeFolderFromLocal: function(etcdID, folderId){
+        let node = $.v3browser.model.getLocalNode(etcdID);
+
+        if(node.group){
+            let idx = -1;
+            $.each(node.group, function (i,v){
+                if(folderId == v.id)
+                    idx = i;
+            })
+
+            if(idx >=0){
+                node.group.splice(idx, 1);
+            }
+
+            $.v3browser.model.saveLocalConfig()
+        }
+    },
     exchangeNode:function(id1, id2, point){
         if(point == 'end'){
             exchangeAfter(id1, CONFIG.nodes, null)
@@ -190,9 +207,34 @@ $.v3browser.model = {
 
         return rtn;
     },
+    saveGroup: function (etcdID, row, group) {
+        let node = $.v3browser.model.getLocalNode(etcdID);
+
+        if(row.type != 'groups' && row.type!='folder'){
+            $.app.show('不能在当前添加集合')
+            return false;
+        }
+
+        let groups = row;
+
+        if(groups==null){
+            groups = [];
+        }
+
+        if(node==null){
+            return '节点不存在';
+        }
+
+        let rtn = this._saveGroup2List(node, group, groups);
+
+        node.group = groups;
+        $.v3browser.model.saveLocalConfig();
+
+        return rtn;
+    },
     _saveGroup2List:function(node, group, groups){
 
-        let idx = findIdx(node.group, group.group_id);
+        let idx = findIdx(groups, group.group_id);
 
         if($.extends.isEmpty(group.group_id)||idx<0){
             group.id = Math.uuid();
@@ -208,7 +250,7 @@ $.v3browser.model = {
             let one = groups[idx];
 
             //one.id = group.id;
-            one.group_id = node.id;
+            one.group_id = group.group_id;
             one.group_prefix = group.group_prefix;
             one.group_demo = group.group_demo;
             one.group_name = group.group_name;
@@ -218,6 +260,40 @@ $.v3browser.model = {
             groups[idx] = one;
 
             $.extend(group, one);
+
+            return idx;
+        }
+    },
+    _saveFolder2List:function(node, folder, groups){
+
+        let idx = findIdx(groups, folder.folder_id);
+
+        if($.extends.isEmpty(folder.folder_id)||idx<0){
+            folder.id = Math.uuid();
+            folder.folder_id = folder.id;
+            folder.node_id = node.id;
+            folder.db_id = node.id;
+            let date = new Date()
+            folder.createtime = date.Format('yyyy-MM-dd HH:mm:ss');
+
+
+            groups.push($.extend({}, folder));
+
+            return -1;
+        }else{
+            let one = groups[idx];
+
+            //one.id = group.id;
+            one.folder_id = folder.folder_id;
+            one.folder_demo = folder.folder_demo;
+            one.folder_name = folder.folder_name;
+
+            let date = new Date()
+            node.updatetime = date.Format('yyyy-MM-dd HH:mm:ss');
+            groups[idx] = one;
+
+            $.extend(folder, one);
+            delete folder['groups']
 
             return idx;
         }
@@ -237,6 +313,12 @@ $.v3browser.model = {
 
         if(parentData==null){
 
+            let rtn = this._saveFolder2List(node, folder, groups);
+
+            node.group = groups;
+            $.v3browser.model.saveLocalConfig();
+
+            return rtn;
         }else{
 
         }
@@ -340,7 +422,7 @@ $.v3browser.model = {
             row.data = rowData;
             delete row.data.group;
             row.text = folder.folder_name;
-            // row.state = 'closed';
+            row.state = 'closed';
             row.iconCls = 'fa fa-folder-o';
             row.type='folder';
             row.mm = "folderMm";
