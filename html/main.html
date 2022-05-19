@@ -177,7 +177,15 @@ $(this).menu('options').node=null;
 </div>
 
 <div id="groupRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="createFolder()" data-options="iconCls:'fa fa-folder-o'">新建目录...</div>
+    <div class="menu-sep"></div>
     <div onclick="createGroupDg()" data-options="iconCls:'fa fa-plus-circle'">新建集合...</div>
+</div>
+
+<div id="folderMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="renameFolder()" data-options="iconCls:'fa fa-pencil-square-o'">重命名...</div>
+    <div class="menu-sep"></div>
+    <div onclick="removeFolder()" data-options="iconCls:'fa fa-plus-circle'">删除目录</div>
 </div>
 
 <div id="groupMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">

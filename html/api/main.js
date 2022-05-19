@@ -1,7 +1,41 @@
-function removeSubTree(id){
+
+function modifyUserPwd() {
+    let opts = {
+        id: 'pwdDialog',
+        title: message.core.login.changepwd,
+        width: 600,
+        height: 400,
+        iconCls: 'fa fa-key',
+        buttons: [{
+            text: message.core.label.confirm,
+            iconCls: 'fa fa-save',
+            btnCls: 'cubeui-btn-green',
+            handler: function () {
+                if($("#pwdDialog").form('validate')==true){
+                    $("#pwdDialog").iDialog('close').form(
+                        'reset');
+                    console.log("Logout")
+                }
+            }
+        }, {
+            text: message.core.label.close,
+            iconCls: 'fa fa-close',
+            btnCls: 'cubeui-btn-red',
+            handler: function () {
+                $("#pwdDialog").iDialog('close');
+            }
+        }]
+    };
+
+    $.app.openDialog(opts.id, contextpath + '/modifypwd.html', 'test=1', opts);
+    //$('#' + opts.id).iDialog('openDialog', opts);
+};
+
+//// For utility
+function removeSubTree(id) {
     let nodes = $('#databaseDg').treegrid('getChildren', id);
-    if(nodes==null)
-        return ;
+    if (nodes == null)
+        return;
     $.each(nodes, function (idx, v) {
         $('#databaseDg').treegrid('remove', v.id);
     })
@@ -25,6 +59,45 @@ function toggleRow(row, initExpandFn){
     }
 }
 
+function findGroupRowParents(row){
+    let node = $.v3browser.model.getLocalNode(row.node_id);
+
+    if(node.group==null)
+        return [];
+
+    let rtn = [];
+
+    while(row.parentRow && row.parentRow=='folder'){
+        rtn.push(row.parentRow);
+        row = row.parentRow;
+    }
+
+    rtn = rtn.reverse()
+
+    let idxRtn = []
+
+    let list = node.group;
+
+    $.each(rtn, function (i, val) {
+        let idx = findIdx(list, val.id);
+        if(idx>=0){
+            if(val.type=='folder'){
+                idxRtn.push({index:idx, row: val, data: list[idx]})
+                list = list[idx].group || [];
+            }else{
+                return false;
+            }
+        }
+        else
+            return false;
+    });
+
+    return idxRtn;
+}
+//// For utility end
+
+
+//// For node
 function newEtcdNode(nodeId){
     return {
         nodes:[
@@ -34,22 +107,22 @@ function newEtcdNode(nodeId){
                             console.log(row);
                             toggleRow(row, function (){
 
-                                let ds = [];
                                 let node = $.v3browser.model.getLocalNode(row.node_id);
 
-                                if(node.group){
-                                    $.each(node.group, function (idx,v){
-                                        let one = $.v3browser.model.convert.Group2Data(v);
-                                        one.event = function(r){
-                                            let node = $.v3browser.model.getLocalNode(r.node_id)
-
-                                            //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
-                                            let title = $.v3browser.model.title.group(v, node)
-                                            $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
-                                        }
-                                        ds.push(one);
-                                    });
-                                }
+                                let ds = buildGroupTreeDatas(node, node.group, row)
+                                // if(node.group){
+                                //     $.each(node.group, function (idx,v){
+                                //         let one = $.v3browser.model.convert.Group2Data(v);
+                                //         one.event = function(r){
+                                //             let node = $.v3browser.model.getLocalNode(r.node_id)
+                                //
+                                //             //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+                                //             let title = $.v3browser.model.title.group(v, node)
+                                //             $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
+                                //         }
+                                //         ds.push(one);
+                                //     });
+                                // }
 
                                 $('#databaseDg').treegrid('append', {
                                     parent:row.id,
@@ -62,33 +135,6 @@ function newEtcdNode(nodeId){
 
                                 return false;
                             });
-                            /*if(row.children!=null){
-                                $('#databaseDg').treegrid('toggle', row.id)
-                            }else{
-                                let ds = [];
-                                let node = $.v3browser.model.getLocalNode(row.node_id);
-
-                                if(node.group){
-                                    $.each(node.group, function (idx,v){
-                                        let one = $.v3browser.model.convert.Group2Data(v);
-                                        one.event = function(r){
-                                            let node = $.v3browser.model.getLocalNode(r.node_id)
-
-                                            //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
-                                            let title = $.v3browser.model.title.group(v, node)
-                                            $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
-                                        }
-                                        ds.push(one);
-                                    });
-                                }
-
-                                $('#databaseDg').treegrid('append', {
-                                    parent:row.id,
-                                    data:ds
-                                });
-
-                                $('#databaseDg').treegrid('expand', row.id)
-                            }*/
                         }, mm:"groupRootMm"},
                     {id: nodeId+"_1"+"_2", node_id: nodeId, text:'查询', disableDnd: true, type:"searches", iconCls:"fa fa-navicon",
                         event:function(row){
@@ -147,27 +193,16 @@ function newEtcdNode(nodeId){
                     });
                 }, mm:"roleRootMm"},
             {id: nodeId+"_6", text:'警报', node_id: nodeId, type:"alarm", disableDnd: true, iconCls:"fa fa-podcast",state1:"closed",
-                // children:[
-                //     {id: nodeId+"_4"+"_1", node_id: nodeId, text:'警报', type:"alarm-object", iconCls:"fa fa-bell-o",
-                //         event:function(row){
-                //
-                //         }}
-                // ]
-            },
+            event:function (){
+
+            }},
             {id: nodeId+"_7", text:'集群', node_id: nodeId, disableDnd: true, type:"cluster", iconCls:"fa fa-sitemap",state:"closed",
                 event:function(row){
                     toggleRow(row, function (){
                         refreshMembers(row);
                         return false;
                     });
-                }, mm:"memberRootMm"
-                // children:[
-                //     {id: nodeId+"_4"+"_1", node_id: nodeId, text:'集群信息', type:"cluster-info", iconCls:"fa fa-mixcloud",
-                //         event:function(row){
-                //
-                //         }}
-                // ]
-            },
+                }, mm:"memberRootMm"},
         ]
     }
 }
@@ -182,6 +217,40 @@ function buildTreeDatas(){
     })
 
     return datas;
+}
+
+function buildGroupTreeDatas(node, datas, parentRow){
+    if(datas==null)
+        datas = [];
+
+    let ds = [];
+
+    if(datas){
+        $.each(datas, function (idx,data){
+            if($.v3browser.model.getDataType(data) == 'group'){
+                let one = $.v3browser.model.convert.Group2Data(data);
+                one.event = function(r){
+                    let node = $.v3browser.model.getLocalNode(r.node_id)
+
+                    let title = $.v3browser.model.title.group(r.data, node)
+                    $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
+                }
+                one.parentRow = parentRow;
+                ds.push(one);
+            }
+            else if($.v3browser.model.getDataType(data) == 'folder'){
+                let one = $.v3browser.model.convert.Folder2Data(data);
+                one.event = function(r){
+                    $('#databaseDg').treegrid('toggle', r.id)
+                    return ;
+                }
+                one.children = buildGroupTreeDatas(node, data.group, one);
+                one.parentRow = parentRow;
+                ds.push(one);
+            }
+        });
+    }
+    return ds;
 }
 
 function openClose(){
@@ -283,63 +352,83 @@ function loadTreeDg(){
             $(this).treegrid('enableDnd', row?row.id:null);
         }),
         onDragOver:function (targetRow, sourceRow, point) {
-
             console.log(""+point)
-
             if(sourceRow.type == 'db'){
-                if(targetRow==null || targetRow.type == 'db'){
-                    if(point == 'append'){
+                if(targetRow!=null && targetRow.type == 'db'){
+                    if(targetRow!=null && point == 'append'){
                         return false
                     }
-
+                    console.log(targetRow)
                     return true;
                 }
                 return false;
             }
+
+            console.log(targetRow)
 
             if(sourceRow.type == 'group'){
-                if(targetRow.type == 'group'){
-                    if(point == 'append'){
-                        return false
-                    }
+                if(targetRow && targetRow.type == 'group'){
                     return true;
                 }
                 return false;
             }
 
-            console.log(sourceRow)
-            console.log(targetRow)
             return false
         },
         onBeforeDrop:function (targetRow,sourceRow,point) {
-
             console.log(point)
+            console.log(targetRow)
 
             if(sourceRow.type == 'db'){
                 if(targetRow==null || targetRow.type == 'db'){
-                    if(point == 'append' && targetRow!=null){
+                    if(targetRow!=null && point == 'append'){
                         return false
                     }
-
                     return true;
                 }
                 return false;
             }
 
             if(sourceRow.type == 'group'){
-                if(targetRow.type == 'group'){
+                if(targetRow && targetRow.type == 'group'){
+                    if(point == 'append'){
+                        return false
+                    }
                     return true;
                 }
+                $.app.show('不能移动到连接节点外')
                 return false;
             }
 
             console.log(sourceRow)
-            console.log(targetRow)
         },
         onDrop:function (targetRow,sourceRow,point) {
-            console.log(sourceRow)
-            console.log(targetRow)
-            console.log(point)
+            if(sourceRow.type == 'db'){
+                if(targetRow == null){
+                    if(point='append'){
+                        $.v3browser.model.exchangeNode(sourceRow.id, null, 'end');
+                        $.v3browser.model.saveLocalConfig();
+                        return true;
+                    }
+
+                    return false;
+                }
+                if(targetRow.type == 'db'){
+                    $.v3browser.model.exchangeNode(sourceRow.id, targetRow.id, point);
+                    $.v3browser.model.saveLocalConfig();
+                    return true;
+                }
+            }
+
+            if(sourceRow.type == 'group'){
+                if(targetRow.type == 'group'){
+                    $.v3browser.model.exchangeGroup(sourceRow.node_id, sourceRow.id, targetRow.id, point);
+                    $.v3browser.model.saveLocalConfig();
+                    return true;
+                }
+            }
+
+            return false;
         },
         onDblClickRow:function (row) {
             if(row == null){
@@ -503,39 +592,6 @@ function openNodeDg(data){
         }]
     });
 }
-
-
-function modifyUserPwd() {
-    let opts = {
-        id: 'pwdDialog',
-        title: message.core.login.changepwd,
-        width: 600,
-        height: 400,
-        iconCls: 'fa fa-key',
-        buttons: [{
-            text: message.core.label.confirm,
-            iconCls: 'fa fa-save',
-            btnCls: 'cubeui-btn-green',
-            handler: function () {
-                if($("#pwdDialog").form('validate')==true){
-                    $("#pwdDialog").iDialog('close').form(
-                        'reset');
-                    console.log("Logout")
-                }
-            }
-        }, {
-            text: message.core.label.close,
-            iconCls: 'fa fa-close',
-            btnCls: 'cubeui-btn-red',
-            handler: function () {
-                $("#pwdDialog").iDialog('close');
-            }
-        }]
-    };
-
-    $.app.openDialog(opts.id, contextpath + '/modifypwd.html', 'test=1', opts);
-    //$('#' + opts.id).iDialog('openDialog', opts);
-};
 
 function deleteNode(){
 
@@ -709,6 +765,9 @@ function importEtcd(){
         }]
     })
 }
+
+
+/// For Group
 
 function groupDg(data){
 
@@ -895,6 +954,110 @@ function createGroupDg(){
     groupDg(data)
 }
 
+/// For Group end
+
+/// For Folder
+function _folderDg(data){
+    let isUpdate = !($.extends.isEmpty(data)||$.extends.isEmpty(data.id));
+
+    $.iDialog.openDialog({
+        text: '添加',
+        minimizable:false,
+        width: 640,
+        height: 300,
+        content: `   
+            <div style="margin: 10px;">
+            </div>
+            <div class="cubeui-fluid" id="create-group-form">
+                <input type="hidden" name="folder_id" value="{{:id}}">
+                <input type="hidden" name="db_id" value="{{:db_id}}">
+                <div class="cubeui-row">
+                
+                    <div class="cubeui-col-sm11">
+                        <label class="cubeui-form-label">名称:</label>
+                        <div class="cubeui-input-block">
+                            <input type="text" data-toggle="cubeui-textbox" id="folder_name" name="folder_name"
+                                   value='{{:folder_name}}' data-options="required:true,prompt:'目录名称，必须填写'">
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="cubeui-row">
+                
+                    <div class="cubeui-col-sm11">
+                        <label class="cubeui-form-label">备注:</label>
+                        <div class="cubeui-input-block">
+                            <input type="text" data-toggle="cubeui-textarea" id="folder_demo" name="folder_demo"
+                                   value='{{:folder_demo}}' data-options="required:false,prompt:'目录备注信息，选择填写',
+                                   height:100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `,
+        render:function(opts, handler){
+            let d = this;
+            console.log("Open dialog");
+
+            handler.render(data)
+
+            if(!isUpdate){
+                $(this).dialog('setTitle', '添加目录')
+            }else{
+                //$(this).dialog('setTitle', '修改集合'+data.group_name.jsEncode())
+                $(this).dialog('setTitle', '修改目录')
+            }
+        },
+        ButtonsGroup:[{
+            text: isUpdate?'修改':'添加',
+            iconCls: 'fa fa-save',
+            btnCls: 'cubeui-btn-blue',
+            handler:'ajaxForm',
+            beforeAjax:function(o){
+                o.ajaxData = $.extends.json.param2json(o.ajaxData);
+                let info = o.ajaxData;
+
+                console.log(info);
+
+                if(isUpdate){
+
+                }else{
+                    let row = $.v3browser.menu.getCurrentOpenMenuRow()
+                    if(row=='folder'||row=='groups'){
+                        if(row == 'folder'){
+
+                        }else{
+                            findGroupRowParents()
+                        }
+
+                    }else{
+                        $.app.show('只有在目录或者集合根路径下才能创建子目录')
+                        return false;
+                    }
+                }
+
+                $.app.show(isUpdate?'修改目录成功':'添加目录成功');
+                $.iDialog.closeOutterDialog($(this))
+
+                return false
+            },
+        }]
+    })
+}
+
+function renameFolder(){
+    let row = $.v3browser.menu.getCurrentOpenMenuRow();
+    _folderDg(row.data)
+}
+
+function createFolder(){
+    _folderDg({});
+}
+
+/// For Folder end
+
+
+/// For User
 function createUserDg(){
     let dbId = $.v3browser.menu.getCurrentOpenMenuNodeId();
     let data = {};
@@ -941,6 +1104,9 @@ function refreshUsers(row){
     }, node)
 }
 
+/// For User end
+
+/// For Role
 function refreshRoles(row){
     let node;
     let dbId=null;
@@ -980,6 +1146,9 @@ function refreshRoles(row){
     }, node)
 }
 
+/// For Role end
+
+/// For Cluster
 function refreshMembers(row){
     let node=null;
     let dbId=null;
@@ -1019,6 +1188,9 @@ function refreshMembers(row){
     }, node)
 }
 
+/// For Cluster end
+
+/// For Search
 function removeSearch(){
     let row = $.v3browser.menu.getCurrentOpenMenuRow()
     let pid = $('#databaseDg').treegrid('getParent', row.id).id
@@ -1049,3 +1221,4 @@ function addSearch() {
 function _openSearch(data) {
 
 }
+/// For Search end
