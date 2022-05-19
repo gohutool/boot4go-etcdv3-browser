@@ -102,13 +102,14 @@ function groupDg(data){
                 let info = o.ajaxData
 
                 let msg = $.v3browser.model.saveGroup2Node(
-                    $.v3browser.menu.getCurrentOpenMenuNodeId(), info);
+                    $.v3browser.menu.getCurrentOpenMenuNodeId(), info, isUpdate?row.parentRow:row);
 
                 if(typeof msg == 'string'){
                     $.app.show("不能添加集合，"+msg);
                 }else{
                     if(msg < 0){
                         let one = $.v3browser.model.convert.Group2Data(info);
+                        one.parentRow = row;
                         one.event = function(r){
                             let node = $.v3browser.model.getLocalNode(r.node_id)
 
@@ -116,11 +117,12 @@ function groupDg(data){
                             let title = $.v3browser.model.title.group(info, node)
                             $.v3browser.menu.addOneTabAndRefresh(title, './kv/group.html', 'fa fa-list-alt', node, r);
                         }
-
                         $('#databaseDg').treegrid('append', {
                             parent: $.v3browser.menu.getCurrentOpenMenuRow().id,
                             data:[one]
                         });
+                        $('#databaseDg').treegrid('enableDnd',one.id);
+
                         $('#databaseDg').treegrid('expand', $.v3browser.menu.getCurrentOpenMenuRow().id);
                     }else{
                         let old = $('#databaseDg').treegrid('find',info.id);
@@ -288,7 +290,7 @@ function _folderDg(data){
 
                 if(isUpdate){
                     let msg = $.v3browser.model.saveFolder2Node(
-                        $.v3browser.menu.getCurrentOpenMenuNodeId(), info, null);
+                        $.v3browser.menu.getCurrentOpenMenuNodeId(), info, row.parentRow);
                     if(typeof msg == 'string'){
                         $.app.show("添加目录失败，"+msg);
                         return
@@ -306,37 +308,37 @@ function _folderDg(data){
 
                 }else{
                     if(row.type=='folder'||row.type=='groups'){
-                        if(row.type == 'folder'){
+                        let msg = $.v3browser.model.saveFolder2Node(
+                            $.v3browser.menu.getCurrentOpenMenuNodeId(), info, row);
 
+                        if(typeof msg == 'string'){
+                            $.app.show("添加目录失败，"+msg);
+                            return ;
                         }else{
-                            let msg = $.v3browser.model.saveFolder2Node(
-                                $.v3browser.menu.getCurrentOpenMenuNodeId(), info, null);
-
-                            if(typeof msg == 'string'){
-                                $.app.show("添加目录失败，"+msg);
-                                return ;
-                            }else{
-                                if(msg < 0){
-                                    let one = $.v3browser.model.convert.Folder2Data(info);
-                                    one.event = function(r){
-                                        $('#databaseDg').treegrid('toggle', r.id);
-                                    }
-                                    $('#databaseDg').treegrid('append', {
-                                        parent: $.v3browser.menu.getCurrentOpenMenuRow().id,
-                                        data:[one]
-                                    });
-                                    $('#databaseDg').treegrid('expand', $.v3browser.menu.getCurrentOpenMenuRow().id);
-                                }else{
-                                    let old = $('#databaseDg').treegrid('find',info.id);
-
-                                    old.text = info.folder_name;
-                                    $.extend(old.data, {
-                                        folder_name:info.folder_name,
-                                        folder_demo:info.folder_demo
-                                    });
-
-                                    $('#databaseDg').treegrid('refresh', old.id);
+                            if(msg < 0){
+                                let one = $.v3browser.model.convert.Folder2Data(info);
+                                one.parentRow = row;
+                                one.event = function(r){
+                                    $('#databaseDg').treegrid('toggle', r.id);
                                 }
+
+                                $('#databaseDg').treegrid('append', {
+                                    parent: $.v3browser.menu.getCurrentOpenMenuRow().id,
+                                    data:[one]
+                                });
+                                $('#databaseDg').treegrid('enableDnd',one.id);
+                                $('#databaseDg').treegrid('expand', $.v3browser.menu.getCurrentOpenMenuRow().id);
+
+                            }else{
+                                let old = $('#databaseDg').treegrid('find',info.id);
+
+                                old.text = info.folder_name;
+                                $.extend(old.data, {
+                                    folder_name:info.folder_name,
+                                    folder_demo:info.folder_demo
+                                });
+
+                                $('#databaseDg').treegrid('refresh', old.id);
                             }
                         }
                     }else{

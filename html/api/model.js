@@ -187,71 +187,52 @@ $.v3browser.model = {
      * @param etcdID
      * @param group   group_name, group_prefix, group_demo
      */
-    saveGroup2Node: function (etcdID, group, row) {
+    saveGroup2Node: function (etcdID, group, parentRow) {
 
         let node = $.v3browser.model.getLocalNode(etcdID);
 
-        if(row == null || row.type == 'groups'){
+        if(node==null){
+            return '节点不存在';
+        }
+
+        if(parentRow == null || parentRow.type == 'groups'){
             let groups = node.group;
 
             if(groups==null){
                 groups = [];
             }
 
-            if(node==null){
-                return '节点不存在';
-            }
-
             let rtn = this._saveGroup2List(node, group, groups);
-
             node.group = groups;
+
+            let date = new Date()
+            node.updatetime = date.Format('yyyy-MM-dd HH:mm:ss');
             $.v3browser.model.saveLocalConfig();
 
             return rtn;
         }
 
-        if(row.type!='folder'){
+        if(parentRow.type!='folder'){
             $.app.show('不能在当前添加集合, 只有在目录或者集合根路径下才能添加集合')
             return false;
         }
 
-        let groups = node.group;
+        let parents = $.v3browser.model.util.findFolderAncestorList(parentRow);
+
+        let parent = parents[parents.length-1].data;
+
+        let groups = parent.group;
 
         if(groups==null){
             groups = [];
-        }
-
-        node.group = groups;
-
-        let parents = this.util.findGroupRowParents(row);
-
-        let parentGroup = node.group;
-
-        if(parents==null)
-            parents=[];
-
-        $.each(parents, function (idx, parent){
-            let currentParent = parent.idx
-        });
-
-        if($.extends.isEmpty(parents)){ // folder is root.
-
-            return ;
-        }else{
-
-        }
-
-        if(groups==null){
-            groups = [];
-        }
-
-        if(node==null){
-            return '节点不存在';
         }
 
         let rtn = this._saveGroup2List(node, group, groups);
 
-        node.group = groups;
+        parent.group = groups;
+
+        let date = new Date()
+        node.updatetime = date.Format('yyyy-MM-dd HH:mm:ss');
         $.v3browser.model.saveLocalConfig();
 
         return rtn;
@@ -264,6 +245,7 @@ $.v3browser.model = {
             group.id = Math.uuid();
             group.group_id = group.id;
             group.node_id = node.id;
+
             let date = new Date()
             group.createtime = date.Format('yyyy-MM-dd HH:mm:ss');
 
@@ -279,8 +261,6 @@ $.v3browser.model = {
             one.group_demo = group.group_demo;
             one.group_name = group.group_name;
 
-            let date = new Date()
-            node.updatetime = date.Format('yyyy-MM-dd HH:mm:ss');
             groups[idx] = one;
 
             $.extend(group, one);
@@ -312,8 +292,6 @@ $.v3browser.model = {
             one.folder_demo = folder.folder_demo;
             one.folder_name = folder.folder_name;
 
-            let date = new Date()
-            node.updatetime = date.Format('yyyy-MM-dd HH:mm:ss');
             groups[idx] = one;
 
             $.extend(folder, one);
@@ -322,7 +300,7 @@ $.v3browser.model = {
             return idx;
         }
     },
-    saveFolder2Node: function (etcdID, folder, parentData) {
+    saveFolder2Node: function (etcdID, folder, parentRow) {
         let node = $.v3browser.model.getLocalNode(etcdID);
 
         if(node==null){
@@ -335,17 +313,41 @@ $.v3browser.model = {
             groups = [];
         }
 
-        if(parentData==null){
-
+        if(parentRow==null || parentRow.type == 'groups'){
             let rtn = this._saveFolder2List(node, folder, groups);
-
             node.group = groups;
+
+            let date = new Date()
+            node.updatetime = date.Format('yyyy-MM-dd HH:mm:ss');
             $.v3browser.model.saveLocalConfig();
 
             return rtn;
-        }else{
-
         }
+
+        if(parentRow.type!='folder'){
+            $.app.show('不能在当前添加目录, 只有在目录或者集合根路径下才能添加目录')
+            return false;
+        }
+
+        let parents = $.v3browser.model.util.findFolderAncestorList(parentRow);
+
+        let parent = parents[parents.length-1].data;
+
+        groups = parent.group;
+
+        if(groups==null){
+            groups = [];
+        }
+
+        let rtn = this._saveFolder2List(node, folder, groups);
+
+        parent.group = groups;
+
+        let date = new Date()
+        node.updatetime = date.Format('yyyy-MM-dd HH:mm:ss');
+        $.v3browser.model.saveLocalConfig();
+
+        return rtn;
 
     },
     saveAuthorization: function(id, token){
@@ -528,11 +530,13 @@ $.v3browser.model = {
         }
     },
     util:{
-        findGroupRowParents: function(row){
+        findFolderAncestorList: function(row){
             let node = $.v3browser.model.getLocalNode(row.node_id);
 
-            if(node.group==null)
+            if(node.group==null){
+                node.group = [];
                 return [];
+            }
 
             let rtn = [];
 
