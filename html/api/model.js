@@ -280,7 +280,7 @@ $.v3browser.model = {
             let date = new Date()
             folder.createtime = date.Format('yyyy-MM-dd HH:mm:ss');
 
-
+            folder.group = [];
             groups.push($.extend({}, folder));
 
             return -1;
@@ -291,6 +291,9 @@ $.v3browser.model = {
             one.folder_id = folder.folder_id;
             one.folder_demo = folder.folder_demo;
             one.folder_name = folder.folder_name;
+
+            if(one.group == null)
+                one.group = [];
 
             groups[idx] = one;
 
@@ -441,6 +444,9 @@ $.v3browser.model = {
         },
         // group group_name/group_prefix/group_demo/id/node_id/group_id
         Folder2Data: function(folder){
+            if(folder.group==null)
+                folder.group = [];
+
             let row = {};
             let rowData = $.extend({}, folder);
             row.id = folder.id;
@@ -558,8 +564,13 @@ $.v3browser.model = {
                 let idx = findIdx(list, val.id);
                 if(idx>=0){
                     if(val.type=='folder'){
+                        if(list[idx].group==null){
+                            list[idx].group = [];
+                        }
+
                         idxRtn.push({index:idx, row: val, data: list[idx]})
-                        list = list[idx].group || [];
+
+                        list = list[idx].group;
                     }else{
                         return false;
                     }

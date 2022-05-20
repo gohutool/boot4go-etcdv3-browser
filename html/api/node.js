@@ -231,16 +231,41 @@ function loadTreeDg(){
             if(sourceRow.type == 'group'||sourceRow.type == 'folder'){
                 if(targetRow && targetRow.type == 'group'){
                     if(point == 'append'){
+                        $.app.show('目前版本不支持集合下嵌套子集合');
                         return false
                     }
                     return true;
                 }
+
                 if(targetRow && targetRow.type == 'folder'){
-                    if(sourceRow.parentRow!=null&&sourceRow.parentRow.id==targetRow.id)
+                    if(sourceRow.parentRow!=null&&sourceRow.parentRow.id==targetRow.id){
+                        $.app.show('操作不合法，不能自我嵌套目录');
                         return false;
+                    }
 
                     return true;
                 }
+
+                if(sourceRow.type == 'folder' && targetRow && targetRow.type == 'folder'){
+
+                    let parents = $.v3browser.model.util.findFolderAncestorList(targetRow);
+
+                    let isloop = false;
+
+                    $.each(parents, function (idx, v) {
+                        if(v.id == sourceRow.id)
+                            isloop = true;
+                    });
+
+                    if(isloop){
+                        $.app.show('目前版本不支持集合子目录嵌套父目录');
+                        return false;
+                    }
+
+
+                    return true;
+                }
+
                 $.app.show('不能移动到连接节点外')
                 return false;
             }
@@ -266,13 +291,18 @@ function loadTreeDg(){
             }
 
             if(sourceRow.type == 'group' || sourceRow.type == 'folder'){
-                if(point == 'append'){
+                if(point == 'append' && targetRow.type=='group'){
                     $.app.show('不支持目前版本');
                     return false;
                 }
-                if(targetRow.type == 'group' || sourceRow.type == 'folder'){
+                if(targetRow.type == 'group' || targetRow.type == 'folder'){
+                    let msg = exchangeGroup(sourceRow.node_id, sourceRow, targetRow, point);
+                    if(typeof msg == 'string'){
+                        $.app.show('目前版本不支持,' + msg);
+                        return ;
+                    }
                     //$.v3browser.model.exchangeGroup(sourceRow.node_id, sourceRow.id, targetRow.id, point);
-                    //$.v3browser.model.saveLocalConfig();
+                    $.v3browser.model.saveLocalConfig();
                     return true;
                 }
             }

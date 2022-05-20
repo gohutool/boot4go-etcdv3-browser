@@ -1,0 +1,62 @@
+{
+  "title": {
+    "text": "",
+    "subtext": "",
+    "x": "center"
+  },
+  "tooltip": {
+    "trigger": "item",
+    "formatter": "{a} {b} : {c} ({d}%)"
+  },
+  "legend": {
+    "orient": "vertical",
+    "left": "left",
+    "data": [
+      "转发成功",
+      "黑名单",
+      "网关超时",
+      "请求错误",
+      "转发丢失"
+    ]
+  },
+  "series": [
+    {
+      "name": "访问来源",
+      "type": "pie",
+      "radius": "55%",
+      "center": [
+        "50%",
+        "60%"
+      ],
+      "data": [
+        {
+          "value": 13335,
+          "name": "转发成功"
+        },
+        {
+          "value": 104,
+          "name": "黑名单"
+        },
+        {
+          "value": 15,
+          "name": "网关超时"
+        },
+        {
+          "value": 29,
+          "name": "请求错误"
+        },
+        {
+          "value": 10,
+          "name": "转发丢失"
+        }
+      ],
+      "itemStyle": {
+        "emphasis": {
+          "shadowBlur": 10,
+          "shadowOffsetX": 0,
+          "shadowColor": "rgba(0, 0, 0, 0.5)"
+        }
+      }
+    }
+  ]
+}

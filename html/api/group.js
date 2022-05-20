@@ -423,24 +423,60 @@ function exchangeGroup(nodeId, sourceRow, targetRow, point){
     let group = node.group || [];
     node.group = group;
 
-    let sourceParentRow = sourceRow.parentRow;
-    let sourceData = null
-    let targetParentRow = targetRow.parentRow;
-    let targetData = null
+    let sourceParents = $.v3browser.model.util.findFolderAncestorList(sourceRow);
+    let targetParents = $.v3browser.model.util.findFolderAncestorList(targetRow);
 
-    if(sourceParentRow==null||sourceParentRow.type=='groups'){
-        sourceData = group
+    let targetParentRow = targetRow.parentRow // data in treegrid
+    let sourceData = null    // list data in memory
+    let targetData = null   // list data in memory
+
+    if(sourceParents==null||sourceParents.length==0){
+        sourceData = group;
+    }else{
+        if(sourceRow.type == 'folder'){
+            if(sourceParents.length>1){
+                sourceData = sourceParents[sourceParents.length-2].data.group;
+            }
+            else{
+                sourceData = group;
+            }
+        }else{
+            sourceData = sourceParents[sourceParents.length-1].data.group;
+        }
     }
 
-    if(targetParentRow==null||targetParentRow.type=='groups'){
+    if(targetParents==null||targetParents.length==0){
         targetData = group
+    }else{
+        if(targetRow.type == 'folder'){
+            if(targetParents.length>1){
+                targetData = targetParents[targetParents.length-2].data.group;
+            }
+            else{
+                targetData = group;
+            }
+        }else{
+            targetData = targetParents[targetParents.length-1].data.group;
+        }
+    }
+
+    if(sourceData == null){
+        sourceData = [];
+    }
+
+    if(targetData == null){
+        targetData = []
     }
 
     if(sourceRow.type == 'group'){
         if(point=='append'){
             if(targetRow.type == 'folder'){
-                targetData = findObj(targetData, targetRow.id)
-                exchangeTwoListAfter(sourceRow.id, sourceData, null, targetData)
+                let targetObject = findObj(targetData, targetRow.id)
+                if(targetObject.group==null)
+                    targetObject.group = [];
+
+                exchangeTwoListAfter(sourceRow.id, sourceData, null, targetObject.group)
+                sourceRow.parentRow = targetRow;
             }else{
                 return '不能Append到集合节点';
             }
@@ -469,15 +505,20 @@ function exchangeGroup(nodeId, sourceRow, targetRow, point){
                isloop = true;
         });
 
-        if(isloop)
-            return '不能将folder移动到子对象里';
-
         if(point=='append'){
             if(targetRow.type == 'group'){
                 return '不能Append到集合节点';
             }else{
-                targetData = findObj(targetData, targetRow.id)
-                exchangeTwoListAfter(sourceRow.id, sourceData, null, targetData)
+
+                if(isloop)
+                    return '不能将folder移动到子对象里';
+
+                let targetObject = findObj(targetData, targetRow.id)
+                if(targetObject.group==null)
+                    targetObject.group = [];
+
+                exchangeTwoListAfter(sourceRow.id, sourceData, null, targetObject.group)
+                sourceRow.parentRow = targetRow;
             }
         }else{
             if(point=='top')

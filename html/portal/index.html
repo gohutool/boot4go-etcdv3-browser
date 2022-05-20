@@ -49,45 +49,110 @@
 </div>
 <script id="tmpl1" type="text/x-jquery-tmpl">
     <div class="layui-container-fluid">
+
         <div class="cardList-wrapper">
-            <div class="card-item" onclick="javascript:triggerNavMenuClick('网关管理', '集群管理','网关列表','网关列表', true)">
-                <div class="card-title">在线网关总数</div>
+            <div class="card-item" onclick="">
+                <div class="card-title">新消息</div>
                 <div class="all-count">
-                    <span id='serverCount'>{{:serverCount}}</span>
-                    <span class="suffix">台</span>
+                    <span id='serverCount'>5</span>
+                    <span class="suffix">条</span>
                 </div>
                 <div class="card-info">
-                    <span>网关总访问次数：<t id='nodeVisit'>1</t>次</span>
+                    <span>今日消息数：<t id='nodeVisit'>20</t>条</span>
                 </div>
             </div>
-            <div class="card-item" onclick="javascript:triggerNavMenuClick('网关管理', '域名管理','域名列表','域名列表', true)">
-                <div class="card-title">活动域名总数</div>
+            <div class="card-item" onclick="">
+                <div class="card-title">新增人数</div>
                 <div class="all-count">
-                    <span id='domainCount'>{{:domainCount}}</span>
-                    <span class="suffix">个</span>
+                    <span id='domainCount'>3</span>
+                    <span class="suffix">人</span>
                 </div>
                 <div class="card-info">
-                    <span>路径映射规则总数：<t id='pathCount'>11</t>条</span>
+                    <span>今日新增人数：<t id='pathCount'>20</t>人</span>
                 </div>
             </div>
             <div class="card-item"  onclick="javascript:triggerNavMenuClick('网关管理', '集群管理','集群列表','集群列表', true)">
-                <div class="card-title">目标集群总数</div>
+                <div class="card-title">用户总数</div>
                 <div class="all-count">
-                    <span id='clusterCount'>1</span>
-                    <span class="suffix">个</span>
+                    <span id='clusterCount'>19</span>
+                    <span class="suffix">人</span>
                 </div>
                 <div class="card-info">
-                    <span>集群服务节点总数：<t id='endpointCount'>3</t>个</span>
+                    <span>注册用户总数：<t id='endpointCount'>133</t>个</span>
                 </div>
             </div>
-            <div class="card-item" onclick="javascript:triggerNavMenuClick('网关管理', '证书管理','证书列表','证书列表', true)">
-                <div class="card-title">SSL证书数</div>
-                <div class="all-count">
-                    <span id='certCount'>{{:certCount}}</span>
-                    <span class="suffix">个</span>
+                <div class="card-item" onclick="javascript:triggerNavMenuClick('网关管理', '证书管理','证书列表','证书列表', true)">
+                    <div class="card-title">待审核文章</div>
+                    <div class="all-count">
+                        <span id='certCount'>13</span>
+                        <span class="suffix">篇</span>
+                    </div>
+                    <div class="card-info">
+                        <span>文章总数：<t id='useCertCount'>222</t>篇</span>
+                    </div>
                 </div>
-                <div class="card-info">
-                    <span>证书下载总次数：<t id='useCertCount'>2</t>次</span>
+        </div>
+
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-md4">
+                <div class="card card-hoverable">
+                    <div class="card-head">
+                        <span class="card-head-icon"><svg t="1624610578335" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1065" width="100%" height="100%"><path d="M464.904 256.496L467.288 88H91.704v168.496h373.2z m0 0" fill="#76DA91" p-id="1066"></path><path d="M776.968 490.04l4.376-168.496H91.704v168.496h685.264z m0 0" fill="#76DA91" p-id="1067"></path><path d="M617.56 723.584l3.36-168.496H91.704v168.496h525.856z m0 0" fill="#76DA91" p-id="1068"></path><path d="M313.704 957.128l1.416-168.496H91.704v168.496h222z m0 0" fill="#76DA91" p-id="1069"></path><path d="M41.8 975.608V88.144H0V1024h1009.936v-48.392H41.8z m0 0" fill="#76DA91" p-id="1070"></path></svg></span>
+                        <span>网关请求量和失败量</span>
+                        <span style='float: right;position: absolute;right: 20px;height: 48px;'>
+                        <a style='display1:none;float:right;margin: 10px auto;' id='pieChart-refresh-bnt' href="javascript:void(0)"
+                               data-toggle="cubeui-menubutton"
+                               data-options="
+                                   iconCls:'fa fa-refresh',
+                                   btnCls:'cubeui-btn-blue'">刷新</a>
+                                   </span>
+                    </div>
+                    <div class="card-body">
+                            <div data-toggle="cubeui-echarts"
+                                 data-options="id:'barChart',url:'./bar.json',height:400"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md4">
+                <div class="card card-hoverable">
+                    <div class="card-head">
+                        <span class="card-head-icon">
+                        <svg t="1624610641908" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1215" width="100%" height="100%"><path d="M959.159 928.219H64.063V98.125h37.045v787.166h858.051z" fill="#F47A75" p-id="1216"></path><path d="M580.658 796.245L369.686 628.169 158.642 760.785l-17.659-37.737 230.991-145.15 208.508 166.113 334.054-270.609 21.225 35.183z" fill="#F47A75" p-id="1217"></path><path d="M152.112 601.753l-28.68-27.17L360.23 238.944 569.003 494.92 903.52 103.683l26.316 30.213-361.462 422.75L362.245 303.91z" fill="#F47A75" p-id="1218"></path></svg>
+                        </span>
+                        <span>最近请求变化</span>
+                        <span style='float: right;position: absolute;right: 20px;height: 48px;'>
+                        <a style='display1:none;float:right;margin: 10px auto;' id='pieChart-refresh-bnt' href="javascript:void(0)"
+                               data-toggle="cubeui-menubutton"
+                               data-options="
+                                   iconCls:'fa fa-refresh',
+                                   btnCls:'cubeui-btn-blue'">刷新</a>
+                                   </span>
+                    </div>
+                    <div class="card-body">
+                            <div data-toggle="cubeui-echarts"
+                                 data-options="id:'lineChart',url:'./line.json',height:400"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md4">
+                <div class="card card-hoverable">
+                    <div class="card-head">
+                        <span class="card-head-icon">
+                        <svg t="1624610661756" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1363" width="100%" height="100%"><path d="M520.3968 554.3936l-20.8896-7.3984-6.016-5.9904-126.592-126.72L197.4016 244.736A423.7312 423.7312 0 0 0 82.304 535.296C82.688 769.8944 272.384 959.488 506.88 960c179.584 0 333.0048-111.616 395.0848-269.1072l-123.9808-44.288-257.6128-92.2112z" fill="#0780CF" p-id="1364"></path><path d="M476.8 430.4128l-58.496-58.5216-218.7008-218.5984A423.2448 423.2448 0 0 1 476.8 38.4v392.0128z" fill="#0780CF" p-id="1365"></path><path d="M530.5088 80.7936c228.3008 7.5008 410.7008 194.4064 411.1872 424.3968 0 45.5168-7.1936 89.216-20.4032 130.304l-390.784-139.776V80.768z" fill="#0780CF" p-id="1366"></path></svg>
+                        </span>
+                        <span>网关请求状态统计</span>
+                        <span style='float: right;position: absolute;right: 20px;height: 48px;'>
+                        <a style='display1:none;float:right;margin: 10px auto;' id='pieChart-refresh-bnt' href="javascript:void(0)"
+                               data-toggle="cubeui-menubutton"
+                               data-options="
+                                   iconCls:'fa fa-refresh',
+                                   btnCls:'cubeui-btn-blue'">刷新</a>
+                                   </span>
+                    </div>
+                    <div class="card-body">
+                            <div data-toggle="cubeui-echarts"
+                                 data-options="id:'pieChart',url:'./pie.json',height:400"></div>
+                    </div>
                 </div>
             </div>
         </div>
