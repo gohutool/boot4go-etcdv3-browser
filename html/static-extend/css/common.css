@@ -18,3 +18,94 @@
 #west .tree-title {
     padding-left: 14px;
 }
+
+.fa{
+    font: normal normal normal 17px FontAwesome!important;
+}
+
+#index_tabs .tabs-tool .fa{
+    font: normal normal normal 14px FontAwesome!important;
+    font-size: 13px!important;
+}
+
+.tabs-icon {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 10px;
+    top: 45%;
+}
+
+.tabs-with-icon {
+    padding-left: 22px!important;
+}
+.tabs li a.tabs-inner {
+    padding: 0 12px!important;
+}
+.panel-with-icon {
+    padding-left: 32px!important;
+}
+
+.panel-icon.fa {
+    padding-left: 10px!important;
+}
+
+.window .window-header .panel-with-icon {
+    padding-left: 40px;
+}
+
+.l-btn-icon.fa{
+    font: normal normal normal 14px FontAwesome!important;
+}
+
+.swithbutton-label{
+    width:auto;float: right!important;
+}
+
+.swithbutton-col-1{
+    z-index: 9999!important;
+}
+
+.swithbutton-col-2{
+    z-index: 9998!important;
+}
+
+.swithbutton-col-3{
+    z-index: 9997!important;
+}
+
+
+.swithbutton-col-4{
+    z-index: 9996!important;
+}
+
+.swithbutton-col-5{
+    z-index: 9995!important;
+}
+
+.swithbutton-col-6{
+    z-index: 9994!important;
+}
+
+.swithbutton-col-7{
+    z-index: 9993!important;
+}
+
+.swithbutton-col-8{
+    z-index: 9992!important;
+}
+
+.textbox-addon .textbox-icon.fa-remove{
+    padding-top: 30%!important;
+    font-size: 14px!important;
+}
+
+.spinner .textbox-addon .textbox-icon.fa-remove{
+    padding-top: 15%!important;
+    font-size: 14px!important;
+}
+
+.combo .textbox-addon .textbox-icon.fa-remove{
+    padding-top: 15%!important;
+    font-size: 14px!important;
+}

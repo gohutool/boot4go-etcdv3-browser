@@ -20,84 +20,181 @@
 
 <div  id="layout" data-toggle="cubeui-layout" data-options="fit:true">
 	<div data-options="region:'north',title:'',border:false,split:false"
-         style="height:110px" class="cubeui-fluid">
-
-        <fieldset>
-            <legend>键值信息</legend>
-        </fieldset>
-
+         style="height:300px" class="cubeui-fluid">
 
         <div class="cubeui-row">
-            <div class="cubeui-col-sm12">
-                <label class="cubeui-form-label">集合前缀:</label>
+
+            <div class="cubeui-col-sm6">
+                <label class="cubeui-form-label">查询名称:</label>
+                <input type='hidden' name='search_id' value='{{:search_id}}'>
+                <input type='hidden' name='db_id' value='{{:db_id}}'>
                 <div class="cubeui-input-block">
-                    <input type="text" readonly data-toggle="cubeui-textbox" name="prefix"
+                    <input type="text" readonly data-toggle="cubeui-textbox" name="search_name"
                            value='{{:prefix}}'>
                 </div>
             </div>
         </div>
+
+        <fieldset>
+            <legend>查询条件设置</legend>
+        </fieldset>
+
         <div class="cubeui-row">
-            <div class="cubeui-col-sm12">
-                <label class="cubeui-form-label">键:</label>
+            <div class="cubeui-col-sm1 swithbutton-col-1">
+                <label class="cubeui-form-label swithbutton-label">启用前缀:</label>
                 <div class="cubeui-input-block">
-                    <input type="text" data-toggle="cubeui-textbox" id="edit_key" name="key"
-                           value='{{:key}}' data-options="required:true,prompt:'前缀({{:~js(prefix)}})的后面部分的字符串，必须填写'">
+                    <input type="text" checked data-toggle="cubeui-switchbutton" name="with_prefix"
+                           data-options="value:1,width:'50px',onText:'',offText:''">
+                </div>
+            </div>
+            <div class="cubeui-col-sm1 swithbutton-col-2">
+                <label class="cubeui-form-label swithbutton-label" style=''>忽略键:</label>
+                <div class="cubeui-input-block">
+                    <input type="text" data-toggle="cubeui-switchbutton" name="ignore_key"
+                           data-options="value:1,width:'50px',onText:'',offText:''">
                 </div>
             </div>
         </div>
 
+        <div class="cubeui-row">
+            <div class="cubeui-col-sm6">
+                <label class="cubeui-form-label">键:</label>
+                <div class="cubeui-input-block">
+                    <input type="text" data-toggle="cubeui-textbox" id="edit_key" name="key"
+                           value='{{:key}}' data-options="required:true,prompt:'查询的键，必须填写'">
+                </div>
+            </div>
+            <div class="cubeui-col-sm6">
+                <label class="cubeui-form-label">创建版本号:</label>
+                <div class="cubeui-input-inline">
+                    <input type="text" data-toggle="cubeui-numberspinner" name="min_create_revision" style='width:300px'
+                           value='{{:min_create_revision}}' data-options="required:false,prompt:'创建版本号的最小值',min:0,increment:1">
+                           -
+                    <input type="text" data-toggle="cubeui-numberspinner" name="max_create_revision" style='width:300px'
+                           value='{{:max_create_revision}}' data-options="required:false,prompt:'创建版本号的最大值',min:0,increment:1">
+                </div>
+            </div>
 
+
+        </div>
+
+
+        <div class="cubeui-row">
+
+            <div class="cubeui-col-sm6">
+                <label class="cubeui-form-label">结束键:</label>
+                <div class="cubeui-input-block">
+                    <input type="text" data-toggle="cubeui-textbox" id="edit_key" name="key"
+                           value='{{:key}}' data-options="required:false,prompt:'查询的结束键，选择作为前缀后，该值将被忽略'">
+                </div>
+            </div>
+            <div class="cubeui-col-sm6 ">
+                <label class="cubeui-form-label">修订版本号:</label>
+                <div class="cubeui-input-inline">
+                    <input type="text" data-toggle="cubeui-numberspinner" name="min_mod_revision" style='width:300px'
+                           value='{{:min_mod_revision}}' data-options="required:false,prompt:'修订版本号的最小值',min:0,increment:1">
+                           -
+                    <input type="text" data-toggle="cubeui-numberspinner" name="max_mod_revision" style='width:300px'
+                           value='{{:max_mod_revision}}' data-options="required:false,prompt:'修订版本号的最大值',min:0,increment:1">
+                </div>
+            </div>
+
+        </div>
+
+
+        <fieldset>
+            <legend>查询结果设置</legend>
+        </fieldset>
+
+
+        <div class="cubeui-row">
+
+            <div class="cubeui-col-sm3">
+                <label class="cubeui-form-label">返回数量:</label>
+                <div class="cubeui-input-block">
+                    <input type="text" data-toggle="cubeui-numberspinner" name="count"
+                           value='{{:key}}' data-options="required:false,prompt:'非正数返回所有记录',min:-1,increment:1">
+                </div>
+            </div>
+
+            <div class="cubeui-col-sm1 swithbutton-col-2">
+                <label class="cubeui-form-label swithbutton-label" style=''>仅数量:</label>
+                <div class="cubeui-input-block">
+                    <input type="text" data-toggle="cubeui-switchbutton" name="count_only"
+                           data-options="value:1,width:'50px',onText:'',offText:''">
+                </div>
+            </div>
+            <div class="cubeui-col-sm1 swithbutton-col-3">
+                <label class="cubeui-form-label swithbutton-label" style=''>仅返回键:</label>
+                <div class="cubeui-input-block">
+                    <input type="text" data-toggle="cubeui-switchbutton" name="key_only"
+                           data-options="value:1,width:'50px',onText:'',offText:''">
+                </div>
+            </div>
+
+
+            <div class="cubeui-col-sm6 cubeui-col-sm-offset1">
+                <label class="cubeui-form-label">排序:</label>
+                <div class="cubeui-input-inline">
+
+                    <input type="text" name="sort_target" value='{{:sort_target}}' data-toggle="cubeui-combobox"  style='width:300px' data-options="
+	                    required:true,prompt:'排序目标，选择填写',
+ 		                valueField:'TEXT',
+ 		                textField:'TEXT',
+ 		                data:[{'TEXT':'KEY'},{'TEXT':'VERSION'},{'TEXT':'CREATE'},{'TEXT':'MOD'},{'TEXT':'VALUE'}]">
+
+                    <input type="text" name="sort_order" value='{{:sort_order}}' data-toggle="cubeui-combobox"  style='width:300px' data-options="
+	                    required:true,prompt:'排序方式，选择填写',
+ 		                valueField:'TEXT',
+ 		                textField:'TEXT',
+ 		                data:[{'TEXT':'NONE'},{'TEXT':'ASCEND'},{'TEXT':'DESCEND'}]">
+                </div>
+            </div>
+
+        </div>
+
+
+            <div id="footer" class="panel-footer" style="height: 34px; padding: 5px; text-align: right;">
+                <a href="#"
+                   data-toggle="cubeui-linkbutton"
+                   data-options="id:'submitBtn',
+                               iconCls:'fa fa-save',
+                               form:{
+                                   id:'formId',
+                                   method:'submit',
+                                   url:'/json/response/success.json',
+                                   refreshRefererTab:true,
+                                   closeCurrentTab:true
+                               }">提交</a>
+                <a href="#"
+                   data-toggle="cubeui-linkbutton"
+                   data-options="id:'submitBtn',
+                               iconCls:'fa fa-exchange',
+                               btnCls:'cubeui-btn-black',
+                               form:{
+                                   id:'formId',
+                                   method:'reset'
+                               }">重置</a>
+                <a href="#"
+                   data-toggle="cubeui-linkbutton"
+                   data-options="id:'submitBtn',
+                               iconCls:'fa fa-trash',
+                               btnCls:'cubeui-btn-red',
+                               form:{
+                                   id:'formId',
+                                   method:'clear'
+                               }">清空</a>
+            </div>
     </div>
 
-    <div data-options="region:'center',titleformat:'', title:'',
+    <div data-options="region:'center',titleformat:'', title1:'查询结果',
 		split:false,border:true,height1:'200px',collapsed:false,
-		iconCls:'fa fa-book',
+		iconCls:'fa fa-list-alt',
 		headerCls:'border_right'"
          style="height1:40%">
 
 
         <table id="groupDg"></table>
-        <!-- 表格工具栏开始 -->
-        <div id="groupDg-toolbar" class="cubeui-toolbar"
-             data-options="grid:{
-                   type:'datagrid',
-                   id:'groupDg'
-               }">
-
-            <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
-                    method1: 'openDialog',
-                    onClick:function(){
-                        addKey();
-                    },
-                    extend: '#groupDg-toolbar',
-                    btnCls: 'cubeui-btn-blue',
-                    iconCls: 'fa fa-plus'
-                }">新增键值</a>
-
-            <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
-                    onClick:function(){
-                        emptyKeys();
-                    },
-                    extend: '#groupDg-toolbar',
-                    btnCls: 'cubeui-btn-red',
-                    iconCls: 'fa fa-trash'
-                }">清空</a>
-
-            <form id="queryForm" class="search-box">
-                <input type="text" id='prefix_search' name="key" data-toggle="cubeui-textbox"
-                       data-options="onClear:function(){
-                            console.log(111);
-                            $('#searchbtn').trigger('click');
-                       }, mask:'{{:~js(prefix)}}', prompt:'key查询，按照prefix({{:~js(prefix)}})+key进行前缀查询',width:360">
-                <a href="javascript:void(0)" id="searchbtn"
-                   data-toggle="cubeui-menubutton"
-                   data-options="method:'query',
-                   iconCls:'fa fa-search',
-                   btnCls:'cubeui-btn-blue',
-                   form:{id:'queryForm'},
-                   grid:{type:'datagrid','id':'groupDg'}">查询</a>
-            </form>
-        </div>
 
     </div>
 </div>
