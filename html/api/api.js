@@ -236,7 +236,7 @@ $.etcd.request = {
             });
         },
         range: function (fn, serverInfo, key, range, withPrefix, count_only, sort_order, sort_target, skip, count,
-                         min_create_revision, min_mod_revision){
+                         min_create_revision, min_mod_revision, max_create_revision, max_mod_revision, keys_only){
             $.etcd.request.execute(serverInfo, function (node) {
                 let data = {};
 
@@ -245,26 +245,35 @@ $.etcd.request = {
                     data['range_end']=Base64.encode($.etcd.request.prefixFormat(key));
                 }else{
                     if(range!=null)
-                        data['range_end']=range;
+                        data['range_end']=Base64.encode(range);
                 }
 
-                if(sort_order!=null){
+                if(!$.extends.isEmpty(sort_order)){
                     data['sort_order']=sort_order;
                 }else{
                     data['sort_order']='NONE';
                 }
 
-                if(sort_target!=null)
+                if(!$.extends.isEmpty(sort_target))
                     data['sort_target']=sort_target;
 
-                if(count_only)
+                if(!$.extends.isEmpty(count_only)&&count_only)
                     data['count_only']=true;
 
-                if(min_create_revision!=null)
-                    data['min_create_revision']=min_create_revision;
+                if(!$.extends.isEmpty(min_create_revision))
+                    data['min_create_revision']=Number(min_create_revision);
 
-                if(min_mod_revision!=null)
-                    data['min_mod_revision']=min_mod_revision;
+                if(!$.extends.isEmpty(min_mod_revision))
+                    data['min_mod_revision']=Number(min_mod_revision);
+
+                if(!$.extends.isEmpty(max_create_revision))
+                    data['max_create_revision']=Number(max_create_revision);
+
+                if(!$.extends.isEmpty(max_mod_revision))
+                    data['max_mod_revision']=Number(max_mod_revision);
+
+                if(!$.extends.isEmpty(keys_only)&&keys_only)
+                    data['keys_only']=true;
 
                 let limit = null;
 
@@ -279,7 +288,7 @@ $.etcd.request = {
                 }
 
                 if(limit!=null)
-                    data['limit']=limit;
+                    data['limit']=Number(limit);
 
                 $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE, data, function (response) {
                     if($.etcd.response.retoken(serverInfo,response))
@@ -411,6 +420,7 @@ $.etcd.response = {
                 rtn.push(o);
             })
         }
+
         return rtn;
     }
 

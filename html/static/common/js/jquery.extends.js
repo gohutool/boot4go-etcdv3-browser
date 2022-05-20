@@ -1178,10 +1178,10 @@ $.extends.getFormJson=function(form, prefix) {
 			if (!o[this.name].push) {
 				o[this.name] = [ o[this.name] ];
 			}
-			o[this.name].push($(id).attr("rturnid") || this.value || '');
+			o[this.name].push($(id).attr("returnid") || this.value || '');
 
 		} else {
-			o[this.name] = $(id).attr("rturnid") || this.value || '';
+			o[this.name] = $(id).attr("returnid") || this.value || '';
 		}
 	});
 

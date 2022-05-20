@@ -109,3 +109,11 @@
     padding-top: 15%!important;
     font-size: 14px!important;
 }
+
+.panel-footer-no-border {
+    border: 0px solid #D3D3D3!important;
+}
+
+.panel-footer-no-background {
+    background: inherit!important;
+}
