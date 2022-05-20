@@ -207,5 +207,52 @@ $.v3browser.menu = {
             t.tabs('close', v)
         });
 
+    },
+    getAllGroups:function (data) {
+        let rtn = [];
+
+        if(data.group){
+            $.each(data.group, function (idx, o) {
+                if(o){
+                    let type = $.v3browser.model.getDataType(o)
+                    if(type == 'folder'){
+                        if(o.group && o.group.length > 0){
+                            let l = $.v3browser.menu.getAllGroups(o);
+
+                            if(l&& l.length > 0){
+                                rtn = rtn.concat(l)
+                            }
+                        }
+                    }else if(type == 'group'){
+                        rtn.push(o)
+                    }
+                }
+            });
+        }
+
+        return rtn;
+    },
+    // just for folder
+    closeAllGroupTabs:function (data) {
+        if(!data){
+            return ;
+        }
+
+        let node = $.v3browser.model.getLocalNode(data.node_id);
+
+        let groups = $.v3browser.menu.getAllGroups(data)
+
+        let titles = [];
+
+        $.each(groups, function (idx, group) {
+           titles.push($.v3browser.model.title.group(group, node))
+        });
+
+        let t = parent.$('#index_tabs');
+
+        $.each(titles, function(idx, v){
+            t.tabs('close', v)
+        });
+
     }
 }

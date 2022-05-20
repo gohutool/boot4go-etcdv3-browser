@@ -128,18 +128,41 @@ $.v3browser.model = {
             return -1;
         }
     },
-    removeGroupFromLocal: function(etcdID, groupId){
+    removeGroupFromLocal: function(etcdID, groupId, parentRow){
         let node = $.v3browser.model.getLocalNode(etcdID);
 
-        if(node.group){
+        if(node.group==null){
+            node.group = [];
+        }
+
+        let groups = null;
+
+        if(parentRow==null){
+            groups = node.group
+        }else{
+            let parents = $.v3browser.model.util.findFolderAncestorList(parentRow);
+            if(parents==null || parents.length == 0){
+                groups = node.group;
+            }else{
+                let g = parents[parents.length-1].data.group;
+                if(g == null){
+                    g = [];
+                    parents[parents.length-1].data.group  = g;
+                }
+                groups = g;
+                parents[parents.length-1].data.group = groups;
+            }
+        }
+
+        if(groups){
             let idx = -1;
-            $.each(node.group, function (i,v){
+            $.each(groups, function (i,v){
                 if(groupId == v.id)
                     idx = i;
             })
 
             if(idx >=0){
-                node.group.splice(idx, 1);
+                groups.splice(idx, 1);
             }
 
             $.v3browser.model.saveLocalConfig()
@@ -314,6 +337,7 @@ $.v3browser.model = {
 
         if(groups==null){
             groups = [];
+            node.group = groups;
         }
 
         if(parentRow==null || parentRow.type == 'groups'){
@@ -454,7 +478,7 @@ $.v3browser.model = {
             row.data = rowData;
             delete row.data.group;
             row.text = folder.folder_name;
-            row.state = 'closed';
+            row.state = 'open';
             row.iconCls = 'fa fa-folder-o';
             row.type='folder';
             row.mm = "folderMm";
@@ -523,11 +547,16 @@ $.v3browser.model = {
     },
     title:{
         group:function(group, node){
-            let title = group.group_name.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+            let groupName = (typeof group == 'string')?group:group.group_name;
+            let nodeName = (typeof node == 'string')?node:node.node_name;
+
+            let title = groupName.jsEncode()+'@'+nodeName.jsEncode()+'-集合';
             return title;
         },
         search:function(search, node){
-            let title = search.search_name.jsEncode()+'@'+node.node_name.jsEncode()+'-查询';
+            let searchName = (typeof search == 'string')?search:search.search_name;
+            let nodeName = (typeof node == 'string')?node:node.node_name;
+            let title = searchName.jsEncode()+'@'+nodeName.jsEncode()+'-查询';
             return title;
         },
         newSearch:function(node){
@@ -549,7 +578,7 @@ $.v3browser.model = {
             if(row.type=='folder')
                 rtn.push(row);
 
-            while(row.parentRow && row.parentRow=='folder'){
+            while(row.parentRow && row.parentRow.type=='folder'){
                 rtn.push(row.parentRow);
                 row = row.parentRow;
             }

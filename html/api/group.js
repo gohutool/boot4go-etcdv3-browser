@@ -93,7 +93,7 @@ function groupDg(data){
             beforeAjax:function(o){
 
                 let row = $.v3browser.menu.getCurrentOpenMenuRow();
-                if(row.type=='groups'||!isUpdate){
+                if(row.type=='groups'&&!isUpdate){
                     openGroupsNodeMenu(row)
                 }
 
@@ -175,7 +175,7 @@ function removeGroup(){
         let title = $.v3browser.model.title.group(row.data, $.v3browser.model.getLocalNode(row.node_id))
         $.v3browser.menu.closeTab(title);
 
-        $.v3browser.model.removeGroupFromLocal(row.node_id, row.id)
+        $.v3browser.model.removeGroupFromLocal(row.node_id, row.id, row.parentRow);
         $('#databaseDg').treegrid('remove', row.id)
         $('#databaseDg').treegrid('refresh', pid);
 
@@ -278,7 +278,7 @@ function _folderDg(data){
             handler:'ajaxForm',
             beforeAjax:function(o){
                 let row = $.v3browser.menu.getCurrentOpenMenuRow();
-                if(row.type=='groups'||!isUpdate){
+                if(row.type=='groups'&&!isUpdate){
                     openGroupsNodeMenu(row)
                 }
 
@@ -373,10 +373,16 @@ function removeFolder(){
     let pid = $('#databaseDg').treegrid('getParent', row.id).id
 
     $.app.confirm("确定删除目录'"+row.text.jsEncode()+"'", function (){
-        $.v3browser.model.removeGroupFromLocal(row.node_id, row.id)
+        let paths = $.v3browser.model.util.findFolderAncestorList(row);
+
+
+        if(paths.length>0){
+            $.v3browser.menu.closeAllGroupTabs(paths[paths.length-1].data)
+        }
+
+        $.v3browser.model.removeGroupFromLocal(row.node_id, row.id, row.parentRow)
         $('#databaseDg').treegrid('remove', row.id)
         $('#databaseDg').treegrid('refresh', pid);
-
     })
 }
 /// For Folder end
@@ -390,6 +396,11 @@ function buildGroupTreeDatas(node, datas, parentRow){
 
     if(datas){
         $.each(datas, function (idx,data){
+            if(data==null){
+                console.error('group node null');
+                return true;
+            }
+
             if($.v3browser.model.getDataType(data) == 'group'){
                 let one = $.v3browser.model.convert.Group2Data(data);
                 one.event = function(r){
