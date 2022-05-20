@@ -74,6 +74,8 @@ $.etcd.postJson = function(url, datastr, fn, requestHeader, progressing){
         datastr = $.extends.json.tostring(datastr)
     }
 
+    requestHeader['Content-Type'] = 'application/json; charset=UTF-8';
+
     $.app.ajax(url, datastr, 'POST', "json", fn, true, progressing, requestHeader);
 };
 
@@ -236,15 +238,15 @@ $.etcd.request = {
             });
         },
         range: function (fn, serverInfo, key, range, withPrefix, count_only, sort_order, sort_target, skip, count,
-                         min_create_revision, min_mod_revision, max_create_revision, max_mod_revision, keys_only){
+                         min_create_revision, min_mod_revision, max_create_revision, max_mod_revision, key_only, ignore_key){
             $.etcd.request.execute(serverInfo, function (node) {
                 let data = {};
 
                 data['key']=Base64.encode(key);
-                if(withPrefix){
+                if(!$.extends.isEmpty(withPrefix)&&withPrefix){
                     data['range_end']=Base64.encode($.etcd.request.prefixFormat(key));
                 }else{
-                    if(range!=null)
+                    if(!$.extends.isEmpty(range))
                         data['range_end']=Base64.encode(range);
                 }
 
@@ -272,8 +274,13 @@ $.etcd.request = {
                 if(!$.extends.isEmpty(max_mod_revision))
                     data['max_mod_revision']=Number(max_mod_revision);
 
-                if(!$.extends.isEmpty(keys_only)&&keys_only)
+                if(!$.extends.isEmpty(key_only)&&key_only)
                     data['keys_only']=true;
+
+                if(!$.extends.isEmpty(ignore_key)&&ignore_key){
+                    data['key']=Base64.encode('\0');
+                    data['range_end']=Base64.encode('\0');
+                }
 
                 let limit = null;
 

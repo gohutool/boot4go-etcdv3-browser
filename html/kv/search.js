@@ -49,8 +49,8 @@ function load(){
     $(function(){
         $("#searchDg").iDatagrid({
             idField: 'id',
-            sortOrder:'asc',
-            sortName:'key',
+            sortOrder1:'asc',
+            sortName1:'key',
             frozenColumns:[[
                 // {field: 'id', title: '', checkbox: true},
                 {field: 'op', title: '操作', sortable: false, halign:'center',align:'center', width: 140, formatter:operateFormatter},
@@ -116,6 +116,23 @@ function doSearch(){
     if($('#searchform').form('validate')){
         let param = $.extends.getFormJson($('#searchform'))
         console.log(param)
+        isSearch = true;
+
+        if(!$.extends.isEmpty(param.sort_order)){
+            if(param.sort_order=='ASCEND'){
+                $('#searchDg').datagrid('options').sortOrder = 'asc';
+            }else if(param.sort_order=='DESCEND'){
+                $('#searchDg').datagrid('options').sortOrder = 'desc';
+            }
+        }
+
+        if(!$.extends.isEmpty(param.sort_target)){
+            $('#searchDg').datagrid('options').sortName = param.sort_target.toLowerCase()
+        }
+
+        $('#searchDg').datagrid('options').param = {};
+
+        $('#searchDg').datagrid('load', param)
     }
 }
 
@@ -125,14 +142,15 @@ function refresh(param){
 
     let prefix = param.prefix;
 
-    let sortOrder = 'NONE'
+    let sortOrder = null;
 
     if(param.order=='asc')
         sortOrder = "ASCEND"
     else if(param.order=='desc')
         sortOrder = "DESCEND"
 
-    let sortTarget = "KEY";
+    let sortTarget = null;
+
     if(param.sort=='key')
         sortTarget = "KEY"
     else if(param.sort=='create_revision')
@@ -144,7 +162,17 @@ function refresh(param){
     else if(param.sort=='version')
         sortTarget = "VERSION"
 
-    let skip = 0;
+    if(!$.extends.isEmpty(sortOrder)){
+        param.sort_order = sortOrder
+    }
+
+    if(!$.extends.isEmpty(sortTarget)){
+        param.sort_target = sortTarget
+    }
+
+    console.log(sortOrder)
+
+    let skip;
 
     if(param.rows == null){
         param.rows = 20;
@@ -156,16 +184,16 @@ function refresh(param){
         skip = (param.page - 1) * param.rows;
     }
 
-    if(!$.extends.isEmpty(param.key)){
-        prefix = prefix+param.key.trim()
+    if(!$.extends.isEmpty(param.prefix)){
+        prefix = param.prefix.trim()
     }
 
-    console.log(sortOrder)
-
     $.etcd.request.kv.range(function (response) {
-        $('#groupDg').datagrid('loadData', {
+        $('#searchDg').datagrid('loadData', {
             total: response.count,
             rows: response.kvs
         })
-    }, node, prefix, null, true, false, sortOrder, sortTarget, skip, param.rows)
+    }, node, prefix, param.range_end, param['with_prefix'], param['count_only'], param['sort_order'], param['sort_target'],
+        skip, param.rows, param['min_create_revision'], param['min_mod_revision'], param['max_create_revision'],
+        param['max_mod_revision'], param['key_only'], param['ignore_key'])
 }
