@@ -426,17 +426,37 @@ $.v3browser.model = {
 
             if(newOne.group){
                 $.each(newOne.group, function (idx, g){
-                    let gId = Math.uuid();
-                    g.id = gId;
-                    g.group_id = gId;
-                    g.node_id=newId;
-                    g.db_id = newId;
-                    g.createtime = date;
-                    delete g['updatetime'];
+                    $.v3browser.model.convert._import4Folder(g, newId, date)
                 })
+            }else{
+                newOne.group=[]
             }
 
             return newOne
+        },
+        _import4Folder:function(g, node_id, date){
+            let gId = Math.uuid();
+
+            g.id = gId;
+            g.node_id=node_id;
+            g.db_id = node_id;
+            g.createtime = date;
+
+            let type = $.v3browser.model.getDataType(g)
+
+            if(type == 'group'){
+                g.group_id = gId;
+            }else if(type == 'folder'){
+                if(g.group==null){
+                    g.group = [];
+                }
+
+                $.each(g.group, function (idx, one){
+                    $.v3browser.model.convert._import4Folder(one, node_id, date)
+                })
+            }
+
+            delete g['updatetime'];
         },
         Node2Data: function(node){
             let row = {};

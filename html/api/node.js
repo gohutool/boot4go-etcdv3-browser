@@ -187,9 +187,6 @@ function loadTreeDg(){
             console.log(""+point)
             if(sourceRow.type == 'db'){
                 if(targetRow!=null && targetRow.type == 'db'){
-                    if(targetRow!=null && point == 'append'){
-                        return false
-                    }
                     console.log(targetRow)
                     return true;
                 }
@@ -221,6 +218,7 @@ function loadTreeDg(){
             if(sourceRow.type == 'db'){
                 if(targetRow==null || targetRow.type == 'db'){
                     if(targetRow!=null && point == 'append'){
+                        $.app.show('目前版本不支持了连接下嵌套子连接');
                         return false
                     }
                     return true;
@@ -350,7 +348,7 @@ function loadTreeDg(){
             {
                 field:'text',
                 title:'服务器地址',
-                width:'380px'
+                width:'100%'
             }]]
     })
 }
@@ -566,13 +564,13 @@ function importEtcd(){
             handler:'ajaxForm',
             beforeAjax:function(o){
                 console.log("测试连接")
-                o.ajaxData = $.extends.json.param2json(o.ajaxData);
-                let info = o.ajaxData
 
                 let newOne = null;
 
                 try{
-                    newOne = $.extends.json.toobject(info.json)
+
+                    let text = $('#import_json').textbox('getText');
+                    newOne = $.extends.json.toobject2(text)
                 }catch (err){
                     $.app.show("json文件格式不正确")
                     return false
@@ -602,12 +600,13 @@ function importEtcd(){
             handler:'ajaxForm',
             beforeAjax:function(o){
                 console.log("确定")
-                o.ajaxData = $.extends.json.param2json(o.ajaxData);
-                console.log(o.ajaxData);
-                let info = o.ajaxData;
+                //o.ajaxData = $.extends.json.param2json(o.ajaxData);
+                //console.log(o.ajaxData);
+                //let info = o.ajaxData;
 
+                let text = $('#import_json').textbox('getText');
 
-                let msg = $.v3browser.model.convert.Text2Node(info.json)
+                let msg = $.v3browser.model.convert.Text2Node(text)
 
                 if(typeof msg == 'string'){
                     $.app.show('导入失败，' + msg);
