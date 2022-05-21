@@ -421,9 +421,18 @@ $.etcd.response = {
         if(!$.extends.isEmpty(kvs)){
             $.each(kvs, function (idx, v) {
                 let o = $.extend({}, v);
-                o.key = Base64.decode(v.key);
+                if(v.key)
+                    o.key = Base64.decode(v.key);
+                else
+                    o.key = '';
+
                 o.id = v.key;
-                o.value = Base64.decode(v.value);
+
+                if(v.value)
+                    o.value = Base64.decode(v.value);
+                else
+                    o.value ='';
+
                 rtn.push(o);
             })
         }

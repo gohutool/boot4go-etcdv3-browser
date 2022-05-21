@@ -46,6 +46,29 @@ function load(){
         }
     }
 
+
+    let row = $.extend({}, $.v3browser.menu.getCurrentTabAttachData());
+
+    if(row.data==null)
+        row.data = {};
+
+    if(row.data['with_prefix']){
+        $('#search_with_prefix').switchbutton('check')
+    }
+
+    if(row.data['ignore_key']){
+        $('#search_ignore_key').switchbutton('check')
+    }
+
+    if(row.data['count_only']){
+        $('#search_count_only').switchbutton('check')
+    }
+
+    if(row.data['key_only']){
+        $('#search_key_only').switchbutton('check')
+    }
+
+
     $(function(){
         $("#searchDg").iDatagrid({
             idField: 'id',
@@ -196,4 +219,113 @@ function refresh(param){
     }, node, prefix, param.range_end, param['with_prefix'], param['count_only'], param['sort_order'], param['sort_target'],
         skip, param.rows, param['min_create_revision'], param['min_mod_revision'], param['max_create_revision'],
         param['max_mod_revision'], param['key_only'], param['ignore_key'])
+}
+
+function save(){
+
+    if($('#searchform').form('validate')) {
+        let node = $.v3browser.menu.getCurrentTabAttachNode();
+        let row = $.v3browser.menu.getCurrentTabAttachData();
+
+        let search = $.extends.getFormJson($('#searchform'))
+        console.log(search)
+
+        search.node_id = node.id;
+        search.search_name = row.data.search_name;
+        search.id = row.id;
+
+        let msg = parent.$.v3browser.model.saveSearch2Node(node.id, search);
+        $.extend(parent.$.v3browser.menu.getTreeRow(row.id).data, search);
+        $.app.show('保存查询成功')
+
+    }else{
+        $.app.show('填写信息不规范，请检查填写数据内容')
+    }
+}
+
+function saveAs(){
+
+
+    if($('#searchform').form('validate')){
+
+        $.iDialog.openDialog({
+            title: '保存为',
+            minimizable:false,
+            width: 750,
+            height: 240,
+            content: `
+            <div style="margin: 10px;">
+            </div>
+            <div class="cubeui-fluid" id="create-group-form">
+                <div class="cubeui-row">
+                
+                    <div class="cubeui-col-sm11">
+                        <label class="cubeui-form-label">名称:</label>
+                        <div class="cubeui-input-block">
+                            <input type="text" data-toggle="cubeui-textbox" id="search_name" name="search_name"
+                                   value='{{:search_name}}' data-options="required:true,prompt:'查询名称，必须填写'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        `,
+            render:function(opts, handler){
+                let d = this;
+                console.log("Open dialog");
+                handler.render({})
+            },
+            buttonsGroup: [{
+                text: '保存',
+                iconCls: 'fa fa-plus-square-o',
+                btnCls: 'cubeui-btn-orange',
+                handler:'ajaxForm',
+                beforeAjax:function(o){
+                    let node = $.v3browser.menu.getCurrentTabAttachNode();
+                    o.ajaxData = $.extends.json.param2json(o.ajaxData);
+                    let info = o.ajaxData
+
+                    let search = $.extends.getFormJson($('#searchform'))
+                    console.log(search)
+
+                    search.node_id = node.id;
+                    search.search_name = info.search_name;
+
+                    let msg = $.v3browser.model.saveSearch2Node(node.id, search);
+
+                    if(typeof msg == 'string'){
+                        $.app.show("不能添加查询，"+msg);
+                    }
+
+                    let one = $.v3browser.model.convert.Search2Data(search);
+                    let row = parent.$.v3browser.menu.getTreeRow($.v3browser.menu.systemMenu.searchMenuId(node.id))
+                    one.parentRow = row;
+                    one.event = function(r){
+                        let node = $.v3browser.model.getLocalNode(r.node_id)
+
+                        //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+                        let title = $.v3browser.model.title.search(info, node)
+                        $.v3browser.menu.addOneTabAndRefresh(title, './kv/search.html', 'fa fa-navicon', node, r);
+                    }
+
+                    parent.openSearchNodeMenu(row)
+
+                    parent.$('#databaseDg').treegrid('append', {
+                        parent: row.id,
+                        data:[one]
+                    });
+                    parent.$('#databaseDg').treegrid('enableDnd',one.id);
+
+                    parent.$('#databaseDg').treegrid('expand', row.id);
+                    $.iDialog.closeOutterDialog($(this))
+                    $.app.show('保存查询成功')
+                    return false;
+                }
+            }]
+        });
+
+    }else{
+        $.app.show('填写信息不规范，请检查填写数据内容')
+    }
+
 }

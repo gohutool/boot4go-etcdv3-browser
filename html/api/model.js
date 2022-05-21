@@ -377,6 +377,59 @@ $.v3browser.model = {
         return rtn;
 
     },
+    saveSearch2Node: function(etcdID, search){
+        let node = $.v3browser.model.getLocalNode(etcdID);
+
+        if(node==null){
+            return '节点不存在';
+        }
+
+        let data = $.extend({}, search);
+        let date = new Date()
+
+        if($.extends.isEmpty(search.id)){
+            data.id = Math.uuid();
+            data.createtime = date.Format('yyyy-MM-dd HH:mm:ss');
+        }else{
+            data.updatetime = date.Format('yyyy-MM-dd HH:mm:ss');
+        }
+
+        data.node_id = etcdID;
+        data.db_id = etcdID;
+
+
+        if(node.search==null){
+            node.search = [];
+        }
+        search.id = data.id;
+
+        let idx = findIdx(node.search, search.id);
+
+        if(idx < 0){
+            node.search.push(data);
+        }else{
+            $.extend(node.search[idx], data)
+        }
+
+        $.v3browser.model.saveLocalConfig();
+
+        return 0;
+    },
+    removeSearchFromLocal: function(etcdID, searchId){
+        let node = $.v3browser.model.getLocalNode(etcdID);
+
+        if(!node.search){
+            node.search = [];
+        }
+
+        let idx = findIdx(node.search, searchId);
+
+        if(idx >=0){
+            node.search.splice(idx, 1);
+        }
+
+        $.v3browser.model.saveLocalConfig()
+    },
     saveAuthorization: function(id, token){
         let idx = $.v3browser.model.findLocalNode(id);
         if(idx<0){
@@ -556,7 +609,6 @@ $.v3browser.model = {
         },
         EmptySearch:function(node_id){
             return {
-                param:{},
                 node_id:node_id,
                 id:'',
             }

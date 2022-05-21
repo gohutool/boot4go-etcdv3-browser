@@ -211,7 +211,42 @@ function openGroupsNodeMenu(row) {
         $('#databaseDg').treegrid('expand', row.id)
     }
 
+}
 
+function openSearchNodeMenu(row) {
+
+    if(row.children==null){
+
+        let node = $.v3browser.model.getLocalNode(row.node_id);
+        let ds = [];
+
+        if(node.search == null)
+            node.search = [];
+
+        if(node.search){
+            $.each(node.search, function (idx,v){
+                let one = $.v3browser.model.convert.Search2Data(v);
+                one.parentRow = row;
+                one.event = function(r){
+                    let node = $.v3browser.model.getLocalNode(r.node_id)
+
+                    //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+                    let title = $.v3browser.model.title.search(v, node)
+                    $.v3browser.menu.addOneTabAndRefresh(title, './kv/search.html', 'fa fa-navicon', node, r);
+                }
+                ds.push(one);
+            });
+        }
+
+        $('#databaseDg').treegrid('append', {
+            parent:row.id,
+            data:ds
+        });
+
+        $('#databaseDg').treegrid('enableDndChildren', row.id)
+
+        $('#databaseDg').treegrid('expand', row.id)
+    }
 }
 /// For Group end
 
@@ -426,7 +461,6 @@ function buildGroupTreeDatas(node, datas, parentRow){
     }
     return ds;
 }
-
 
 function exchangeGroup(nodeId, sourceRow, targetRow, point){
 

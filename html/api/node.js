@@ -4,7 +4,7 @@ function newEtcdNode(nodeId){
     return {
         nodes:[
             {id: nodeId+"_1", node_id: nodeId, text:'键值', disableDnd: true, type:"kv", iconCls:"fa fa-table",state:"closed", children:[
-                    {id: nodeId+"_1"+"_1", node_id: nodeId, text:'集合', disableDnd: true, type:"groups", iconCls:"fa fa-object-group",
+                    {id: $.v3browser.menu.systemMenu.groupMenuId(nodeId), node_id: nodeId, text:'集合', disableDnd: true, type:"groups", iconCls:"fa fa-object-group",
                         event:function(row){
                             console.log(row);
                             toggleRow(row, function (){
@@ -12,44 +12,23 @@ function newEtcdNode(nodeId){
                                 return false;
                             });
                         }, mm:"groupRootMm"},
-                    {id: nodeId+"_1"+"_2", node_id: nodeId, text:'查询', disableDnd: true, type:"searches", iconCls:"fa fa-navicon",
+                    {id: $.v3browser.menu.systemMenu.searchMenuId(nodeId), node_id: nodeId, text:'查询', disableDnd: true, type:"searches", iconCls:"fa fa-navicon",
                         event:function(row){
                             console.log(row);
                             toggleRow(row, function (){
-                                let ds = [];
-                                let node = $.v3browser.model.getLocalNode(row.node_id);
-                                if(node.search){
-                                    $.each(node.search, function (idx,v){
-                                        let one = $.v3browser.model.convert.Search2Data(v);
-                                        one.event = function(r){
-                                            let node = $.v3browser.model.getLocalNode(r.node_id)
-
-                                            //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
-                                            let title = $.v3browser.model.title.search(v, node)
-                                            $.v3browser.menu.addOneTabAndRefresh(title, './kv/search.html', 'fa fa-navicon', node, r);
-                                        }
-                                        ds.push(one);
-                                    });
-                                }
-
-                                $('#databaseDg').treegrid('append', {
-                                    parent:row.id,
-                                    data:ds
-                                });
-
-                                $('#databaseDg').treegrid('expand', row.id)
+                                openSearchNodeMenu(row);
                                 return false;
                             });
                         }, mm:"searchRootMm"},
                 ]},
             {id: nodeId+"_2", text:'租约', node_id: nodeId, type:"lease", disableDnd: true, iconCls:"fa fa-plug",state:"closed", children:[
-                    {id: nodeId+"_2"+"_1", node_id: nodeId, text:'租约', disableDnd: true, type:"lease-object", iconCls:"fa fa-ticket",
+                    {id: $.v3browser.menu.systemMenu.leaseMenuId(nodeId), node_id: nodeId, text:'租约', disableDnd: true, type:"lease-object", iconCls:"fa fa-ticket",
                         event:function(row){
 
                         }}
                 ]},
             {id: nodeId+"_3", text:'对象锁', node_id: nodeId, type:"lock", disableDnd: true, iconCls:"fa fa-lock",state:"closed", children:[
-                    {id: nodeId+"_3"+"_1", node_id: nodeId, text:'锁对象', disableDnd: true, type:"lock-object", iconCls:"fa fa-server",
+                    {id: $.v3browser.menu.systemMenu.lockMenuId(nodeId), node_id: nodeId, text:'锁对象', disableDnd: true, type:"lock-object", iconCls:"fa fa-server",
                         event:function(row){
 
                         }}

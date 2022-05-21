@@ -62,7 +62,7 @@
                 <label class="cubeui-form-label">键:</label>
                 <div class="cubeui-input-block">
                     <input type="text" data-toggle="cubeui-textbox" id="search_prefix" name="prefix"
-                           value='{{:key}}' data-options="required:true,prompt:'查询的键，必须填写'">
+                           value='{{:prefix}}' data-options="required:true,prompt:'查询的键，必须填写'">
                 </div>
             </div>
             <div class="cubeui-col-sm6">
@@ -174,14 +174,21 @@
                            onClick:function(){
                                 $('#searchform').form('clear');
                            }">清空</a>
+            {{if modify}}
             <a href="#"
                data-toggle="cubeui-linkbutton"
-               data-options="id:'submitBtn',
+               data-options="
                            iconCls:'fa fa-save',
                            btnCls:'cubeui-btn-brown',
-                           onClick:function(){
-                                $('#searchform').form('clear');
-                           }">保存为...</a>
+                           onClick:save">保存</a>
+            {{else}}
+            <a href="#"
+               data-toggle="cubeui-linkbutton"
+               data-options="
+                           iconCls:'fa fa-save',
+                           btnCls:'cubeui-btn-brown',
+                           onClick:saveAs">保存为...</a>
+            {{/if}}
         </div>
     </div>
 </form>
@@ -209,15 +216,22 @@
                 ROOT_RES_URL + "/api/api.js",
                 ROOT_RES_URL + "/api/model.js",
                 ROOT_RES_URL + "/api/menu.js",
+                ROOT_RES_URL + "/api/group.js",
                 ROOT_RES_URL + "/kv/search.js",
             ],
             render: function () {
                 stop = true
                 console.log("finish")
 
-                let data = $.extend({}, $.v3browser.menu.getCurrentTabAttachData());
+                let row = $.extend({}, $.v3browser.menu.getCurrentTabAttachData());
 
-                APP.renderBody("#tmpl1", data)
+                if(row.data==null)
+                    row.data = {};
+
+                console.log("============");
+                console.log(row);
+
+                APP.renderBody("#tmpl1", $.extend({},row.data, {modify: row.modify}))
 
                 // let t = $.templates("#tmpl1").render({id:"1022", name:"davidliu"})
                 // $('body div').remove()

@@ -51,7 +51,11 @@
 }
 
 .window .window-header .panel-with-icon {
-    padding-left: 40px;
+    padding-left: 45px!important;
+}
+
+.window .window-header .panel-icon, .window .window-header .panel-tool {
+    margin-top: -10px!important;
 }
 
 .l-btn-icon.fa{
@@ -116,4 +120,17 @@
 
 .panel-footer-no-background {
     background: inherit!important;
+}
+
+.menu-line {
+    left: 30px!important;
+}
+.menu-item>.menu-text {
+    padding-left: 33px!important;
+}
+
+
+
+#west .tree-title {
+    font-size: 13px!important;
 }

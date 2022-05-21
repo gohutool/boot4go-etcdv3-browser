@@ -254,5 +254,22 @@ $.v3browser.menu = {
             t.tabs('close', v)
         });
 
+    },
+    getTreeRow:function(rowId){
+        return $('#databaseDg').treegrid('find', rowId);
+    },
+    systemMenu:{
+        groupMenuId : function (nodeId){
+            return nodeId+"_1"+"_1";
+        },
+        searchMenuId : function (nodeId){
+            return nodeId+"_1"+"_2";
+        },
+        leaseMenuId : function (nodeId){
+            return nodeId+"_2"+"_1";
+        },
+        lockMenuId : function (nodeId){
+            return nodeId+"_3"+"_1";
+        }
     }
 }
