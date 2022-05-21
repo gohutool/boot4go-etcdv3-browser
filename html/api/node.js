@@ -24,35 +24,43 @@ function newEtcdNode(nodeId){
             {id: nodeId+"_2", text:'租约', node_id: nodeId, type:"lease", disableDnd: true, iconCls:"fa fa-plug",state:"closed", children:[
                     {id: $.v3browser.menu.systemMenu.leaseMenuId(nodeId), node_id: nodeId, text:'租约', disableDnd: true, type:"lease-object", iconCls:"fa fa-ticket",
                         event:function(row){
-
-                        }}
+                            //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
+                            let node = $.v3browser.model.getLocalNode(row.node_id)
+                            let title = $.v3browser.model.title.lease(node)
+                            $.v3browser.menu.addOneTabAndRefresh(title, './lease/lease.html', 'fa fa-navicon', node, row);
+                        }, mm:"leaseRootMm"}
                 ]},
             {id: nodeId+"_3", text:'对象锁', node_id: nodeId, type:"lock", disableDnd: true, iconCls:"fa fa-lock",state:"closed", children:[
                     {id: $.v3browser.menu.systemMenu.lockMenuId(nodeId), node_id: nodeId, text:'锁对象', disableDnd: true, type:"lock-object", iconCls:"fa fa-server",
                         event:function(row){
-
-                        }}
+                            let node = $.v3browser.model.getLocalNode(row.node_id)
+                            let title = $.v3browser.model.title.lock(node)
+                            $.v3browser.menu.addOneTabAndRefresh(title, './lock/lock.html', 'fa fa-navicon', node, row);
+                        }, mm:"lockRootMm"}
                 ]},
-            {id: nodeId+"_4", text:'用户', node_id: nodeId, type:"user", disableDnd: true, iconCls:"fa fa-user-circle-o",state:"closed",
+            {id: nodeId+"_4", text:'用户', node_id: nodeId, type:"user", disableDnd: true, iconCls:"fa fa-user-circle-o",
                 event:function(row){
+                    row.state = "open";
                     toggleRow(row, function (){
                         refreshUsers(row);
                         return false;
                     });
                 }, mm:"userRootMm"},
-            {id: nodeId+"_5", text:'角色', node_id: nodeId, type:"role", disableDnd: true, iconCls:"fa fa-user-o",state:"closed",
+            {id: nodeId+"_5", text:'角色', node_id: nodeId, type:"role", disableDnd: true, iconCls:"fa fa-user-o",
                 event:function(row){
+                    row.state = "open";
                     toggleRow(row, function (){
                         refreshRoles(row);
                         return false;
                     });
                 }, mm:"roleRootMm"},
-            {id: nodeId+"_6", text:'警报', node_id: nodeId, type:"alarm", disableDnd: true, iconCls:"fa fa-podcast",state1:"closed",
-                event:function (){
-
+            {id: nodeId+"_6", text:'警报', node_id: nodeId, type:"alarm", disableDnd: true, iconCls:"fa fa-podcast",
+                event:function (row){
+                    row.state = "open";
                 }},
-            {id: nodeId+"_7", text:'集群', node_id: nodeId, disableDnd: true, type:"cluster", iconCls:"fa fa-sitemap",state:"closed",
+            {id: nodeId+"_7", text:'集群', node_id: nodeId, disableDnd: true, type:"cluster", iconCls:"fa fa-sitemap",
                 event:function(row){
+                    row.state = "open";
                     toggleRow(row, function (){
                         refreshMembers(row);
                         return false;
@@ -188,6 +196,13 @@ function loadTreeDg(){
                 return false;
             }
 
+            if(sourceRow.type == 'search'){
+                if(targetRow && (targetRow.type == 'search')){
+                    return true;
+                }
+                return false;
+            }
+
             return false
         },
         onBeforeDrop:function (targetRow,sourceRow,point) {
@@ -206,6 +221,12 @@ function loadTreeDg(){
             }
 
             if(sourceRow.type == 'group'||sourceRow.type == 'folder'){
+
+                if(targetRow==null || sourceRow.node_id != targetRow.node_id){
+                    $.app.show('目前版本不支持跨连接的移动');
+                    return false;
+                }
+
                 if(targetRow && targetRow.type == 'group'){
                     if(point == 'append'){
                         $.app.show('目前版本不支持集合下嵌套子集合');
@@ -247,6 +268,26 @@ function loadTreeDg(){
                 return false;
             }
 
+            if(sourceRow.type == 'search'){
+
+                if(targetRow==null || sourceRow.node_id != targetRow.node_id){
+                    $.app.show('目前版本不支持跨连接的移动');
+                    return false;
+                }
+
+                if(targetRow && targetRow.type == 'search'){
+                    if(point == 'append'){
+                        $.app.show('目前版本不支持查询下嵌套子查询');
+                        return false
+                    }
+                    return true;
+                }else{
+                    $.app.show('不能移动到查询外')
+                }
+
+                return false;
+            }
+
             console.log(sourceRow)
         },
         onDrop:function (targetRow,sourceRow,point) {
@@ -268,6 +309,12 @@ function loadTreeDg(){
             }
 
             if(sourceRow.type == 'group' || sourceRow.type == 'folder'){
+
+                if(targetRow==null || sourceRow.node_id != targetRow.node_id){
+                    $.app.show('目前版本不支持跨连接的移动');
+                    return false;
+                }
+
                 if(point == 'append' && targetRow.type=='group'){
                     $.app.show('不支持目前版本');
                     return false;
@@ -282,6 +329,28 @@ function loadTreeDg(){
                     $.v3browser.model.saveLocalConfig();
                     return true;
                 }
+            }
+
+            if(sourceRow.type == 'search'){
+
+                if(targetRow==null || sourceRow.node_id != targetRow.node_id){
+                    $.app.show('目前版本不支持跨连接的移动');
+                    return false;
+                }
+
+                if(targetRow && targetRow.type == 'search'){
+                    if(point == 'append'){
+                        $.app.show('目前版本不支持查询下嵌套子查询');
+                        return false
+                    }
+
+                    $.v3browser.model.exchangeSearch(sourceRow.node_id, sourceRow.id, targetRow.id, point);
+                    $.v3browser.model.saveLocalConfig();
+
+                    return true;
+                }
+
+                return false;
             }
 
             return false;

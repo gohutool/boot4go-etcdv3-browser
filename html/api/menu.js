@@ -270,6 +270,18 @@ $.v3browser.menu = {
         },
         lockMenuId : function (nodeId){
             return nodeId+"_3"+"_1";
+        },
+        userMenuId : function (nodeId){
+            return nodeId+"_4"+"_1";
+        },
+        roleMenuId : function (nodeId){
+            return nodeId+"_5"+"_1";
+        },
+        alarmMenuId : function (nodeId){
+            return nodeId+"_6"+"_1";
+        },
+        clusterMenuId : function (nodeId){
+            return nodeId+"_7"+"_1";
         }
     }
 }

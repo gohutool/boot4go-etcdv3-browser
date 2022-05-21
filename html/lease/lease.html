@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:jc="http://www.joinsunsoft.com">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <script src="/static/common/js/ui.js"></script>
+</head>
+
+<body>
+<div id="loading" class="loading-wrap">
+    <div class="loading-content">
+        <div class="loading-round"></div>
+        <div class="loading-dot"></div>
+    </div>
+</div>
+<script id="tmpl1" type="text/x-jquery-tmpl">
+<table id="groupDg"></table>
+<!-- 表格工具栏开始 -->
+<div id="groupDg-toolbar" class="cubeui-toolbar"
+     data-options="grid:{
+           type:'datagrid',
+           id:'groupDg'
+       }">
+
+    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+            method1: 'openDialog',
+            onClick:function(){
+                addKey();
+            },
+            extend: '#groupDg-toolbar',
+            btnCls: 'cubeui-btn-blue',
+            iconCls: 'fa fa-plus'
+        }">新增键值</a>
+
+    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+            onClick:function(){
+                emptyKeys();
+            },
+            extend: '#groupDg-toolbar',
+            btnCls: 'cubeui-btn-red',
+            iconCls: 'fa fa-trash'
+        }">清空</a>
+
+    <form id="queryForm" class="search-box">
+    	<input type="text" id='prefix_search' name="key" data-toggle="cubeui-textbox"
+               data-options="onClear:function(){
+                    console.log(111);
+                    $('#searchbtn').trigger('click');
+               }, mask:'{{:~js(prefix)}}', prompt:'key查询，按照prefix({{:~js(prefix)}})+key进行前缀查询',width:360">
+        <a href="javascript:void(0)" id="searchbtn"
+           data-toggle="cubeui-menubutton"
+           data-options="method:'query',
+           iconCls:'fa fa-search',
+           btnCls:'cubeui-btn-blue',
+           form:{id:'queryForm'},
+           grid:{type:'datagrid','id':'groupDg'}">查询</a>
+    </form>
+</div>
+<!-- 表格工具栏结束 -->
+</script>
+
+</body>
+<script>
+    new APP(function () {
+        return {
+            css: [],
+            js: [
+                ROOT_RES_URL + "/api/api.js",
+                ROOT_RES_URL + "/api/model.js",
+                ROOT_RES_URL + "/api/menu.js",
+                ROOT_RES_URL + "/kv/kv.js",
+            ],
+            render: function () {
+                stop = true
+                console.log("finish")
+
+                let data = $.extend({}, $.v3browser.menu.getCurrentTabAttachData());
+
+                APP.renderBody("#tmpl1", data)
+
+                // let t = $.templates("#tmpl1").render({id:"1022", name:"davidliu"})
+                // $('body div').remove()
+                // $(t).appendTo($('body'))
+            }
+        }
+    });
+
+
+    APP.fn(function(){
+        load();
+    })
+</script>
+</html>

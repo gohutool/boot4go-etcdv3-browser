@@ -16,10 +16,6 @@ function removeSearch(){
     })
 }
 
-function openSearch() {
-
-}
-
 function addSearch() {
     let node = $.v3browser.menu.getCurrentOpenMenuNode();
     let title = $.v3browser.model.title.newSearch(node)

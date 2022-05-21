@@ -180,14 +180,14 @@
                data-options="
                            iconCls:'fa fa-save',
                            btnCls:'cubeui-btn-brown',
-                           onClick:save">保存</a>
+                           onClick:saveSearch">保存</a>
             {{else}}
             <a href="#"
                data-toggle="cubeui-linkbutton"
                data-options="
                            iconCls:'fa fa-save',
                            btnCls:'cubeui-btn-brown',
-                           onClick:saveAs">保存为...</a>
+                           onClick:saveSearchAs">保存为...</a>
             {{/if}}
         </div>
     </div>
@@ -242,7 +242,7 @@
 
 
     APP.fn(function(){
-        load();
+        loadSearch();
     })
 </script>
 </html>

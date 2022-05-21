@@ -176,8 +176,9 @@ $(this).menu('options').node=null;
 
 <div id="groupRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
     <div onclick="createFolder()" data-options="iconCls:'fa fa-folder-o'">新建目录...</div>
+    <div onclick="createGroupDg()" data-options="iconCls:'fa fa-object-group'">新建集合...</div>
     <div class="menu-sep"></div>
-    <div onclick="createGroupDg()" data-options="iconCls:'fa fa-plus-circle'">新建集合...</div>
+    <div onclick="refreshGroups()" data-options="iconCls:'fa fa-refresh'">刷新</div>
 </div>
 
 <div id="folderMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
@@ -206,6 +207,8 @@ $(this).menu('options').node=null;
     <div onclick="editUserDg()" data-options="iconCls:'fa fa-delicious'">授权角色...</div>
     <div class="menu-sep"></div>
     <div onclick="removeUser()" data-options="iconCls:'fa fa-trash'">删除用户</div>
+    <div class="menu-sep"></div>
+    <div onclick="refreshUser()" data-options="iconCls:'fa fa-refresh'">刷新</div>
 </div>
 
 <div id="roleRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
@@ -218,6 +221,8 @@ $(this).menu('options').node=null;
     <div onclick="editRoleDg()" data-options="iconCls:'fa fa-delicious'">授权权限...</div>
     <div class="menu-sep"></div>
     <div onclick="removeRole()" data-options="iconCls:'fa fa-trash'">删除角色</div>
+    <div class="menu-sep"></div>
+    <div onclick="refreshRoles()" data-options="iconCls:'fa fa-refresh'">刷新</div>
 </div>
 
 <div id="memberRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
@@ -243,6 +248,14 @@ $(this).menu('options').node=null;
     <div onclick="editSearch()" data-options="iconCls:'fa fa-folder-open-o'">编辑查询...</div>
     <div class="menu-sep"></div>
     <div onclick="removeSearch()" data-options="iconCls:'fa fa-trash'">删除查询</div>
+</div>
+
+<div id="leaseRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="refreshRoles()" data-options="iconCls:'fa fa-refresh'">刷新</div>
+</div>
+
+<div id="lockRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="refreshRoles()" data-options="iconCls:'fa fa-refresh'">刷新</div>
 </div>
 </script>
 </body>

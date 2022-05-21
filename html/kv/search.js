@@ -1,6 +1,6 @@
 let isSearch = false
 
-function load(){
+function loadSearch(){
 
     $('#search_with_prefix').switchbutton('options').onChange = function(checked){
         if(checked){
@@ -76,15 +76,15 @@ function load(){
             sortName1:'key',
             frozenColumns:[[
                 // {field: 'id', title: '', checkbox: true},
-                {field: 'op', title: '操作', sortable: false, halign:'center',align:'center', width: 140, formatter:operateFormatter},
+                {field: 'op', title: '操作', sortable: false, halign:'center',align:'center', width: 140, formatter:search_operateFormatter},
                 {field: 'key', title: '键', sortable: true,
-                    formatter:$.iGrid.templateformatter('{key}'),
+                    formatter:$.iGrid.tooltipformatter(),
                     width: 400},
             ]],
             onBeforeLoad:function (param){
                 console.log(param)
                 if(isSearch)
-                    refresh(param);
+                    refreshSearch(param);
             },
             columns: [[
                 {
@@ -126,7 +126,7 @@ function load(){
     });
 }
 
-function operateFormatter(value, row, index) {
+function search_operateFormatter(value, row, index) {
     let htmlstr = "";
 
     htmlstr += '<button class="layui-btn-blue layui-btn layui-btn-normal layui-btn-xs" onclick="editKey(\'' + row.id + '\')">修改</button>';
@@ -160,7 +160,7 @@ function doSearch(){
 }
 
 
-function refresh(param){
+function refreshSearch(param){
     let node = $.v3browser.menu.getCurrentTabAttachNode();
 
     let prefix = param.prefix;
@@ -221,7 +221,7 @@ function refresh(param){
         param['max_mod_revision'], param['key_only'], param['ignore_key'])
 }
 
-function save(){
+function saveSearch(){
 
     if($('#searchform').form('validate')) {
         let node = $.v3browser.menu.getCurrentTabAttachNode();
@@ -243,7 +243,7 @@ function save(){
     }
 }
 
-function saveAs(){
+function saveSearchAs(){
 
 
     if($('#searchform').form('validate')){

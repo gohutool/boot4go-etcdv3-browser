@@ -205,6 +205,19 @@ $.v3browser.model = {
             exchangeAfter(id1, node.group, id2)
         }
     },
+    exchangeSearch:function(nodeId, id1, id2, point){
+        let node = $.v3browser.model.getLocalNode(nodeId);
+        let search = node.search || [];
+        node.search = search;
+
+        if(point == 'top'){
+            exchangeBefore(id1, node.search, id2)
+        }else if(point == 'bottom'){
+            exchangeAfter(id1, node.search, id2)
+        }else{
+
+        }
+    },
     /**
      *
      * @param etcdID
@@ -632,7 +645,30 @@ $.v3browser.model = {
             return title;
         },
         newSearch:function(node){
-            let title = '新建@'+node.node_name.jsEncode()+'-查询';
+            let nodeName = (typeof node == 'string')?node:node.node_name;
+            let title = '新建@'+nodeName.jsEncode()+'-查询';
+            return title;
+        },
+        lease:function(node){
+            let nodeName = (typeof node == 'string')?node:node.node_name;
+            let title = '租约列表@'+nodeName.jsEncode()+'-租约';
+            return title;
+        },
+        lock:function(node){
+            let nodeName = (typeof node == 'string')?node:node.node_name;
+            let title = '锁对象@'+nodeName.jsEncode()+'-对象锁';
+            return title;
+        },
+        user:function(user, node){
+            let userName = (typeof user == 'string')?user:user.user_name;
+            let nodeName = (typeof node == 'string')?node:node.node_name;
+            let title = userName.jsEncode() + '@'+nodeName.jsEncode()+'-用户';
+            return title;
+        },
+        user:function(role, node){
+            let roleName = (typeof role == 'string')?role:role.role_name;
+            let nodeName = (typeof node == 'string')?node:node.node_name;
+            let title = roleName.jsEncode() + '@'+nodeName.jsEncode()+'-角色';
             return title;
         }
     },

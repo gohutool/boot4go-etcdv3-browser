@@ -250,7 +250,13 @@ function openSearchNodeMenu(row) {
 }
 /// For Group end
 
+function refreshGroups(){
+    let node = $.v3browser.menu.getCurrentOpenMenuNode();
+    let row = $.v3browser.menu.getTreeRow($.v3browser.menu.systemMenu.groupMenuId(node.id));
+    removeSubTree(row.id);
 
+    openGroupsNodeMenu(row)
+}
 
 
 

@@ -36,9 +36,22 @@ function removeSubTree(id) {
     let nodes = $('#databaseDg').treegrid('getChildren', id);
     if (nodes == null)
         return;
-    $.each(nodes, function (idx, v) {
-        $('#databaseDg').treegrid('remove', v.id);
-    })
+
+    let row = $('#databaseDg').treegrid('find', id);
+
+    if(row.children){
+        let ids = $.extends.collect(row.children, function (v) {
+            return v.id;
+        })
+
+        $.each(ids, function (idx, v) {
+
+            $('#databaseDg').treegrid('remove', v);
+
+        })
+
+        delete row.children;
+    }
 }
 
 function toggleRow(row, initExpandFn){
