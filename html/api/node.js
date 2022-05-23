@@ -31,11 +31,11 @@ function newEtcdNode(nodeId){
                         }, mm:"leaseRootMm"}
                 ]},
             {id: nodeId+"_3", text:'对象锁', node_id: nodeId, type:"lock", disableDnd: true, iconCls:"fa fa-lock",state:"closed", children:[
-                    {id: $.v3browser.menu.systemMenu.lockMenuId(nodeId), node_id: nodeId, text:'锁对象', disableDnd: true, type:"lock-object", iconCls:"fa fa-server",
+                    {id: $.v3browser.menu.systemMenu.lockMenuId(nodeId), node_id: nodeId, text:'锁对象', disableDnd: true, type:"lock-object", iconCls:"fa fa-unlock-alt",
                         event:function(row){
                             let node = $.v3browser.model.getLocalNode(row.node_id)
                             let title = $.v3browser.model.title.lock(node)
-                            $.v3browser.menu.addOneTabAndRefresh(title, './lock/lock.html', 'fa fa-navicon', node, row);
+                            $.v3browser.menu.addOneTabAndRefresh(title, './lock/lock.html', 'fa fa-unlock-alt', node, row);
                         }, mm:"lockRootMm"}
                 ]},
             {id: nodeId+"_4", text:'用户', node_id: nodeId, type:"user", disableDnd: true, iconCls:"fa fa-user-circle-o",

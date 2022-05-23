@@ -22,6 +22,11 @@ let V3_LEASE_REVOKE = '/v3/kv/lease/revoke'
 let V3_LEASE_GRANT = '/v3/lease/grant'
 let V3_LEASE_KEEPALIVE = '/v3/lease/keepalive'
 
+let ETC4GO_LOCK_FORMAT = "/etcd4go-lock/#lock/_"
+let ETC4GO_LOCK_INFO_PREFIX = "/etcd4go-lock/#info/"
+let ETC4GO_LOCK_INFO_FORMAT = ETC4GO_LOCK_INFO_PREFIX + "_"
+let ETC4GO_LOCK_REQUEST_INFO_PREFIX = "/etcd4go-lock/#request/_{key}/"
+let ETC4GO_LOCK_REQUEST_INFO_FORMAT = ETC4GO_LOCK_REQUEST_INFO_PREFIX + "_{leaseid}"
 
 // function
 $.app.beforeRequest = function (options){
@@ -179,6 +184,123 @@ $.etcd.request = {
                 fn.call(serverInfo, response)
             console.log(response)
         }, null, progressing)
+    },
+    lock:{
+        unlock:function(fn, serverInfo,key, leaseid){
+
+            $.etcd.request.execute(serverInfo, function (node) {
+                let data = {};
+                data.ID = leaseid;
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_REVOKE, data, function (response) {
+                    if ($.etcd.response.retoken(serverInfo, response))
+                        return;
+
+                    if(response&&response.code){
+                        $.app.show('强制解锁失败:'+response.error+', 可能锁的状态已经改变，请刷新数据后重试.');
+                        return;
+                    }
+
+                    if(fn && $.isFunction(fn)){
+                        fn.call(node, response)
+                    }
+
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            })
+
+            // $.etcd.request.lease.revoke(function (response){
+            //     if(fn && $.isFunction(fn)){
+            //         fn.call(node, response)
+            //     }
+            // }, serverInfo, leaseid);
+        },
+        lockinfo:function(fn, serverInfo,key){
+            $.etcd.request.execute(serverInfo, function (node) {
+                    $.etcd.request.kv.range(function(response){
+
+                        response.kvs = response.kvs||[];
+
+                        let list = $.extends.collect(response.kvs, function (v) {
+                            return $.extends.json.toobject2(v.value)
+                        });
+
+                        response.requests = list;
+                        response.count = list.length;
+                        delete response.kvs;
+
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+
+                    }, node, ETC4GO_LOCK_REQUEST_INFO_PREFIX.format2({key:key}),
+                        null, true);
+            });
+        },
+        list: function(fn, serverInfo, skip, count, key, sort_order, sort_target){
+
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.request.kv.range(function(response){
+                    response.kvs = response.kvs||[];
+
+                    let allT = response.kvs.length;
+
+                    let list = []
+
+                    for(let idx = 0 ; idx < allT; idx++){
+                        if(!$.extends.isEmpty(key)) {
+                            if (response.kvs[idx].key.indexOf(key) < 0)
+                                continue;
+                        }
+                        let obj = $.extend({}, response.kvs[idx]);
+                        obj.value = $.extends.json.toobject2(response.kvs[idx].value);
+                        obj.key = obj.key.replace(ETC4GO_LOCK_INFO_FORMAT, '');
+
+                        $.extend(obj, obj.value);
+                        delete obj.value;
+                        list.push(obj)
+                    }
+
+                    if(sort_order!='KEY'){
+                        list = list.sort(function (a, b) {
+                            return a>b?1:-1;
+                        })
+                    }
+
+                    let limit = 0;
+
+                    if (skip == null || skip <=0)
+                        skip = 0;
+
+                    if (count == null || count <=0){
+                        limit = response.leases.length
+                    }else{
+                        limit = skip + count
+                    }
+
+                    limit = limit>list.length?list.length:limit;
+                    let total = list.length;
+
+                    response.kvs = list;
+
+                    list = [];
+
+                    for(let idx = skip; idx < limit ; idx ++){
+                        list.push(response.kvs[idx])
+                    }
+
+                    response.ids = list;
+                    delete  response.kvs;
+
+                    response.total = total;
+
+                    if(fn && $.isFunction(fn)){
+                        fn.call(node, response)
+                    }
+
+
+                }, serverInfo, ETC4GO_LOCK_INFO_PREFIX, null, true, false,sort_order,'KEY', 0, 0)
+            });
+
+        }
     },
     lease:{
         grant: function(fn, serverInfo, leaseid, ttl){

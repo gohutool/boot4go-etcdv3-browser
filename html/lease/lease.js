@@ -68,7 +68,7 @@ function leaseOperateFormatter(value, row, index) {
 function refreshLease(param){
 
     if(param.rows == null){
-        param.rows = 10;
+        param.rows = 20;
     }
 
     let skip;
