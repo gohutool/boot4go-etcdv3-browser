@@ -20,6 +20,7 @@ let V3_LEASE_ALL = '/v3/kv/lease/leases'
 let V3_LEASE_TIMETOLIVE = '/v3/kv/lease/timetolive'
 let V3_LEASE_REVOKE = '/v3/kv/lease/revoke'
 let V3_LEASE_GRANT = '/v3/lease/grant'
+let V3_LEASE_KEEPALIVE = '/v3/lease/keepalive'
 
 
 // function
@@ -209,6 +210,68 @@ $.etcd.request = {
 
                 }, $.etcd.request.buildTokenHeader(serverInfo))
             });
+        },
+        keepalive: function(fn, serverInfo, leaseid){
+
+            $.etcd.request.execute(serverInfo, function (node) {
+                let data = {};
+                data.ID = leaseid;
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_KEEPALIVE, data, function (response) {
+                    if ($.etcd.response.retoken(serverInfo, response))
+                        return;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            })
+        },
+        keepAliveBulk: function(fn, serverInfo, leaseids){
+
+            leaseids = leaseids||[];
+
+            let o = leaseids.length;
+            let ok = [];
+            let fail = [];
+
+            $.etcd.request.execute(serverInfo, function (node) {
+
+                $.app.showProgress('批量续约租约中......')
+
+                $.each(leaseids, function (idx, lease){
+
+                    let data = {};
+                    data.ID = lease;
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_KEEPALIVE, data, function (response) {
+
+                        if ($.etcd.response.retoken(serverInfo, response)){
+                            fail.push(lease);
+                        }else{
+                            if($.etcd.response.check(response)){
+                                ok.push(lease)
+                            }else{
+                                fail.push(lease);
+                            }
+                        }
+
+                        if(idx >= o - 1){
+                            response.ok = ok;
+                            response.fail = fail;
+
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                                $.app.closeProgess()
+                            }
+                        }
+
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                })
+
+            })
         },
         revoke: function(fn, serverInfo, leaseid){
 

@@ -35,12 +35,22 @@
 
     <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
             onClick:function(){
+                keepaliveLease();
+            },
+            extend: '#leaseDg-toolbar',
+            btnCls: 'cubeui-btn-yellowgreen',
+            iconCls: 'fa fa-ticket'
+        }">延续租约</a>
+
+    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+            onClick:function(){
                 removeLease();
             },
             extend: '#leaseDg-toolbar',
             btnCls: 'cubeui-btn-red',
             iconCls: 'fa fa-times'
         }">删除租约</a>
+
 
     <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
             onClick:function(){

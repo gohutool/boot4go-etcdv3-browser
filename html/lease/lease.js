@@ -11,7 +11,7 @@ function loadLease(){
             frozenColumns:[[
                 {field: 'ID', title: '', checkbox: true},
                 {field: 'op', title: '操作', sortable: false, halign:'center',align:'center',
-                    width: 90, formatter:leaseOperateFormatter},
+                    width: 150, formatter:leaseOperateFormatter},
                 {field: '_ID', title: 'LeaseID', sortable: false,
                     formatter:$.iGrid.buildformatter([$.iGrid.templateformatter('{ID}'), $.iGrid.tooltipformatter()]),
                     width: 250},
@@ -59,8 +59,7 @@ function loadLease(){
 
 function leaseOperateFormatter(value, row, index) {
     let htmlstr = "";
-
-
+    htmlstr += '<button class="layui-btn-yellowgreen layui-btn layui-btn-xs" onclick="keepaliveLease(\'' + row.ID + '\')">续约</button>';
     htmlstr += '<button class="layui-btn-gray layui-btn layui-btn-xs" onclick="removeLease(\'' + row.ID + '\')">删除租约</button>';
 
     return htmlstr;
@@ -201,6 +200,46 @@ function _del(ids, node){
     }, node, subIds);
 }
 
+function keepaliveLease(leaseId) {
+    let node = $.v3browser.menu.getCurrentTabAttachNode();
+
+    if($.extends.isEmpty(leaseId)){
+        let rows = $('#leaseDg').datagrid('getChecked');
+
+        if(rows.length == 0){
+            $.app.alert('请选择需要续约的租期')
+        }else{
+            $.app.confirm('确定要续约选中的租期', function (){
+
+                let leaseIds = $.extends.collect(rows, function(r){
+                    return r.ID;
+                });
+
+                $.etcd.request.lease.keepAliveBulk(function (response) {
+
+                    $.app.show('租期续约完成，成功{ok}条，失败{fail}条'.format2(
+                        {"ok":response.ok.length+'',
+                            "fail":response.fail.length+''})
+                    );
+                    $('#leaseDg').datagrid('reload');
+
+                }, node, leaseIds);
+            });
+
+
+        }
+    }else{
+
+        $.app.confirm('确定要续约租期'+leaseId, function (){
+            $.etcd.request.lease.keepalive(function (response) {
+                $.app.show('租期续约成功')
+                $('#leaseDg').datagrid('reload')
+            }, node, leaseId);
+        });
+    }
+
+}
+
 function addLease(){
 
     $.iDialog.openDialog({
@@ -240,7 +279,7 @@ function addLease(){
                         <label class="cubeui-form-label">租期(秒):</label>
                         <div class="cubeui-input-block">
                             <input type="text" data-toggle="cubeui-numberspinner" name="ttl"
-                                   value='' data-options="required:true,value:60,prompt:'租期时间,默认60秒，必须填写',min:60,increment:60">
+                                   value='' data-options="required:true,value:60,prompt:'租期时间,默认60秒，必须填写',min:0,increment:60">
                         </div>
                     </div>
                 </div>
