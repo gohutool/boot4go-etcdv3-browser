@@ -25,7 +25,7 @@ $.v3browser.model = {
         CONFIG = $.extends.json.toobject($.app.localStorage.getItem(NODES_KEY, "{}"))
 
         if(CONFIG.nodes == null){
-            CONFIG.nodes = {}
+            CONFIG.nodes = []
         }
     },
     saveLocalConfig : function (){

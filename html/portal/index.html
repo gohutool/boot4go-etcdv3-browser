@@ -23,13 +23,9 @@
                      console.log("finish")
                     //
                     //
-                    APP.renderBody("#tmpl1", {id:"1022", name:"davidliu"})
+                    APP.renderBody("#tmpl1", {id:"1022", name:"davidliu"});
+                    refreshPieChart();
 
-                    refreshPieChart()
-                    //
-                    // let t = $.templates("#tmpl1").render({id:"1022", name:"davidliu"})
-                    // $('body div').remove()
-                    // $(t).appendTo($('body'))
                 }
             }
         });
@@ -52,43 +48,43 @@
 
         <div class="cardList-wrapper">
             <div class="card-item" onclick="">
-                <div class="card-title">新消息</div>
+                <div class="card-title">新关注</div>
                 <div class="all-count">
-                    <span id='serverCount'>5</span>
-                    <span class="suffix">条</span>
+                    <span id='nodeCount'>5</span>
+                    <span class="suffix">个</span>
                 </div>
                 <div class="card-info">
-                    <span>今日消息数：<t id='nodeVisit'>20</t>条</span>
+                    <span>今日用户浏览：<t id='nodeVisit'>20</t>条</span>
                 </div>
             </div>
             <div class="card-item" onclick="">
                 <div class="card-title">新增人数</div>
                 <div class="all-count">
-                    <span id='domainCount'>3</span>
+                    <span id='manCount'>3</span>
                     <span class="suffix">人</span>
                 </div>
                 <div class="card-info">
-                    <span>今日新增人数：<t id='pathCount'>20</t>人</span>
+                    <span>今日新增人数：<t id='newManCount'>20</t>人</span>
                 </div>
             </div>
             <div class="card-item"  onclick="javascript:triggerNavMenuClick('网关管理', '集群管理','集群列表','集群列表', true)">
                 <div class="card-title">用户总数</div>
                 <div class="all-count">
-                    <span id='clusterCount'>19</span>
+                    <span id='userCount'>19</span>
                     <span class="suffix">人</span>
                 </div>
                 <div class="card-info">
-                    <span>注册用户总数：<t id='endpointCount'>133</t>个</span>
+                    <span>注册用户总数：<t id='newUserCount'>133</t>个</span>
                 </div>
             </div>
                 <div class="card-item" onclick="javascript:triggerNavMenuClick('网关管理', '证书管理','证书列表','证书列表', true)">
-                    <div class="card-title">待审核文章</div>
+                    <div class="card-title">新证书请求</div>
                     <div class="all-count">
                         <span id='certCount'>13</span>
-                        <span class="suffix">篇</span>
+                        <span class="suffix">个</span>
                     </div>
                     <div class="card-info">
-                        <span>文章总数：<t id='useCertCount'>222</t>篇</span>
+                        <span>本月总数：<t id='useCertCount'>222</t>个</span>
                     </div>
                 </div>
         </div>
@@ -109,7 +105,7 @@
                     </div>
                     <div class="card-body">
                             <div data-toggle="cubeui-echarts"
-                                 data-options="id:'barChart',url:'./bar.json',height:400"></div>
+                                 data-options="id:'barChart',url:'https://www.ginghan.com/bar.json',height:400"></div>
                     </div>
                 </div>
             </div>
@@ -130,7 +126,7 @@
                     </div>
                     <div class="card-body">
                             <div data-toggle="cubeui-echarts"
-                                 data-options="id:'lineChart',url:'./line.json',height:400"></div>
+                                 data-options="id:'lineChart',url:'https://www.ginghan.com/line.json',height:400"></div>
                     </div>
                 </div>
             </div>
@@ -151,7 +147,7 @@
                     </div>
                     <div class="card-body">
                             <div data-toggle="cubeui-echarts"
-                                 data-options="id:'pieChart',url:'./pie.json',height:400"></div>
+                                 data-options="id:'pieChart',url:'https://www.ginghan.com/pie.json',height:400"></div>
                     </div>
                 </div>
             </div>
