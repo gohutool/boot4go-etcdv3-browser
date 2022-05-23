@@ -15,46 +15,55 @@
     </div>
 </div>
 <script id="tmpl1" type="text/x-jquery-tmpl">
-<table id="groupDg"></table>
+<table id="leaseDg"></table>
 <!-- 表格工具栏开始 -->
-<div id="groupDg-toolbar" class="cubeui-toolbar"
+<div id="leaseDg-toolbar" class="cubeui-toolbar"
      data-options="grid:{
            type:'datagrid',
-           id:'groupDg'
+           id:'leaseDg'
        }">
 
     <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
             method1: 'openDialog',
             onClick:function(){
-                addKey();
+                addLease();
             },
-            extend: '#groupDg-toolbar',
+            extend: '#leaseDg-toolbar',
             btnCls: 'cubeui-btn-blue',
             iconCls: 'fa fa-plus'
-        }">新增键值</a>
+        }">新增租期</a>
 
     <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
             onClick:function(){
-                emptyKeys();
+                removeLease();
             },
-            extend: '#groupDg-toolbar',
+            extend: '#leaseDg-toolbar',
             btnCls: 'cubeui-btn-red',
+            iconCls: 'fa fa-times'
+        }">删除租约</a>
+
+    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+            onClick:function(){
+                emptyLease();
+            },
+            extend: '#leaseDg-toolbar',
+            btnCls: 'cubeui-btn-brown',
             iconCls: 'fa fa-trash'
-        }">清空</a>
+        }">清空租约</a>
 
     <form id="queryForm" class="search-box">
-    	<input type="text" id='prefix_search' name="key" data-toggle="cubeui-textbox"
+    	<input type="text" id='prefix_search' name="lease_key" data-toggle="cubeui-textbox"
                data-options="onClear:function(){
                     console.log(111);
                     $('#searchbtn').trigger('click');
-               }, mask:'{{:~js(prefix)}}', prompt:'key查询，按照prefix({{:~js(prefix)}})+key进行前缀查询',width:360">
+               }, mask:'{{:~js(prefix)}}', prompt:'根据ReleaseID查询，按结尾进行匹配',width:360">
         <a href="javascript:void(0)" id="searchbtn"
            data-toggle="cubeui-menubutton"
            data-options="method:'query',
            iconCls:'fa fa-search',
            btnCls:'cubeui-btn-blue',
            form:{id:'queryForm'},
-           grid:{type:'datagrid','id':'groupDg'}">查询</a>
+           grid:{type:'datagrid','id':'leaseDg'}">查询</a>
     </form>
 </div>
 <!-- 表格工具栏结束 -->
@@ -69,7 +78,7 @@
                 ROOT_RES_URL + "/api/api.js",
                 ROOT_RES_URL + "/api/model.js",
                 ROOT_RES_URL + "/api/menu.js",
-                ROOT_RES_URL + "/kv/kv.js",
+                ROOT_RES_URL + "/lease/lease.js",
             ],
             render: function () {
                 stop = true
@@ -88,7 +97,7 @@
 
 
     APP.fn(function(){
-        load();
+        loadLease();
     })
 </script>
 </html>

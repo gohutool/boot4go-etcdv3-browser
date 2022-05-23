@@ -41,7 +41,7 @@
          style="height: 70px; padding: 0; margin: 0; overflow: hidden;">
         <table style="float: left; border-spacing: 0px;height:70px">
             <tr>
-                <td class="webname" style="width:200px;font-size:15px;">
+                <td class="webname" style="width:240px;font-size:15px;">
                     <img style="font-size:26px; padding-right:8px;height:28px"
                          src="./static/cubeui/images/cube.png"></img>
                     EtcdV3 Browser</td>
@@ -146,7 +146,8 @@ $(this).menu('options').node=null;
     <div data-options="iconCls:'fa fa-plus'">
         <span>新建连接</span>
         <div style="width:150px;">
-            <div data-options="iconCls:'fa fa-share-square-o'" onclick='importEtcd()'><b>导入...</b></div>
+            <div data-options="iconCls:'fa fa-share-square-o'" onclick='importEtcd()'>导入...</div>
+            <div data-options="iconCls:'fa fa-floppy-o'" onclick='saveAsEtcd()'>另存为...</div>
             <div class="menu-sep"></div>
             <div data-options="iconCls:'fa fa-html5'" onclick='createEtcd()'><b>Etcd数据库...</b></div>
             <div class="menu-sep"></div>
@@ -165,7 +166,7 @@ $(this).menu('options').node=null;
     <div data-options="iconCls:'fa fa-plus'">
         <span>新建连接</span>
         <div style="width:150px;">
-            <div data-options="iconCls:'fa fa-share-square-o'" onclick='importEtcd()'><b>导入...</b></div>
+            <div data-options="iconCls:'fa fa-share-square-o'" onclick='importEtcd()'>导入...</div>
             <div class="menu-sep"></div>
             <div data-options="iconCls:'fa fa-html5'" onclick='createEtcd()'><b>Etcd数据库...</b></div>
             <div class="menu-sep"></div>
@@ -310,5 +311,13 @@ $(this).menu('options').node=null;
 
 
 </script>
+<style>
+    body{
+        -webkit-user-select:none;
+        -moz-user-select:none;
+        -ms-user-select:none;
+        user-select:none;
+    }
+</style>
 
 </html>

@@ -16,6 +16,12 @@ let V3_RANGE = '/v3/kv/range'
 let V3_RANGE_DEL = '/v3/kv/deleterange'
 let V3_RANGE_PUT = '/v3/kv/put'
 
+let V3_LEASE_ALL = '/v3/kv/lease/leases'
+let V3_LEASE_TIMETOLIVE = '/v3/kv/lease/timetolive'
+let V3_LEASE_REVOKE = '/v3/kv/lease/revoke'
+let V3_LEASE_GRANT = '/v3/lease/grant'
+
+
 // function
 $.app.beforeRequest = function (options){
     console.log("$.app.beforeRequest")
@@ -173,6 +179,195 @@ $.etcd.request = {
             console.log(response)
         }, null, progressing)
     },
+    lease:{
+        grant: function(fn, serverInfo, leaseid, ttl){
+
+            let data = {};
+
+            if(leaseid==null || leaseid<=0)
+                data.ID = 0+'';
+            else
+                data.ID = leaseid+'';
+
+            if(ttl==null || ttl<=0)
+                data.TTL = '60'
+            else
+                data.TTL = ttl+'';
+
+            data.ID = leaseid;
+
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_GRANT, data, function (response) {
+                    if ($.etcd.response.retoken(serverInfo, response))
+                        return;
+
+                    if ($.etcd.response.check(response)) {
+                        if (fn && $.isFunction(fn)) {
+                            fn.call(node, response)
+                        }
+                    }
+
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        },
+        revoke: function(fn, serverInfo, leaseid){
+
+            $.etcd.request.execute(serverInfo, function (node) {
+                let data = {};
+                data.ID = leaseid;
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_REVOKE, data, function (response) {
+                    if ($.etcd.response.retoken(serverInfo, response))
+                        return;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            })
+        },
+        revokeBulk: function(fn, serverInfo, leaseids){
+
+            leaseids = leaseids||[];
+
+            let o = leaseids.length;
+            let ok = [];
+            let fail = [];
+
+            $.etcd.request.execute(serverInfo, function (node) {
+
+                $.app.showProgress('批量删除租约中......')
+
+                $.each(leaseids, function (idx, lease){
+
+                    let data = {};
+                    data.ID = lease;
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_REVOKE, data, function (response) {
+
+                        if ($.etcd.response.retoken(serverInfo, response)){
+                          fail.push(lease);
+                        }else{
+                            if($.etcd.response.check(response)){
+                                ok.push(lease)
+                            }else{
+                                fail.push(lease);
+                            }
+                        }
+
+                        if(idx >= o - 1){
+                            response.ok = ok;
+                            response.fail = fail;
+
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                                $.app.closeProgess()
+                            }
+                        }
+
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                })
+
+            })
+        },
+        timetolive: function(fn, serverInfo, leaseid){
+            $.etcd.request.execute(serverInfo, function (node) {
+                let data = {};
+                data.ID = leaseid;
+                data.keys = true;
+
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_TIMETOLIVE, data, function (response) {
+                    if ($.etcd.response.retoken(serverInfo, response))
+                        return;
+
+                    if($.etcd.response.check(response)){
+
+                        if($.extends.isEmpty(response['grantedTTL'])){
+                            response.valid = false;
+                        }else{
+                            response.valid = true;
+                        }
+
+                        if($.extends.isEmpty(response['grantedTTL']) || response['grantedTTL']=='-1'){
+                            response.timeout = true;
+                        }else{
+                            response.timeout = false;
+                        }
+
+                        if(response.keys){
+                            $.each(response.keys, function (idx,v) {
+                                response.keys[idx] = Base64.decode(v)
+                            })
+                        }
+
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo));
+            })
+        },
+        lease:function(fn, serverInfo, skip, count, key){
+            $.etcd.request.execute(serverInfo, function (node) {
+
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_ALL, {}, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+
+                        let total = 0;
+                        let ids = [];
+
+                        if(response.leases!=null){
+                            if(!$.extends.isEmpty(key)){
+                                let newLeases = [];
+                                
+                                $.each(response.leases, function (idx, val) {
+                                    if(val.ID.endsWith(key)){
+                                        newLeases.push(val)
+                                    }
+                                })
+                                response.leases = newLeases;
+                            }
+
+                            total = response.leases.length
+
+                            let limit = 0;
+
+                            if (skip == null || skip <=0)
+                                skip = 0;
+
+                            if (count == null || count <=0){
+                                limit = response.leases.length
+                            }else{
+                                limit = skip + count
+                            }
+
+                            limit = limit>response.leases.length?response.leases.length:limit;
+
+                            for(let idx = skip; idx < limit ; idx ++){
+                                ids.push(response.leases[idx])
+                            }
+
+                            delete response.leases;
+                        }
+
+
+                        response.ids = ids;
+                        response.total = total;
+
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+
+                }, $.etcd.request.buildTokenHeader(serverInfo));
+            });
+        }
+    },
     kv:{
         del:function (fn, serverInfo, key, withPrefix){
             let data = {};
@@ -206,7 +401,7 @@ $.etcd.request = {
             data['value'] = Base64.encode(value);
 
             if(!$.extends.isEmpty(leaseid)){
-                data['lease'] = parseInt(leaseid)
+                data['lease'] = leaseid
             }
 
             if(ignore_lease){

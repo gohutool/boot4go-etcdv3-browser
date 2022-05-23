@@ -8,7 +8,7 @@ function load(){
                 // {field: 'id', title: '', checkbox: true},
                 {field: 'op', title: '操作', sortable: false, halign:'center',align:'center', width: 140, formatter:operateFormatter},
                 {field: 'key', title: '键', sortable: true,
-                    formatter:$.iGrid.templateformatter('{key}'),
+                    formatter:$.iGrid.tooltipformatter(),
                     width: 400},
             ]],
             onBeforeLoad:function (param){
@@ -20,7 +20,14 @@ function load(){
                     field: 'value',
                     title: '键值',
                     sortable: true,
-                    width: 540,
+                    width: 440,
+                    formatter:$.iGrid.tooltipformatter()
+                },
+                {
+                    field: 'lease',
+                    title: '租约',
+                    sortable: false,
+                    width: 180,
                     formatter:$.iGrid.tooltipformatter()
                 },
                 {
@@ -38,7 +45,7 @@ function load(){
                     sortable: true,
                     halign:'right',
                     align:'right',
-                    width: 140,
+                    width: 120,
                     formatter:$.iGrid.tooltipformatter()
                 },
                 {
@@ -47,7 +54,7 @@ function load(){
                     sortable: true,
                     halign:'right',
                     align:'right',
-                    width: 140,
+                    width: 120,
                     formatter:$.iGrid.tooltipformatter()
                 }
             ]],
@@ -220,6 +227,7 @@ function editKey(key) {
             d.prefix = data.prefix;
             d.key = key.substring(d.prefix.length)
             d.value = response.kvs[0].value;
+            d.lease = response.kvs[0].lease?response.kvs[0].lease:'';
 
             _keyDlg(d);
         }

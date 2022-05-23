@@ -474,14 +474,6 @@ a.cubeui-link{
 .auto-height{
     height: auto;
 }
-body{
-    -webkit-user-select:none;
-    -moz-user-select:none;
-    -ms-user-select:none;
-    user-select:none;
-}
-
-
 
 .layui-btn-green {
     border: 0;

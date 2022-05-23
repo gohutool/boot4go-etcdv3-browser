@@ -5503,3 +5503,27 @@ $(function(){
 $(function(){
 	$('.buttonpanel').parsebuttonpanel();
 });
+
+$.extends.number = {
+	hex2IntString:function(str){
+		if($.extends.isEmpty(str))
+			return 0;
+
+		if(!str.startsWith('0x'))
+			str = '0x'+str;
+
+		return BigInt(str).toString('10');
+	},
+	str2int:function(str, base){
+		if(base == null)
+			base = '10';
+
+		return parseInt(str, base);
+	},
+	int2Str:function(str, base){
+		if(base == null)
+			base = '10';
+
+		return BigInt(str).toString(base);
+	},
+}

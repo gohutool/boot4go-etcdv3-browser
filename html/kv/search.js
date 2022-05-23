@@ -83,6 +83,7 @@ function loadSearch(){
             ]],
             onBeforeLoad:function (param){
                 console.log(param)
+                console.log('##############################')
                 if(isSearch)
                     refreshSearch(param);
             },
@@ -91,7 +92,14 @@ function loadSearch(){
                     field: 'value',
                     title: '键值',
                     sortable: true,
-                    width: 540,
+                    width: 440,
+                    formatter:$.iGrid.tooltipformatter()
+                },
+                {
+                    field: 'lease',
+                    title: '租约',
+                    sortable: false,
+                    width: 180,
                     formatter:$.iGrid.tooltipformatter()
                 },
                 {
@@ -109,7 +117,7 @@ function loadSearch(){
                     sortable: true,
                     halign:'right',
                     align:'right',
-                    width: 140,
+                    width: 120,
                     formatter:$.iGrid.tooltipformatter()
                 },
                 {
@@ -118,12 +126,19 @@ function loadSearch(){
                     sortable: true,
                     halign:'right',
                     align:'right',
-                    width: 140,
+                    width: 120,
                     formatter:$.iGrid.tooltipformatter()
                 }
             ]],
         });
+
+
+        if(row.refresh){
+            doSearch();
+        }
     });
+
+
 }
 
 function search_operateFormatter(value, row, index) {

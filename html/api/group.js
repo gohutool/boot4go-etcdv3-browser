@@ -232,7 +232,9 @@ function openSearchNodeMenu(row) {
 
                     //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
                     let title = $.v3browser.model.title.search(v, node)
-                    $.v3browser.menu.addOneTabAndRefresh(title, './kv/search.html', 'fa fa-navicon', node, r);
+                    let row = $.extend({}, r);
+                    row.refresh = true;
+                    $.v3browser.menu.addOneTabAndRefresh(title, './kv/search.html', 'fa fa-navicon', node, row);
                 }
                 ds.push(one);
             });

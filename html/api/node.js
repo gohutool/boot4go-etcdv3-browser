@@ -22,7 +22,7 @@ function newEtcdNode(nodeId){
                         }, mm:"searchRootMm"},
                 ]},
             {id: nodeId+"_2", text:'租约', node_id: nodeId, type:"lease", disableDnd: true, iconCls:"fa fa-plug",state:"closed", children:[
-                    {id: $.v3browser.menu.systemMenu.leaseMenuId(nodeId), node_id: nodeId, text:'租约', disableDnd: true, type:"lease-object", iconCls:"fa fa-ticket",
+                    {id: $.v3browser.menu.systemMenu.leaseMenuId(nodeId), node_id: nodeId, text:'租期', disableDnd: true, type:"lease-object", iconCls:"fa fa-ticket",
                         event:function(row){
                             //let title = r.text.jsEncode()+'@'+node.node_name.jsEncode()+'-集合';
                             let node = $.v3browser.model.getLocalNode(row.node_id)

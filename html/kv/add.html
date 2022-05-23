@@ -19,7 +19,7 @@
             <label class="cubeui-form-label">键:</label>
             <div class="cubeui-input-block">
                 <input type="text" data-toggle="cubeui-textbox" id="edit_key" name="key"
-                       value='{{:key}}' data-options="required:true,prompt:'前缀({{:~js(prefix)}})的后面部分的字符串，必须填写'">
+                       value='{{:key}}' data-options="required:false,prompt:'前缀({{:~js(prefix)}})的后面部分的字符串，必须填写'">
             </div>
         </div>
     </div>
@@ -37,7 +37,7 @@
         <div class="cubeui-col-sm12">
             <label class="cubeui-form-label">租约ID:</label>
             <div class="cubeui-input-block">
-                <input type="text" data-toggle="cubeui-numberbox" name="lease" id="edit_lease"
+                <input type="text" data-toggle="cubeui-textbox" name="lease" id="edit_lease"
                        value='{{:lease}}' data-options="required:false,prompt:'租约ID，选择填写，默认为空，不使用租约'">
             </div>
         </div>
