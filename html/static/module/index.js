@@ -414,7 +414,7 @@ function logout() {
 	**/
 
 	$.app.confirm(message.core.login.comfirm_logout, function (r) {
-		$.app.get(contextpath + '/logout',null
+		$.app.get(contextpath + '/logout.json',null
             , function(){
         	window.location.href = contextpath + '/login.html';
         });
