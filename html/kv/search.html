@@ -41,19 +41,15 @@
         </fieldset>
 
         <div class="cubeui-row">
-            <div class="cubeui-col-sm1 swithbutton-col-1">
+            <div class="cubeui-col-sm1">
                 <label class="cubeui-form-label swithbutton-label">启用前缀:</label>
-                <div class="cubeui-input-block">
+            </div>
+            <div class="cubeui-col-sm2">
                     <input data-toggle="cubeui-switchbutton" id='search_with_prefix' name="with_prefix"
                            data-options="value:1,width:'50px',onText:'',offText:''">
-                </div>
-            </div>
-            <div class="cubeui-col-sm1 swithbutton-col-2">
-                <label class="cubeui-form-label swithbutton-label" style=''>所有键:</label>
-                <div class="cubeui-input-block">
+                    <label class="cubeui-form-label swithbutton-label-2" style=''>所有键:</label>
                     <input data-toggle="cubeui-switchbutton" id='search_ignore_key' name="ignore_key"
                            data-options="value:1,width:'50px',onText:'',offText:''">
-                </div>
             </div>
         </div>
 
@@ -68,10 +64,10 @@
             <div class="cubeui-col-sm6">
                 <label class="cubeui-form-label">创建版本号:</label>
                 <div class="cubeui-input-inline">
-                    <input type="text" data-toggle="cubeui-numberspinner" name="min_create_revision" style='width:300px'
+                    <input type="text" data-toggle="cubeui-numberspinner" name="min_create_revision" style='width:200px'
                            value='{{:min_create_revision}}' data-options="required:false,prompt:'创建版本号的最小值',min:0,increment:1">
                            -
-                    <input type="text" data-toggle="cubeui-numberspinner" name="max_create_revision" style='width:300px'
+                    <input type="text" data-toggle="cubeui-numberspinner" name="max_create_revision" style='width:200px'
                            value='{{:max_create_revision}}' data-options="required:false,prompt:'创建版本号的最大值',min:0,increment:1">
                 </div>
             </div>
@@ -89,10 +85,10 @@
             <div class="cubeui-col-sm6 ">
                 <label class="cubeui-form-label">修订版本号:</label>
                 <div class="cubeui-input-inline">
-                    <input type="text" data-toggle="cubeui-numberspinner" name="min_mod_revision" style='width:300px'
+                    <input type="text" data-toggle="cubeui-numberspinner" name="min_mod_revision" style='width:200px'
                            value='{{:min_mod_revision}}' data-options="required:false,prompt:'修订版本号的最小值',min:0,increment:1">
                            -
-                    <input type="text" data-toggle="cubeui-numberspinner" name="max_mod_revision" style='width:300px'
+                    <input type="text" data-toggle="cubeui-numberspinner" name="max_mod_revision" style='width:200px'
                            value='{{:max_mod_revision}}' data-options="required:false,prompt:'修订版本号的最大值',min:0,increment:1">
                 </div>
             </div>
@@ -115,33 +111,31 @@
                 </div>
             </div>
 
-            <div class="cubeui-col-sm1 swithbutton-col-2">
+            <div class="cubeui-col-sm1">
                 <label class="cubeui-form-label swithbutton-label" style=''>仅数量:</label>
-                <div class="cubeui-input-block">
-                    <input type="text" data-toggle="cubeui-switchbutton" id='search_count_only' name="count_only"
-                           data-options="value:1,width:'50px',onText:'',offText:''">
-                </div>
             </div>
-            <div class="cubeui-col-sm1 swithbutton-col-3">
-                <label class="cubeui-form-label swithbutton-label" style=''>仅返回键:</label>
-                <div class="cubeui-input-block">
+            <div class="cubeui-col-sm2">
+                 <input type="text" data-toggle="cubeui-switchbutton" id='search_count_only' name="count_only"
+                           data-options="value:1,width:'50px',onText:'',offText:''">
+                <label class="cubeui-form-label swithbutton-label-2" style=''>仅返回键:</label>
                     <input type="text" data-toggle="cubeui-switchbutton" id='search_key_only' name="key_only"
                            data-options="value:1,width:'50px',onText:'',offText:''">
-                </div>
             </div>
 
 
-            <div class="cubeui-col-sm6 cubeui-col-sm-offset1">
+            <div class="cubeui-col-sm6">
                 <label class="cubeui-form-label">排序:</label>
                 <div class="cubeui-input-inline">
 
-                    <input type="text" id='search_sort_target' name="sort_target" value='{{:sort_target}}' data-toggle="cubeui-combobox"  style='width:300px' data-options="
+                    <input type="text" id='search_sort_target' name="sort_target" value='{{:sort_target}}' data-toggle="cubeui-combobox"  style='width:200px' data-options="
 	                    required:false,prompt:'排序目标，选择填写',
  		                valueField:'TEXT',
  		                textField:'TEXT',
  		                data:[{'TEXT':'KEY'},{'TEXT':'VERSION'},{'TEXT':'CREATE'},{'TEXT':'MOD'},{'TEXT':'VALUE'}]">
 
-                    <input type="text" id='search_sort_order' name="sort_order" value='{{:sort_order}}' data-toggle="cubeui-combobox"  style='width:300px' data-options="
+ 		                &nbsp;
+
+                    <input type="text" id='search_sort_order' name="sort_order" value='{{:sort_order}}' data-toggle="cubeui-combobox"  style='width:200px' data-options="
 	                    required:false,prompt:'排序方式，选择填写',
  		                valueField:'TEXT',
  		                textField:'TEXT',

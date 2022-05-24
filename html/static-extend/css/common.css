@@ -66,6 +66,11 @@
     width:auto;float: right!important;
 }
 
+.swithbutton-label-2{
+    display: inline-block!important;
+    width:auto;float: none!important;
+}
+
 .swithbutton-col-1{
     z-index: 9999!important;
 }
