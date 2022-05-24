@@ -171,6 +171,8 @@ function doSearch(){
         $('#searchDg').datagrid('options').param = {};
 
         $('#searchDg').datagrid('load', param)
+    }else{
+        $.app.show('填写信息不规范，请检查填写数据内容')
     }
 }
 

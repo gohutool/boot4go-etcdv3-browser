@@ -22,6 +22,8 @@ let V3_LEASE_REVOKE = '/v3/kv/lease/revoke'
 let V3_LEASE_GRANT = '/v3/lease/grant'
 let V3_LEASE_KEEPALIVE = '/v3/lease/keepalive'
 
+let V3_WATCH_WATCH = '/v3/watch'
+
 let ETC4GO_LOCK_FORMAT = "/etcd4go-lock/#lock/_"
 let ETC4GO_LOCK_INFO_PREFIX = "/etcd4go-lock/#info/"
 let ETC4GO_LOCK_INFO_FORMAT = ETC4GO_LOCK_INFO_PREFIX + "_"
@@ -74,6 +76,35 @@ $.app.afterError = function (options, response){
 
 $.etcd = {}
 
+$.etcd.ajaxStream = function(url, datastr, fn, requestHeader){
+
+    if(requestHeader == null){
+        requestHeader = {};
+    }
+
+    requestHeader['Content-Type'] = 'application/json; charset=UTF-8';
+    /**/
+
+    if(!$.extends.isEmpty(requestHeader.token)){
+        requestHeader.Authorization = requestHeader.token;
+        delete requestHeader.token;
+
+    }
+
+    $.app.ajaxStream(url,{
+        headers:requestHeader,
+        method:'POST',
+        data:datastr
+    },
+        function(xhr, state, chunk){
+        if(!$.extends.isEmpty(chunk)){
+            if(fn){
+                fn(xhr, state, chunk)
+            }
+        }
+    });
+}
+
 $.etcd.postJson = function(url, datastr, fn, requestHeader, progressing){
 
     if(requestHeader == null){
@@ -115,6 +146,16 @@ $.etcd.request = {
         }
 
         return {"token":serverInfo.node_token};
+    },
+    ajaxStream:function(serverInfo, url, data, fn){
+        $.etcd.request.kv.range(function(response){
+            if ($.etcd.response.retoken(serverInfo, response))
+                return;
+
+            if($.etcd.response.check(response)){
+                $.etcd.ajaxStream(url, data, fn, $.etcd.request.buildTokenHeader(serverInfo))
+            }
+        }, serverInfo, '___', null, null, true)
     },
     execute: function(serverInfo, cmd){
         if($.extends.isEmpty(serverInfo)){
@@ -184,6 +225,92 @@ $.etcd.request = {
                 fn.call(serverInfo, response)
             console.log(response)
         }, null, progressing)
+    },
+    watch:{
+      watch: function(fn, serverInfo, watchId, key, range_end, withPrefix, prev_kv, fragment, progress_notify, start_revision){
+          let request = {};
+          let data = {};
+
+          if(!$.extends.isEmpty(withPrefix)&&withPrefix){
+              data['range_end']=Base64.encode($.etcd.request.prefixFormat(key));
+          }else{
+              if(!$.extends.isEmpty(range_end))
+                  data['range_end']=Base64.encode(range_end);
+          }
+
+          data['key']=Base64.encode(key);
+
+          if(!$.extends.isEmpty(fragment))
+              data['fragment']=true;
+
+          if(!$.extends.isEmpty(progress_notify))
+              data['progress_notify']=true;
+
+          if(!$.extends.isEmpty(prev_kv))
+              data['prev_kv']=true;
+
+          if(!$.extends.isEmpty(start_revision))
+              data['start_revision']=start_revision;
+
+
+          if(!$.extends.isEmpty(watchId))
+              data['watchId']=watchId;
+
+
+          request.create_request = data
+
+          $.etcd.request.ajaxStream(serverInfo, V3_ENDPOINT.format2(serverInfo) + V3_WATCH_WATCH, request, function(xhr,state,chuck){
+              let json = null;
+
+              try{
+                  if(!$.extends.isEmpty(chuck)){
+                      json = $.extends.json.toobject2(chuck)
+                  }
+              }catch (e) {
+                  console.error(e)
+              }
+
+              if(json!=null){
+                  if($.extends.isEmpty(json.error)&&$.extends.isEmpty(json.result.cancel_reason)){
+                      if(fn)
+                        fn(json, xhr, state)
+                  }else{
+                      if(!$.extends.isEmpty(json.error)){
+                          $.app.show("接收数据流失败："+json.error)
+                      }else{
+                          $.app.show("接收数据流失败："+json.result.cancel_reason)
+                      }
+
+                  }
+              }else{
+                  console.log(xhr);
+                  console.log(chuck);
+              }
+          })
+
+      },
+      stop: function(fn, serverInfo, watchId){
+          $.etcd.request.execute(serverInfo, function (node) {
+              let data = {};
+              data.cancel_request = {};
+              data.cancel_request.watch_id = watchId;
+
+              $.etcd.request.ajaxStream(serverInfo,
+                  V3_ENDPOINT.format2(serverInfo) + V3_WATCH_WATCH, data, function(xhr,state,chuck){
+                  let json = null;
+
+                  try{
+                      if(!$.extends.isEmpty(chuck)){
+                          json = $.extends.json.toobject2(chuck)
+                      }
+                  }catch (e) {
+                      console.error(e)
+                  }
+
+                  fn(json, xhr, state)
+              })
+          });
+      }
     },
     lock:{
         unlock:function(fn, serverInfo,key, leaseid){

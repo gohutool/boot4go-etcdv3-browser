@@ -54,6 +54,12 @@ function newEtcdNode(nodeId){
                         return false;
                     });
                 }, mm:"roleRootMm"},
+            {id: nodeId+"_7", text:'观察点', node_id: nodeId, disableDnd: true, type:"watchs", iconCls:"fa fa-eye",
+                event:function(row){
+                    let node = $.v3browser.model.getLocalNode(row.node_id)
+                    let title = $.v3browser.model.title.watch(node)
+                    $.v3browser.menu.addOneTabAndRefresh(title, './watch/watch.html', 'fa fa-eye', node, row);
+                }, mm1:"memberRootMm"},
             {id: nodeId+"_6", text:'警报', node_id: nodeId, type:"alarm", disableDnd: true, iconCls:"fa fa-podcast",
                 event:function (row){
                     row.state = "open";

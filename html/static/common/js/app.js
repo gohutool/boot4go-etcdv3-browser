@@ -427,10 +427,80 @@ initAjax = function(){
 
 		$.app.jqueryAjax(url, options);
 	};
+
+
+	/* One-time setup (run once before other code)
+     *   adds onreadystatechange to $.ajax options
+     *   from https://gist.github.com/chrishow/3023092)
+     *   success etc will still fire if provided
+     */
+	$.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+		if ( options.onreadystatechange ) {
+			var xhrFactory = options.xhr;
+			options.xhr = function() {
+				var xhr = xhrFactory.apply( this, arguments );
+				function handler() {
+					options.onreadystatechange( xhr, jqXHR );
+				}
+				if ( xhr.addEventListener ) {
+					xhr.addEventListener( "readystatechange", handler, false );
+				} else {
+					setTimeout( function() {
+						var internal = xhr.onreadystatechange;
+						if ( internal ) {
+							xhr.onreadystatechange = function() {
+								handler();
+								internal.apply( this, arguments );
+							};
+						}
+					}, 0 );
+				}
+				return xhr;
+			};
+		}
+	});
+
 };
 
 initAjax();
 
+$.app.ajaxStream = function(url, options, onreadystatechange){
+
+	// ----- myReadyStateChange(): this will do my incremental processing -----
+	var last_start = 0; // using global var for over-simplified example
+
+	function myReadyStateChange(xhr /*, jqxhr */) {
+		if(xhr.readyState >= 3 && xhr.responseText.length > last_start) {
+			let chunk = xhr.responseText.slice(last_start);
+			last_start += chunk.length;
+			//alert('Got chunk: ' + chunk);
+			//console.log('Got chunk: ', chunk);
+			if(onreadystatechange){
+				onreadystatechange(xhr, xhr.readyState, chunk)
+			}
+		}else{
+			if(onreadystatechange){
+				onreadystatechange(xhr, xhr.readyState, null)
+			}
+		}
+	}
+
+	options.onreadystatechange = myReadyStateChange
+	options.cache = false;
+
+	if($.extends.isEmpty(options.method)){
+		options['method'] = 'POST';
+	}
+
+	if(!$.extends.isEmpty(options.data)){
+		if(typeof options.data == 'object'){
+			options.data=$.extends.json.tostring(options.data)
+		}
+	}
+
+	$.app.jqueryAjax(url, options);
+
+}
 
 /**
  * easyui event register

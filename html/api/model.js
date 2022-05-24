@@ -659,6 +659,11 @@ $.v3browser.model = {
             let title = '锁对象@'+nodeName.jsEncode()+'-对象锁';
             return title;
         },
+        watch:function(node){
+            let nodeName = (typeof node == 'string')?node:node.node_name;
+            let title = '监控@'+nodeName.jsEncode()+'-观察点';
+            return title;
+        },
         user:function(user, node){
             let userName = (typeof user == 'string')?user:user.user_name;
             let nodeName = (typeof node == 'string')?node:node.node_name;

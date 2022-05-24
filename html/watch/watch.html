@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:jc="http://www.joinsunsoft.com">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <script src="/static/common/js/ui.js"></script>
+</head>
+
+<body>
+<div id="loading" class="loading-wrap">
+    <div class="loading-content">
+        <div class="loading-round"></div>
+        <div class="loading-dot"></div>
+    </div>
+</div>
+<script id="tmpl1" type="text/x-jquery-tmpl">
+<div style="margin: 0px;">
+</div>
+
+<div  id="layout" data-toggle="cubeui-layout" data-options="fit:true">
+<form id='searchform'>
+	<div data-options="region:'north',title:'',border:false,split:false"
+         style="height:190px" class="cubeui-fluid">
+
+        <fieldset>
+            <legend>观测点设置</legend>
+        </fieldset>
+
+        <div class="cubeui-row">
+            <div class="cubeui-col-sm1">
+                <label class="cubeui-form-label swithbutton-label">启用前缀:</label>
+            </div>
+            <div class="cubeui-col-sm11">
+                    <input data-toggle="cubeui-switchbutton" id='search_with_prefix' name="with_prefix"
+                           data-options="value:1,width:'50px',onText:'',offText:''">
+                    <label class="cubeui-form-label swithbutton-label-2" style=''>返回携带旧值:</label>
+                    <input data-toggle="cubeui-switchbutton" id='search_ignore_key' name="prev_kv"
+                           data-options="value:1,width:'50px',onText:'',offText:''">
+                    <label class="cubeui-form-label swithbutton-label-2" style=''>可拆解:</label>
+                    <input data-toggle="cubeui-switchbutton" name="fragment"
+                           data-options="value:1,width:'50px',onText:'',offText:''">
+                    <label class="cubeui-form-label swithbutton-label-2" style=''>可恢复:</label>
+                    <input data-toggle="cubeui-switchbutton" name="progress_notify"
+                           data-options="value:1,width:'50px',onText:'',offText:''">
+            </div>
+        </div>
+
+        <div class="cubeui-row">
+            <div class="cubeui-col-sm6">
+                <label class="cubeui-form-label">键:</label>
+                <div class="cubeui-input-block">
+                    <input type="text" data-toggle="cubeui-textbox" id="search_prefix" name="prefix"
+                           value='{{:prefix}}' data-options="required:true,prompt:'查询的键，必须填写'">
+                </div>
+            </div>
+        </div>
+
+        <div class="cubeui-row">
+
+            <div class="cubeui-col-sm6">
+                <label class="cubeui-form-label">结束键:</label>
+                <div class="cubeui-input-block">
+                    <input type="text" data-toggle="cubeui-textbox" id="search_range_end" name="range_end"
+                           value='{{:key}}' data-options="required:false,prompt:'查询的结束键，选择作为前缀后，该值将被忽略'">
+                </div>
+            </div>
+            <div class="cubeui-col-sm6">
+                <label class="cubeui-form-label">起始修订号:</label>
+                <div class="cubeui-input-block">
+                    <input type="text" data-toggle="cubeui-numberspinner" name="start_revision"
+                           value='{{:min_create_revision}}' data-options="required:false,prompt:'起始修订号，默认不填写',min:0,increment:1">
+                </div>
+            </div>
+
+        </div>
+
+        <div id="footer" class="panel-footer panel-footer-no-border panel-footer-no-background" style="height: 34px; padding: 5px; text-align: right;">
+
+               <a href="#" id="startWatchBtn"
+                           data-toggle="cubeui-linkbutton"
+                           data-options="
+                           iconCls:'fa fa-eye',
+                           btnCls:'cubeui-btn-blue',
+                           onClick:function(){
+                                test();
+                           }
+                           ">开始观察</a>
+
+            <a href="#" id="stopWatchBtn"
+               data-toggle="cubeui-linkbutton"
+               data-options="id:'submitBtn',
+                            disabled:true,
+                           iconCls:'fa fa-eye-slash',
+                           btnCls:'cubeui-btn-black',
+                           onClick:function(){
+                               stopTest();
+                           }">停止观察</a>
+
+            <a href="#"  id="clearBtn"
+               data-toggle="cubeui-linkbutton"
+               data-options="id:'submitBtn',
+                           iconCls:'fa fa-trash',
+                           btnCls:'cubeui-btn-red',
+                           onClick:function(){
+                                $('#searchform').form('clear');
+                           }">清空列表</a>
+        </div>
+    </div>
+</form>
+    <div data-options="region:'center',titleformat:'', title1:'查询结果',
+		split:false,border:true,height1:'200px',collapsed:false,
+		iconCls:'fa fa-list-alt',
+		headerCls:'border_right'"
+         style="height1:40%">
+
+
+        <table id="watchDg"></table>
+
+    </div>
+</div>
+
+
+</script>
+
+</body>
+<script>
+    new APP(function () {
+        return {
+            css: [],
+            js: [
+                ROOT_RES_URL + "/api/api.js",
+                ROOT_RES_URL + "/api/model.js",
+                ROOT_RES_URL + "/api/menu.js",
+                ROOT_RES_URL + "/api/group.js",
+                ROOT_RES_URL + "/watch/watch.js",
+            ],
+            render: function () {
+                stop = true
+                console.log("finish")
+
+                let row = $.extend({}, $.v3browser.menu.getCurrentTabAttachData());
+
+                if(row.data==null)
+                    row.data = {};
+
+                console.log("============");
+                console.log(row);
+
+                APP.renderBody("#tmpl1", $.extend({},row.data, {modify: row.modify}))
+
+                // let t = $.templates("#tmpl1").render({id:"1022", name:"davidliu"})
+                // $('body div').remove()
+                // $(t).appendTo($('body'))
+            }
+        }
+    });
+
+
+    APP.fn(function(){
+        initDg();
+    })
+</script>
+</html>
