@@ -139,3 +139,14 @@
 #west .tree-title {
     font-size: 12px!important;
 }
+
+.cubeui-row-no-margin{
+    margin-bottom: 0px!important;
+    margin-top: 0px!important;
+}
+
+.cubeui-form-label-left{
+    display: inline-block!important;
+    width:auto;float: none!important;
+    padding-left: 10px!important;
+}

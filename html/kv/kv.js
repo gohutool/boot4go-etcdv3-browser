@@ -149,12 +149,23 @@ function _keyDlg(data){
         title: '编辑',
         maximized1:true,
         minimizable:false,
-        width: 840,
+        width: 900,
         height: 640,
         render:function(opts, handler){
             let d = this;
             console.log("Open dialog")
             handler.render(data)
+
+
+            $("#with_auto_leaase").switchbutton('options').onChange = function(checked){
+                if(checked){
+                    $("#with_auto_leaase_ttl").numberspinner('enable')
+                    $("#edit_lease").textbox('disable')
+                }else{
+                    $("#with_auto_leaase_ttl").numberspinner('disable')
+                    $("#edit_lease").textbox('enable')
+                }
+            }
 
             if(!$.extends.isEmpty(data.key)){
                 $(this).dialog('setTitle', '更新键值')
@@ -187,6 +198,7 @@ function _keyDlg(data){
 
                 if(!$.extends.isEmpty(data.lease)){
                     $("#with_auto_leaase").switchbutton('uncheck');
+                    $("#with_auto_leaase_ttl").numberspinner('disable')
                 }else{
                 }
 
@@ -216,7 +228,7 @@ function _keyDlg(data){
                     reloadDg();
                 }, node, data.prefix+info.key, info.value, info.lease,
                     $.extends.isEmpty(info.ignore_value)?false:true,
-                    $.extends.isEmpty(info.ignore_lease)?false:true)
+                    $.extends.isEmpty(info.ignore_lease)?false:true, info.ttl)
 
                 return false;
             },

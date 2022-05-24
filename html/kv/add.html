@@ -34,18 +34,29 @@
     </div>
 
     <div class="cubeui-row">
-        <div class="cubeui-col-sm8">
+        <div class="cubeui-col-sm6">
             <label class="cubeui-form-label">租约ID:</label>
             <div class="cubeui-input-block">
                 <input type="text" data-toggle="cubeui-textbox" name="lease" id="edit_lease"
                        value='{{:lease}}' data-options="required:false,prompt:'租约ID，选择填写，默认为空，不使用租约'">
             </div>
         </div>
-        <div class="cubeui-col-sm4">
+        <div class="cubeui-col-sm3">
             <label class="cubeui-form-label">使用系统租约ID:</label>
             <div class="cubeui-input-block">
                 <input id="with_auto_leaase" data-toggle="cubeui-switchbutton" name="auto_leaase"
                        data-options="value:1,width:'55px',onText:'',offText:''">
+            </div>
+        </div>
+        <div class="cubeui-col-sm3">
+            <div class="cubeui-row cubeui-row-no-margin">
+                <div class="cubeui-col-sm3">
+                    <label class="cubeui-form-label cubeui-form-label-left">租期:</label>
+                </div>
+                <div class="cubeui-col-sm9">
+                    <input type="text" disabled id="with_auto_leaase_ttl" data-toggle="cubeui-numberspinner" name="ttl"
+                           value='' data-options="required:true,value:60,prompt:'租期时间,默认60秒，必须填写',min:0,increment:60">
+                </div>
             </div>
         </div>
     </div>

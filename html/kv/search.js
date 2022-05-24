@@ -345,6 +345,23 @@ function saveSearchAs(){
 
 }
 
+function delKey(key){
+    let node = $.v3browser.menu.getCurrentTabAttachNode();
+
+    key = Base64.decode(key);
+
+    $.app.confirm('确定删除当前的键值\''+key.jsEncode()+'\'', function (){
+        $.etcd.request.kv.del(function (response){
+            $.app.show("键值删除成功");
+            $('#searchDg').datagrid('reload')
+        }, node, key,  false)
+    })
+}
+
+function addKey() {
+    _keyDlg({});
+}
+
 function editKey(key) {
     let node = $.v3browser.menu.getCurrentTabAttachNode();
     key = Base64.decode(key);
@@ -371,25 +388,29 @@ function _keyDlg(data){
         title: '编辑',
         maximized1:true,
         minimizable:false,
-        width: 840,
+        width: 900,
         height: 640,
         render:function(opts, handler){
             let d = this;
             console.log("Open dialog")
             handler.render(data)
 
+
+            $("#with_auto_leaase").switchbutton('options').onChange = function(checked){
+                if(checked){
+                    $("#edit_lease").textbox('disable')
+                    $("#with_auto_leaase_ttl").numberspinner('enable')
+                }else{
+                    $("#edit_lease").textbox('enable')
+                    $("#with_auto_leaase_ttl").numberspinner('disable')
+                }
+            }
+
             if(!$.extends.isEmpty(data.key)){
                 $(this).dialog('setTitle', '更新键值')
                 $("#ignore_lease").switchbutton('enable')
                 $("#ignore_value").switchbutton('enable')
 
-                $("#with_auto_leaase").switchbutton('options').onChange = function(checked){
-                    if(checked){
-                        $("#edit_lease").numberspinner('disable')
-                    }else{
-                        $("#edit_lease").numberspinner('enable')
-                    }
-                }
 
                 $("#ignore_value").switchbutton('options').onChange = function(checked){
                     if(checked){
@@ -414,6 +435,7 @@ function _keyDlg(data){
 
                 if(!$.extends.isEmpty(data.lease)){
                     $("#with_auto_leaase").switchbutton('uncheck');
+                    $("#with_auto_leaase_ttl").numberspinner('disable')
                 }else{
                 }
 
@@ -441,7 +463,7 @@ function _keyDlg(data){
                         $('#searchDg').datagrid('reload');
                     }, node, info.key, info.value, info.lease,
                     $.extends.isEmpty(info.ignore_value)?false:true,
-                    $.extends.isEmpty(info.ignore_lease)?false:true)
+                    $.extends.isEmpty(info.ignore_lease)?false:true, info.ttl)
 
                 return false;
             },

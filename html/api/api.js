@@ -579,7 +579,8 @@ $.etcd.request = {
 
             });
         },
-        put:function (fn, serverInfo, key, value, leaseid, ignore_value, ignore_lease){
+        put:function (fn, serverInfo, key, value, leaseid, ignore_value, ignore_lease, ttl){
+
             let data = {};
 
             data['key']=Base64.encode(key);
@@ -603,17 +604,35 @@ $.etcd.request = {
 
             $.etcd.request.execute(serverInfo, function (node){
 
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE_PUT, data, function (response) {
-                    if($.etcd.response.retoken(serverInfo,response))
-                        return ;
+                let putFn = function(){
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE_PUT, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
 
-                    if($.etcd.response.check(response)){
-                        if(fn && $.isFunction(fn)){
-                            fn.call(node, response)
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
                         }
-                    }
 
-                }, $.etcd.request.buildTokenHeader(serverInfo));
+                    }, $.etcd.request.buildTokenHeader(serverInfo));
+                }
+
+                if($.extends.isEmpty(leaseid)&&ttl!=null&&ttl>0){
+                    $.etcd.request.lease.grant(function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            data['lease'] = response.ID;
+                            putFn();
+                        }
+                    }, serverInfo, null, ttl)
+                }else{
+                    putFn();
+                }
+
+
 
             });
         },
