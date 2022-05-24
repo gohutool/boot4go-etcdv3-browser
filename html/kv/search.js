@@ -344,3 +344,107 @@ function saveSearchAs(){
     }
 
 }
+
+function editKey(key) {
+    let node = $.v3browser.menu.getCurrentTabAttachNode();
+    key = Base64.decode(key);
+
+    $.etcd.request.kv.range(function (response) {
+
+        if($.extends.isEmpty(response.kvs)){
+            $.app.show('当前键值不存在，请刷新后进行操作');
+            return ;
+        }else{
+            let d = {}
+            d.key = key;
+            d.value = response.kvs[0].value;
+            d.lease = response.kvs[0].lease?response.kvs[0].lease:'';
+
+            _keyDlg(d);
+        }
+
+    }, node, key, null, false, false)
+}
+
+function _keyDlg(data){
+    $.iDialog.openDialog({
+        title: '编辑',
+        maximized1:true,
+        minimizable:false,
+        width: 840,
+        height: 640,
+        render:function(opts, handler){
+            let d = this;
+            console.log("Open dialog")
+            handler.render(data)
+
+            if(!$.extends.isEmpty(data.key)){
+                $(this).dialog('setTitle', '更新键值')
+                $("#ignore_lease").switchbutton('enable')
+                $("#ignore_value").switchbutton('enable')
+
+                $("#with_auto_leaase").switchbutton('options').onChange = function(checked){
+                    if(checked){
+                        $("#edit_lease").numberspinner('disable')
+                    }else{
+                        $("#edit_lease").numberspinner('enable')
+                    }
+                }
+
+                $("#ignore_value").switchbutton('options').onChange = function(checked){
+                    if(checked){
+                        $("#edit_value").numberspinner('disable')
+                    }else{
+                        $("#edit_value").numberspinner('enable')
+                    }
+                }
+
+                $("#ignore_lease").switchbutton('options').onChange = function(checked){
+                    if(checked){
+                        $("#edit_lease").numberspinner('disable')
+                        $("#with_auto_leaase").switchbutton('disable');
+                    }else{
+
+                        if(!$("#with_auto_leaase").switchbutton('options').checked)
+                            $("#edit_lease").numberspinner('enable')
+
+                        $("#with_auto_leaase").switchbutton('enable');
+                    }
+                }
+
+                if(!$.extends.isEmpty(data.lease)){
+                    $("#with_auto_leaase").switchbutton('uncheck');
+                }else{
+                }
+
+            } else{
+                $(this).dialog('setTitle', '新增键值')
+            }
+        },
+        href: contextpath + '/kv/searchkey.html?id=',
+        buttonsGroup: [{
+            text: !$.extends.isEmpty(data.key)?'保存':'添加',
+            iconCls: 'fa fa-save',
+            btnCls: 'cubeui-btn-blue',
+            handler:'ajaxForm',
+            beforeAjax:function(o){
+                let info = $.extends.json.param2json(o.ajaxData);
+                console.log(info)
+
+                let node = $.v3browser.menu.getCurrentTabAttachNode();
+
+                let dlg = this;
+
+                $.etcd.request.kv.put(function(response){
+                        $.app.show(!$.extends.isEmpty(data.key)?'保存键值成功':'添加键值成功');
+                        $.iDialog.closeOutterDialog($(dlg));
+                        $('#searchDg').datagrid('reload');
+                    }, node, info.key, info.value, info.lease,
+                    $.extends.isEmpty(info.ignore_value)?false:true,
+                    $.extends.isEmpty(info.ignore_lease)?false:true)
+
+                return false;
+            },
+        }]
+    });
+}

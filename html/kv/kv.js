@@ -162,11 +162,18 @@ function _keyDlg(data){
                 $("#ignore_value").switchbutton('enable')
                 $("#ignore_lease").switchbutton('enable')
 
+
                 $("#ignore_lease").switchbutton('options').onChange = function(checked){
+
                     if(checked){
+                        $("#with_auto_leaase").switchbutton('disable');
                         $("#edit_lease").numberspinner('disable')
                     }else{
-                        $("#edit_lease").numberspinner('enable')
+
+                        if(!$("#with_auto_leaase").switchbutton('options').checked)
+                            $("#edit_lease").numberspinner('enable')
+
+                        $("#with_auto_leaase").switchbutton('enable');
                     }
                 }
 
@@ -176,6 +183,11 @@ function _keyDlg(data){
                     }else{
                         $("#edit_value").numberspinner('enable')
                     }
+                }
+
+                if(!$.extends.isEmpty(data.lease)){
+                    $("#with_auto_leaase").switchbutton('uncheck');
+                }else{
                 }
 
             } else{
