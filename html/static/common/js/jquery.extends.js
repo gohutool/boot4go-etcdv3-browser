@@ -1437,3 +1437,146 @@ $.extends.base64JsonDecode = function(obj){
 
 	return rtn
 }
+
+function copyArray(list){
+	let rtn = [];
+
+	$.each(list, function (idx,v){
+		rtn.push($.extend({}, v))
+	})
+
+	return rtn;
+}
+
+function findIdx(list, id){
+	let rtn = -1;
+
+	if(list==null)
+		return rtn;
+
+	$.each(list, function (idx,v){
+		if(id == v.id){
+			rtn = idx;
+			return false;
+		}
+	})
+
+	return rtn;
+}
+
+function findObj(list, id){
+	let i = findIdx(list, id)
+
+	if(i<0)
+		return null;
+
+	return list[i];
+}
+
+function exchangeOrder(list, id1, id2){
+	let idx1 = findIdx(list, id1);
+
+	let idx2 = 0;
+
+	if(id2){
+		idx2 = findIdx(list, id2)
+	}
+
+	let one = list[idx1];
+	let two = list[idx2];
+
+	list[idx1] = two;
+	list[idx2] = one;
+}
+
+function exchangeBefore(sid, list, tid) {
+	let idx1 = findIdx(list, sid);
+	let one = list[idx1];
+	list.splice(idx1, 1)
+
+	let idx2 = 0;
+	if(tid){
+		idx2 = findIdx(list, tid)
+	}
+	list.splice(idx2, 0, one)
+}
+
+function exchangeAfter(sid, list, tid) {
+	let idx1 = findIdx(list, sid);
+	let one = list[idx1];
+	list.splice(idx1, 1)
+
+	let idx2 = list.length;
+	if(tid){
+		idx2 = findIdx(list, tid);
+	}
+	list.splice(idx2+1, 0, one)
+}
+
+function exchangeTwoListAfter(sid, slist, tid, tlist) {
+	let idx1 = findIdx(slist, sid);
+	let one = slist[idx1];
+	slist.splice(idx1, 1)
+
+	let idx2 = tlist.length-1;
+	if(tid){
+		idx2 = findIdx(tlist, tid);
+	}
+	tlist.splice(idx2+1, 0, one)
+}
+
+function exchangeTwoListBefore(sid, slist, tid, tlist) {
+	let idx1 = findIdx(slist, sid);
+	let one = slist[idx1];
+	slist.splice(idx1, 1)
+
+	let idx2 = 0;
+	if(tid){
+		idx2 = findIdx(tlist, tid)
+	}
+	tlist.splice(idx2, 0, one)
+}
+
+function pageLocal(datas, param, sortable){
+
+	datas = datas||[];
+
+	let skip;
+
+	if(param.rows == null){
+		param.rows = 20;
+	}
+
+	if(param.page == null || param.page<=0){
+		skip = 0
+	}else{
+		skip = (param.page - 1) * param.rows;
+	}
+
+	let result = [];
+
+	if(sortable && param.sort!= null && !$.extends.isEmpty(param.sort)){
+		param.order= param.order||'asc';
+		let flag = 1;
+		if(param.order != 'asc'){
+			flag = -1;
+		}
+
+		result = datas.sort(function (a, b) {
+			return (a>b?1:-1)*flag;
+		})
+
+	}else{
+		result = datas;
+	}
+
+	let limit = skip + param.rows;
+	limit = limit>result.length?result.length:limit;
+
+	let rtn = [];
+	for(let idx = skip; idx < limit ; idx ++){
+		rtn.push(result[idx])
+	}
+
+	return rtn;
+}

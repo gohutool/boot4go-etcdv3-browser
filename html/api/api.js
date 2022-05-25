@@ -15,6 +15,8 @@ APIS.V3_AUTH_ROLE_LIST = '/v3/auth/role/list'
 APIS.V3_AUTH_ROLE_ADD = '/v3/auth/role/add'
 APIS.V3_AUTH_ROLE_DELETE = '/v3/auth/role/delete'
 APIS.V3_AUTH_ROLE_GET = '/v3/auth/role/get'
+APIS.V3_AUTH_ROLE_REVOKE = '/v3/auth/role/revoke'
+APIS.V3_AUTH_ROLE_GRANT = '/v3/auth/role/grant'
 
 APIS.V3_AUTH_STATUS = '/v3/auth/status'
 APIS.V3_AUTH_ENABLE = '/v3/auth/enable'
@@ -1074,6 +1076,22 @@ $.etcd.request = {
 
                         if($.etcd.response.check(response)){
                             if(fn && $.isFunction(fn)){
+                                response.perm = response.perm||[];
+
+                                response.count = response.perm.length;
+
+                                let perm = [];
+
+                                $.each(response.perm, function(idx,v){
+                                    perm.push({
+                                        "permType": $.extends.isEmpty(v.permType)?'READ':v.permType,
+                                        "key": Base64.decode(v.key),
+                                        "range_end": $.extends.isEmpty(v.range_end)?'':Base64.decode(v.range_end),
+                                    })
+                                });
+
+                                response.perm = perm;
+
                                 fn.call(node, response)
                             }
                         }
@@ -1104,6 +1122,63 @@ $.etcd.request = {
                     data.role = rolename;
 
                     $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_ROLE_DELETE, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
+            grant:function(fn, serverInfo, rolename, key, range_end, permType){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+
+                    data.key = Base64.encode(key)
+
+                    if(!$.extends.isEmpty(range_end)){
+                        data.range_end = Base64.encode(range_end)
+                    }
+
+                    if(!$.extends.isEmpty(permType)){
+                        data.permType = permType
+                    }else{
+                        data.permType = 'READWRITE'
+                    }
+
+                    let perm = data;
+                    data = {}
+                    data.name = rolename;
+                    data.perm = perm;
+
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_ROLE_GRANT, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
+            revoke:function(fn, serverInfo, rolename, key, range_end){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+
+                    data.role = rolename;
+                    data.key = Base64.encode(key)
+
+                    if(!$.extends.isEmpty(range_end)){
+                        data.range_end = Base64.encode(range_end)
+                    }
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_ROLE_REVOKE, data, function (response) {
                         if($.etcd.response.retoken(serverInfo,response))
                             return ;
 

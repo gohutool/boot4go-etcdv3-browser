@@ -667,13 +667,13 @@ $.v3browser.model = {
         user:function(user, node){
             let userName = (typeof user == 'string')?user:user.text;
             let nodeName = (typeof node == 'string')?node:node.node_name;
-            let title = userName.jsEncode() + '@'+nodeName.jsEncode()+'-用户';
+            let title = userName.jsEncode() + '@'+nodeName.jsEncode()+'-用户角色';
             return title;
         },
         role:function(role, node){
             let roleName = (typeof role == 'string')?role:role.text;
             let nodeName = (typeof node == 'string')?node:node.node_name;
-            let title = roleName.jsEncode() + '@'+nodeName.jsEncode()+'-角色';
+            let title = roleName.jsEncode() + '@'+nodeName.jsEncode()+'-角色权限';
             return title;
         }
     },

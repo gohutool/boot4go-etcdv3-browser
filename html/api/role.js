@@ -21,7 +21,15 @@ function refreshRoles(row){
 
             let datas = [];
             $.each(response.roles, function (idx, role) {
-                datas.push($.v3browser.model.convert.Role2Data(role, dbId))
+                let one = $.v3browser.model.convert.Role2Data(role, dbId)
+                one.event = function(r){
+                    let node = $.v3browser.model.getLocalNode(r.node_id)
+
+                    let title = $.v3browser.model.title.role(r.text, node)
+
+                    $.v3browser.menu.addOneTabAndRefresh(title, './auth/permission.html', 'fa fa-user-o', node, r);
+                }
+                datas.push(one)
             })
 
             removeSubTree(roleRowId);
