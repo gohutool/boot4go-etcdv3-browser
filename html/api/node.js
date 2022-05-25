@@ -54,7 +54,7 @@ function newEtcdNode(nodeId){
                         return false;
                     });
                 }, mm:"roleRootMm"},
-            {id: nodeId+"_7", text:'观察点', node_id: nodeId, disableDnd: true, type:"watchs", iconCls:"fa fa-eye",
+            {id: nodeId+"_8", text:'观察点', node_id: nodeId, disableDnd: true, type:"watchs", iconCls:"fa fa-eye",
                 event:function(row){
                     let node = $.v3browser.model.getLocalNode(row.node_id)
                     let title = $.v3browser.model.title.watch(node)
@@ -86,6 +86,140 @@ function buildTreeDatas(){
     })
 
     return datas;
+}
+
+function getNodeDatas(){
+    let datas = [];
+
+    $.each(CONFIG.nodes, function(idx, v){
+
+        datas.push({
+            node_id:v.id,
+            node_name:v.node_name
+        });
+    });
+
+    return datas;
+}
+
+function getUriDatas(){
+    let datas = [];
+
+    $.each(APIS, function(k, v){
+
+        datas.push({
+            uri:v,
+            text:v+'['+k+']'
+        });
+    });
+
+    return datas;
+}
+
+function openDebugDg(){
+
+    let datas = []
+
+    $.iDialog.openDialog({
+        text: '添加',
+        minimizable:false,
+        maximized:true,
+        width: 940,
+        height: 600,
+        content: `
+            <div style="margin: 10px;">
+            </div>
+            <div class="cubeui-fluid" id="create-group-form">
+                <input type="hidden" name="folder_id" value="{{:id}}">
+                <input type="hidden" name="db_id" value="{{:db_id}}">
+                <div class="cubeui-row">
+                
+                        <label class="cubeui-form-label">服务节点:</label>
+                        <div class="cubeui-input-block">
+                            <input type="text" data-toggle="cubeui-combobox" name="debug_node"
+                                   value='' data-options="required:true,prompt:'服务节点，选择填写',
+                                   valueField:'node_id',
+                                   textField:'node_name',
+                                   data:getNodeDatas(),
+                                   ">
+                        </div>
+                    
+                </div>
+                
+                <div class="cubeui-row">      
+                        <label class="cubeui-form-label">调试URI:</label>
+                        <div class="cubeui-input-block">
+                            <input type="text" data-toggle="cubeui-combobox" name="debug_uri"
+                            data-options="required:true,prompt:'调试URI，必须填写',
+                                   valueField:'uri',
+                                   textField:'text',
+                                   data:getUriDatas(),
+                                   "
+                                   value='/v3'>
+                        </div>
+                </div>
+               
+                <div class="cubeui-row">               
+                    <div class="cubeui-col-sm6">
+                        <label class="cubeui-form-label">请求数据:</label>
+                        <div class="cubeui-input-block">
+                            <input type="text" data-toggle="cubeui-textarea" id="debug_data" name="debug_data"
+                                   value='' data-options="height:400,required:false,prompt:'调试请求数据，必须填写'">
+                        </div>
+                    </div>         
+                    <div class="cubeui-col-sm6">
+                        <label class="cubeui-form-label">响应数据:</label>
+                        <div class="cubeui-input-block">
+                            <input type="text" data-toggle="cubeui-textarea" id="debug_response" name="debug_response"
+                                   value='' readonly data-options="height:400,prompt:'调试响应数据'">
+                        </div>
+                    </div>
+                </div>
+                
+        `,
+        render:function(opts, handler){
+            let d = this;
+            console.log("Open dialog");
+
+            handler.render({})
+
+
+            $(this).dialog('setTitle', '调试')
+        },
+        leftButtonsGroup:[{
+            text: '测试',
+            iconCls: 'fa fa-terminal',
+            btnCls: 'cubeui-btn-blue',
+            handler:'ajaxForm',
+            beforeAjax:function(o){
+                console.log("测试")
+                $('#debug_response').textbox('setText', '');
+
+                o.ajaxData = $.extends.json.param2json(o.ajaxData);
+                let info = o.ajaxData
+
+                let node = $.v3browser.model.getLocalNode(info.debug_node);
+                let uri = info.debug_uri;
+                let data = info.debug_data;
+
+                $.etcd.request.debug(function (response) {
+                    $('#debug_response').textbox('setText', $.extends.json.tostring(response))
+                },node, uri, data)
+
+                return false
+            },
+        }],
+        buttonsGroup:[{
+            text: '清除数据',
+            iconCls: 'fa fa-magic',
+            btnCls: 'cubeui-btn-orange',
+            handler:'ajaxForm',
+            beforeAjax:function(o){
+                $('#debug_response').textbox('setText', '');
+                return false
+            },
+        }]
+    });
 }
 
 

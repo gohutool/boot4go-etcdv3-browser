@@ -114,7 +114,7 @@
                 href="http://www.joinsunsoft.com" target="_blank"></a>
 				<a href="http://www.beian.miit.gov.cn" target="_blank"> 粤ICP备16033069号</a>
 			</span> <span
-            style="float: right; padding-right: 5px; width: 30%; text-align: right;">版本：v.1.0.22  <a
+            style="float: right; padding-right: 5px; width: 30%; text-align: right;"><span id='versioninfo'>版本：v.1.0.22</span>  <a
             href="javascript:void(0);"
             onclick="show_term();">《条款说明》</a></span>
     </div>
@@ -198,6 +198,10 @@ $(this).menu('options').node=null;
 </div>
 
 <div id="userRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
+    <div onclick="viewAuth()" data-options="iconCls:'fa fa-shield'">查看授权状态...</div>
+    <div onclick="enableAuth()" data-options="iconCls:'fa fa-toggle-on'">开启授权</div>
+    <div onclick="disableAuth()" data-options="iconCls:'fa fa-toggle-off'">关闭授权</div>
+    <div class="menu-sep"></div>
     <div onclick="createUserDg()" data-options="iconCls:'fa fa-user-plus'">新建用户...</div>
     <div class="menu-sep"></div>
     <div onclick="refreshUsers()" data-options="iconCls:'fa fa-refresh'">刷新</div>
@@ -308,6 +312,11 @@ $(this).menu('options').node=null;
             }
         }
     });
+
+    function openDebugMode(){
+        console.log("debug");
+        openDebugDg()
+    }
 
 
 </script>

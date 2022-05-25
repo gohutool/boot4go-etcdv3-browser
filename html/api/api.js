@@ -1,28 +1,31 @@
 let V3_ENDPOINT = 'http://{node_host}:{node_port}'
 
-let V3_MTN = '/v3/maintenance/status'
-let V3_ECHO = '/v3/kv/range'
-let V3_AUTH = '/v3/auth/authenticate'
-let V3_VERSION = '/version'
+let APIS = {}
+APIS.V3_ECHO = '/v3/kv/range'
+APIS.V3_AUTH = '/v3/auth/authenticate'
+APIS.V3_VERSION = '/version'
 
-let V3_AUTH_USER_LIST = '/v3/auth/user/list'
-let V3_AUTH_ROLE_LIST = '/v3/auth/role/list'
+APIS.V3_AUTH_USER_LIST = '/v3/auth/user/list'
+APIS.V3_AUTH_ROLE_LIST = '/v3/auth/role/list'
+
+APIS.V3_AUTH_STATUS = '/v3/auth/status'
+APIS.V3_AUTH_ENABLE = '/v3/auth/enable'
+APIS.V3_AUTH_DISABLE = '/v3/auth/disable'
+
+APIS.V3_CLUSTER_MEMBER_LIST = '/v3/cluster/member/list'
 
 
-let V3_CLUSTER_MEMBER_LIST = '/v3/cluster/member/list'
+APIS.V3_RANGE = '/v3/kv/range'
+APIS.V3_RANGE_DEL = '/v3/kv/deleterange'
+APIS.V3_RANGE_PUT = '/v3/kv/put'
 
+APIS.V3_LEASE_ALL = '/v3/kv/lease/leases'
+APIS.V3_LEASE_TIMETOLIVE = '/v3/kv/lease/timetolive'
+APIS.V3_LEASE_REVOKE = '/v3/kv/lease/revoke'
+APIS.V3_LEASE_GRANT = '/v3/lease/grant'
+APIS.V3_LEASE_KEEPALIVE = '/v3/lease/keepalive'
 
-let V3_RANGE = '/v3/kv/range'
-let V3_RANGE_DEL = '/v3/kv/deleterange'
-let V3_RANGE_PUT = '/v3/kv/put'
-
-let V3_LEASE_ALL = '/v3/kv/lease/leases'
-let V3_LEASE_TIMETOLIVE = '/v3/kv/lease/timetolive'
-let V3_LEASE_REVOKE = '/v3/kv/lease/revoke'
-let V3_LEASE_GRANT = '/v3/lease/grant'
-let V3_LEASE_KEEPALIVE = '/v3/lease/keepalive'
-
-let V3_WATCH_WATCH = '/v3/watch'
+APIS.V3_WATCH_WATCH = '/v3/watch'
 
 let ETC4GO_LOCK_FORMAT = "/etcd4go-lock/#lock/_"
 let ETC4GO_LOCK_INFO_PREFIX = "/etcd4go-lock/#info/"
@@ -157,6 +160,24 @@ $.etcd.request = {
             }
         }, serverInfo, '___', null, null, true)
     },
+    debug:function (fn, serverInfo, uri, data){
+        $.etcd.request.execute(serverInfo, function (node) {
+            $.etcd.postJson(V3_ENDPOINT.format2(node) + uri, data, function (response) {
+                if($.etcd.response.retoken(serverInfo,response))
+                    return ;
+
+                if($.etcd.response.check(response)){
+                    if(fn && $.isFunction(fn)){
+                        fn.call(node, response)
+                    }
+                }else{
+                    if(fn && $.isFunction(fn)){
+                        fn.call(node, response)
+                    }
+                }
+            }, $.etcd.request.buildTokenHeader(serverInfo))
+        });
+    },
     execute: function(serverInfo, cmd){
         if($.extends.isEmpty(serverInfo)){
             cmd.call(serverInfo, {});
@@ -182,7 +203,7 @@ $.etcd.request = {
         }
     },
     echo:function(serverInfo, fn){
-        let url = V3_ENDPOINT.format2(serverInfo) + V3_ECHO;
+        let url = V3_ENDPOINT.format2(serverInfo) + APIS.V3_ECHO;
         let data = {};
         data.count_only = true;
         data.key = Base64.encode('/test/');
@@ -197,13 +218,13 @@ $.etcd.request = {
 
         if(serverInfo.authorized_enabled){
             console.log("authorized_enabled is enabled")
-            url = V3_ENDPOINT.format2(serverInfo) + V3_AUTH
+            url = V3_ENDPOINT.format2(serverInfo) + APIS.V3_AUTH
             data = {};
             data.name = serverInfo.node_username;
             data.password = serverInfo.node_password;
         }else{
             console.log("authorized_enabled is disabled")
-            url = V3_ENDPOINT.format2(serverInfo) + V3_ECHO
+            url = V3_ENDPOINT.format2(serverInfo) + APIS.V3_ECHO
             data = {};
             data.count_only = true;
             data.key = Base64.encode('/test/');
@@ -259,7 +280,7 @@ $.etcd.request = {
 
           request.create_request = data
 
-          $.etcd.request.ajaxStream(serverInfo, V3_ENDPOINT.format2(serverInfo) + V3_WATCH_WATCH, request, function(xhr,state,chuck){
+          $.etcd.request.ajaxStream(serverInfo, V3_ENDPOINT.format2(serverInfo) + APIS.V3_WATCH_WATCH, request, function(xhr,state,chuck){
               let json = null;
 
               try{
@@ -296,7 +317,7 @@ $.etcd.request = {
               data.cancel_request.watch_id = watchId;
 
               $.etcd.request.ajaxStream(serverInfo,
-                  V3_ENDPOINT.format2(serverInfo) + V3_WATCH_WATCH, data, function(xhr,state,chuck){
+                  V3_ENDPOINT.format2(serverInfo) + APIS.V3_WATCH_WATCH, data, function(xhr,state,chuck){
                   let json = null;
 
                   try{
@@ -318,7 +339,7 @@ $.etcd.request = {
             $.etcd.request.execute(serverInfo, function (node) {
                 let data = {};
                 data.ID = leaseid;
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_REVOKE, data, function (response) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_LEASE_REVOKE, data, function (response) {
                     if ($.etcd.response.retoken(serverInfo, response))
                         return;
 
@@ -447,7 +468,7 @@ $.etcd.request = {
             data.ID = leaseid;
 
             $.etcd.request.execute(serverInfo, function (node) {
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_GRANT, data, function (response) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_LEASE_GRANT, data, function (response) {
                     if ($.etcd.response.retoken(serverInfo, response))
                         return;
 
@@ -465,7 +486,7 @@ $.etcd.request = {
             $.etcd.request.execute(serverInfo, function (node) {
                 let data = {};
                 data.ID = leaseid;
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_KEEPALIVE, data, function (response) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_LEASE_KEEPALIVE, data, function (response) {
                     if ($.etcd.response.retoken(serverInfo, response))
                         return;
 
@@ -495,7 +516,7 @@ $.etcd.request = {
                     let data = {};
                     data.ID = lease;
 
-                    $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_KEEPALIVE, data, function (response) {
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_LEASE_KEEPALIVE, data, function (response) {
 
                         if ($.etcd.response.retoken(serverInfo, response)){
                             fail.push(lease);
@@ -527,7 +548,7 @@ $.etcd.request = {
             $.etcd.request.execute(serverInfo, function (node) {
                 let data = {};
                 data.ID = leaseid;
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_REVOKE, data, function (response) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_LEASE_REVOKE, data, function (response) {
                     if ($.etcd.response.retoken(serverInfo, response))
                         return;
 
@@ -557,7 +578,7 @@ $.etcd.request = {
                     let data = {};
                     data.ID = lease;
 
-                    $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_REVOKE, data, function (response) {
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_LEASE_REVOKE, data, function (response) {
 
                         if ($.etcd.response.retoken(serverInfo, response)){
                           fail.push(lease);
@@ -590,7 +611,7 @@ $.etcd.request = {
                 data.ID = leaseid;
                 data.keys = true;
 
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_TIMETOLIVE, data, function (response) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_LEASE_TIMETOLIVE, data, function (response) {
                     if ($.etcd.response.retoken(serverInfo, response))
                         return;
 
@@ -624,7 +645,7 @@ $.etcd.request = {
         lease:function(fn, serverInfo, skip, count, key){
             $.etcd.request.execute(serverInfo, function (node) {
 
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_LEASE_ALL, {}, function (response) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_LEASE_ALL, {}, function (response) {
                     if($.etcd.response.retoken(serverInfo,response))
                         return ;
 
@@ -692,7 +713,7 @@ $.etcd.request = {
 
             $.etcd.request.execute(serverInfo, function (node){
 
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE_DEL, data, function (response) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_RANGE_DEL, data, function (response) {
                     if($.etcd.response.retoken(serverInfo,response))
                         return ;
 
@@ -732,7 +753,7 @@ $.etcd.request = {
             $.etcd.request.execute(serverInfo, function (node){
 
                 let putFn = function(){
-                    $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE_PUT, data, function (response) {
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_RANGE_PUT, data, function (response) {
                         if($.etcd.response.retoken(serverInfo,response))
                             return ;
 
@@ -823,7 +844,7 @@ $.etcd.request = {
                 if(limit!=null)
                     data['limit']=Number(limit);
 
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_RANGE, data, function (response) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_RANGE, data, function (response) {
                     if($.etcd.response.retoken(serverInfo,response))
                         return ;
 
@@ -862,18 +883,74 @@ $.etcd.request = {
         }
     },
     auth:{
+        status:function (fn, serverInfo){
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_STATUS, {}, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        },
+        enable:function (fn, serverInfo){
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_ENABLE, {}, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        },
+        disable:function (fn, serverInfo){
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_DISABLE, {}, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        },
         user_list: function (fn, serverInfo){
             $.etcd.request.execute(serverInfo, function (node) {
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_AUTH_USER_LIST, {}, function (response) {
-                    fn(node, response)
-                    // $.app.show(response)
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_USER_LIST, {}, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
                 }, $.etcd.request.buildTokenHeader(serverInfo))
             });
         },
         role_list: function (fn, serverInfo){
             $.etcd.request.execute(serverInfo, function (node) {
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_AUTH_ROLE_LIST, {}, function (response) {
-                    fn(node, response)
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_ROLE_LIST, {}, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+
                     // $.app.show(response)
                 }, $.etcd.request.buildTokenHeader(serverInfo))
             });
@@ -882,9 +959,15 @@ $.etcd.request = {
     cluster:{
         member_list:function (fn, serverInfo){
             $.etcd.request.execute(serverInfo, function (node) {
-                $.etcd.postJson(V3_ENDPOINT.format2(node) + V3_CLUSTER_MEMBER_LIST, {}, function (response) {
-                    fn(node, response)
-                    // $.app.show(response)
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_CLUSTER_MEMBER_LIST, {}, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
                 }, $.etcd.request.buildTokenHeader(serverInfo))
             });
         }

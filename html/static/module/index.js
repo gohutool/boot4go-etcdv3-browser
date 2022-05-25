@@ -1170,6 +1170,14 @@ function setupQuickScan(url, mincharnum, opts){
 	
 }
 
+$(function(){
+   $('#versioninfo').dblclick(function(){
+       if(window.openDebugMode && $.isFunction(window.openDebugMode)){
+           window.openDebugMode()
+       }
+   });
+});
+
 
 function show_term() {
 

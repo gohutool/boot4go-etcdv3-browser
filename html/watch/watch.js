@@ -1,12 +1,33 @@
 let result = [];
 
 function initDg(){
+    $('#search_ignore_key').switchbutton('options').onChange = function(checked){
+        if(checked){
+            $("#search_prefix").textbox('disable');
+            $("#search_range_end").textbox('disable');
+            $('#search_with_prefix').switchbutton('disable');
+        }else{
+            //$("#search_prefix").textbox('disable');
+
+            if($('#search_with_prefix').switchbutton('options').checked==true){
+                $("#search_range_end").textbox('disable')
+                $("#search_prefix").textbox('enable');
+            }
+
+            $("#search_range_end").textbox('enable')
+            $("#search_prefix").textbox('enable');
+            $("#search_with_prefix").switchbutton('enable')
+        }
+    }
 
     $('#search_with_prefix').switchbutton('options').onChange = function(checked){
         if(checked){
+            $("#search_prefix").textbox('enable');
             $("#search_range_end").textbox('disable')
+            $('#search_ignore_key').switchbutton('disable');
         }else{
             $("#search_range_end").textbox('enable')
+            $('#search_ignore_key').switchbutton('enable');
         }
     }
 
@@ -15,25 +36,34 @@ function initDg(){
     $(function(){
         $("#watchDg").iDatagrid({
             idField: 'id',
-            sortOrder:'asc',
-            sortName:'key',
-            pageSize:10,
+            sortOrder1:'asc',
+            sortName1:'key',
+            pageSize:20,
             frozenColumns:[[
-                {field: 'id', title: '', checkbox: true},
+                // {field: 'id', title: '', checkbox: false},
                 {field: 'op', title: '操作', sortable: false, halign:'center',align:'center',
-                    width: 150, formatter:keyOperateFormatter},
+                    width: 80, formatter:keyOperateFormatter},
                 {field: 'key', title: '事件键', sortable: false,
                     formatter:$.iGrid.buildformatter([$.iGrid.templateformatter('{key}'), $.iGrid.tooltipformatter()]),
-                    width: 400},
+                    width: 350},
                 {field: 'type', title: '事件类型', sortable: false,
                     formatter:$.iGrid.tooltipformatter(),
-                    width: 170},
+                    width: 80},
             ]],
             onBeforeLoad:function (param){
                 console.log(param)
                 buildResult(param)
             },
             columns: [[
+                {field: 'version', title: '版本', sortable: false,
+                    formatter:$.iGrid.tooltipformatter(),
+                    width: 70},
+                {field: 'create_revision', title: '创建修订号', sortable: false,
+                    formatter:$.iGrid.tooltipformatter(),
+                    width: 100},
+                {field: 'mod_revision', title: '更新修订号', sortable: false,
+                    formatter:$.iGrid.tooltipformatter(),
+                    width: 100},
                 {field: 'kv', title: '值', sortable: false,
                     formatter:$.iGrid.tooltipformatter(),
                     width: 400},
@@ -68,13 +98,37 @@ function buildResult(param){
     })
 }
 
+function clearResult(){
+    result = []
+    $('#watchDg').datagrid('reload')
+}
+
 
 function keyOperateFormatter(value, row, index) {
     let htmlstr = "";
-    htmlstr += '<button class="layui-btn-gray layui-btn layui-btn-xs" onclick="removeLock(\'' + index + '\',\''
-        + row.leaseid +'\')">强制解锁</button>';
+
+    htmlstr += '<button class="layui-btn-blue layui-btn layui-btn-xs" onclick="viewResult(\'' + index + '\',\''
+        + row.id +'\')">查看</button>';
+    /*htmlstr += '<button class="layui-btn-gray layui-btn layui-btn-xs" onclick="removeLock(\'' + index + '\',\''
+        + row.id +'\')">强制解锁</button>';*/
 
     return htmlstr;
+}
+
+function viewResult(idx){
+    let row = $('#watchDg').datagrid('getRows')[idx]
+    $.iDialog.openDialog({
+        title: '查看事件信息',
+        minimizable:false,
+        width: 900,
+        height: 640,
+        href:contextpath + '/watch/view.html',
+        render:function(opts, handler){
+            let d = this;
+            console.log("Open dialog");
+            handler.render(row)
+        }
+    });
 }
 
 function removeLock(idx, leaseid){
@@ -91,6 +145,7 @@ function removeLock(idx, leaseid){
 }
 
 let watchId;
+let xhrObj;
 
 function stopTest(){
 
@@ -102,14 +157,20 @@ function stopTest(){
         //$('#clearBtn').linkbutton('disable');
         return;
     }
+    //
+    // let node = $.v3browser.menu.getCurrentTabAttachNode();
+    //
+    // $.etcd.request.watch.stop(function(response){
+    // }, node, watchId);
 
-    let node = $.v3browser.menu.getCurrentTabAttachNode();
+    if(xhrObj!=null){
+        xhrObj.abort();
+        xhrObj = null;
+    }
 
-    $.etcd.request.watch.stop(function(response){
-    }, node, watchId);
-
-    if(watchId!=null)
+    if(watchId!=null){
         $.app.show('观察点'+watchId+'已经停止');
+    }
     else
         $.app.show('观察点已经停止');
 
@@ -130,6 +191,11 @@ function test(){
 
         watchId = new Date().getTime()
 
+        if(param.ignore_key){
+            param.prefix = '\0';
+            param.range_end = '\0';
+        }
+
         $.etcd.request.watch.watch(function(response, xhr,state){
             console.log(xhr);
             console.log(response);
@@ -138,6 +204,7 @@ function test(){
 
                 if(response.result.watch_id!=null){
                     watchId = response.result.watch_id;
+                    xhrObj = xhr;
                 }
 
                 if(response.result.created){
@@ -153,6 +220,8 @@ function test(){
                     //$('#clearBtn').linkbutton('enable');
                 }
 
+                let rowWatchid = response.result.watch_id || '';
+
                 if(response.result.events != null){
                     $.each(response.result.events, function(idx,v){
                         let row = {}
@@ -161,6 +230,8 @@ function test(){
                         }else{
                             row.type=v.type
                         }
+
+                        row.watch_id = rowWatchid;
 
                         row.data=v.kv
 
@@ -174,9 +245,18 @@ function test(){
                             row.id = v.kv.key
                             row.key = v.kv.key
                             row.kv = $.extends.json.tostring(v.kv);
+                            row.create_revision = v.kv.create_revision||'';
+                            row.mod_revision = v.kv.mod_revision||'';
+                            row.version = v.kv.version||'';
                         }
-                        else
+                        else{
                             row.kv = '';
+                            row.id = '';
+                            row.key = '';
+                            row.create_revision = '';
+                            row.mod_revision = '';
+                            row.version = '';
+                        }
 
                         row.prev_data=v.prev_kv
 
@@ -188,9 +268,16 @@ function test(){
                                 v.prev_kv.value = Base64.decode(v.prev_kv.value)
                             }
                             row.prev_kv = $.extends.json.tostring(v.prev_kv);
+                            row.prev_create_revision = v.prev_kv.create_revision||'';
+                            row.prev_mod_revision = v.prev_kv.mod_revision||'';
+                            row.prev_version = v.prev_kv.version||'';
                         }
-                        else
+                        else{
                             row.prev_kv = '';
+                            row.prev_create_revision = '';
+                            row.prev_mod_revision = '';
+                            row.prev_version = '';
+                        }
 
                         result.splice(0,0, row)
                     })

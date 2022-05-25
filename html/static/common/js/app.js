@@ -498,7 +498,7 @@ $.app.ajaxStream = function(url, options, onreadystatechange){
 		}
 	}
 
-	$.app.jqueryAjax(url, options);
+	return $.app.jqueryAjax(url, options);
 
 }
 

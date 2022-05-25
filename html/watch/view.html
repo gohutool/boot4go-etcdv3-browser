@@ -1,0 +1,128 @@
+<style>
+    .align-center {
+        text-align: center;
+    }
+    .margin-top-10{
+        margin-top: 10px;
+    }
+    .layui-container-fluid {
+        margin: 5px;
+    }
+    .table-label{
+        min-width: 90px!important;
+    }
+    .table-value{
+        word-break:break-all!important;
+    }
+</style>
+
+<div style="background-color: #f7f7f7">
+    <div class="layui-fluid">
+        <table class="layui-table" style="margin: 0px 0;">
+            <thead>
+            <tr>
+                <th colspan="6" style="text-align: center">事件详情</th>
+            </tr>
+            </thead>
+            <tr>
+                <td >键：</td>
+                <th colspan="5" class="table-value">{{>key}}</th>
+            </tr>
+            <tr>
+                <td >事件类型：</td>
+                <td>{{:type}}</td>
+                <td>包含旧值：</td>
+                <td>
+                    {{if prev_data}}
+                    是
+                    {{else}}
+                    否
+                    {{/if}}
+                </td>
+
+            </tr>
+            <tr style="background-color: #f2f2f2;">
+                <th colspan="6" style="text-align: center">当前值</th>
+            </tr>
+            <tr>
+                <td>值：</td>
+                <th colspan="5" class="table-value">{{>data.value}}</th>
+            </tr>
+            <tr>
+                <td class="table-label">更新修订号：</td>
+                <td>{{:mod_revision}}</td>
+                <td class="table-label">创建修订号：</td>
+                <td>{{:create_revision}}</td>
+
+            </tr>
+            <tr>
+                <td>版本号：</td>
+                <td>{{:version}}</td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            {{if prev_data}}
+            <tr style="background-color: #f2f2f2;">
+                <th colspan="6" style="text-align: center">旧值</th>
+            </tr>
+            <tr>
+                <td>值：</td>
+                <th colspan="5" class="table-value">{{>prev_data.value}}</th>
+            </tr>
+            <tr>
+                <td>更新修订号：</td>
+                <td>{{:prev_mod_revision}}</td>
+                <td>创建修订号：</td>
+                <td>{{:prev_create_revision}}</td>
+
+            </tr>
+            <tr>
+                <td>版本号：</td>
+                <td>{{:prev_version}}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            {{/if}}
+
+
+<!--            <tr>-->
+<!--                <td>计划开始时间：</td>-->
+<!--                <td>2021-05-11</td>-->
+<!--                <td>计划结束时间：</td>-->
+<!--                <td>2021-05-11</td>-->
+
+<!--            </tr>-->
+
+<!--            <tr>-->
+<!--                <td> 实际开始时间</td>-->
+<!--                <td>2021-05-11</td>-->
+<!--                <td>实际结束时间：</td>-->
+<!--                <td>2021-05-11</td>-->
+
+<!--            </tr>-->
+
+<!--            <tr>-->
+<!--                <td>创建人：</td>-->
+<!--                <td>超级管理员</td>-->
+<!--                <td>创建时间：</td>-->
+
+<!--                <td>2021-05-11 14:54:38:000</td>-->
+
+<!--            </tr>-->
+<!--            <tr>-->
+<!--                <td>排序：</td>-->
+<!--                <td>1</td>-->
+<!--                <td></td>-->
+<!--                <td></td>-->
+
+<!--            </tr>-->
+
+<!--            <tr>-->
+<!--                <td>任务内容：</td>-->
+<!--                <th colspan="5">MISBoot快速开发平台</th>-->
+<!--            </tr>-->
+            </thead>
+        </table>
+    </div>
+</div>
