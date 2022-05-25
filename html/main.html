@@ -202,22 +202,22 @@ $(this).menu('options').node=null;
     <div onclick="enableAuth()" data-options="iconCls:'fa fa-toggle-on'">开启授权</div>
     <div onclick="disableAuth()" data-options="iconCls:'fa fa-toggle-off'">关闭授权</div>
     <div class="menu-sep"></div>
-    <div onclick="createUserDg()" data-options="iconCls:'fa fa-user-plus'">新建用户...</div>
+    <div onclick="addUser()" data-options="iconCls:'fa fa-user-plus'">新建用户...</div>
     <div class="menu-sep"></div>
     <div onclick="refreshUsers()" data-options="iconCls:'fa fa-refresh'">刷新</div>
 </div>
 
 <div id="userMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
-    <div onclick="editPwdDg()" data-options="iconCls:'fa fa-pencil'">修改密码...</div>
+    <div onclick="changePwd()" data-options="iconCls:'fa fa-pencil'">修改密码...</div>
     <div onclick="editUserDg()" data-options="iconCls:'fa fa-delicious'">授权角色...</div>
     <div class="menu-sep"></div>
     <div onclick="removeUser()" data-options="iconCls:'fa fa-trash'">删除用户</div>
     <div class="menu-sep"></div>
-    <div onclick="refreshUser()" data-options="iconCls:'fa fa-refresh'">刷新</div>
+    <div onclick="refreshUsers()" data-options="iconCls:'fa fa-refresh'">刷新</div>
 </div>
 
 <div id="roleRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
-    <div onclick="createRoleDg()" data-options="iconCls:'fa fa-user-o'">新建角色...</div>
+    <div onclick="addRole()" data-options="iconCls:'fa fa-user-o'">新建角色...</div>
     <div class="menu-sep"></div>
     <div onclick="refreshRoles()" data-options="iconCls:'fa fa-refresh'">刷新</div>
 </div>

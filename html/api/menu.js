@@ -272,16 +272,19 @@ $.v3browser.menu = {
             return nodeId+"_3"+"_1";
         },
         userMenuId : function (nodeId){
-            return nodeId+"_4"+"_1";
+            return nodeId+"_4";
         },
         roleMenuId : function (nodeId){
-            return nodeId+"_5"+"_1";
+            return nodeId+"_5";
         },
         alarmMenuId : function (nodeId){
             return nodeId+"_6"+"_1";
         },
         clusterMenuId : function (nodeId){
-            return nodeId+"_7"+"_1";
+            return nodeId+"_7";
+        },
+        watchMenuId : function (nodeId){
+            return nodeId+"_8";
         }
     }
 }

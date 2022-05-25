@@ -6,7 +6,15 @@ APIS.V3_AUTH = '/v3/auth/authenticate'
 APIS.V3_VERSION = '/version'
 
 APIS.V3_AUTH_USER_LIST = '/v3/auth/user/list'
+APIS.V3_AUTH_USER_ADD = '/v3/auth/user/add'
+APIS.V3_AUTH_USER_DELETE = '/v3/auth/user/delete'
+APIS.V3_AUTH_USER_CHNAGEPW = '/v3/auth/user/changepw'
+APIS.V3_AUTH_USER_GET = '/v3/auth/user/get'
+
 APIS.V3_AUTH_ROLE_LIST = '/v3/auth/role/list'
+APIS.V3_AUTH_ROLE_ADD = '/v3/auth/role/add'
+APIS.V3_AUTH_ROLE_DELETE = '/v3/auth/role/delete'
+APIS.V3_AUTH_ROLE_GET = '/v3/auth/role/get'
 
 APIS.V3_AUTH_STATUS = '/v3/auth/status'
 APIS.V3_AUTH_ENABLE = '/v3/auth/enable'
@@ -932,7 +940,9 @@ $.etcd.request = {
                         return ;
 
                     if($.etcd.response.check(response)){
+
                         if(fn && $.isFunction(fn)){
+                            response.users = response.users||[];
                             fn.call(node, response)
                         }
                     }
@@ -947,6 +957,7 @@ $.etcd.request = {
 
                     if($.etcd.response.check(response)){
                         if(fn && $.isFunction(fn)){
+                            response.roles = response.roles||[];
                             fn.call(node, response)
                         }
                     }
@@ -954,6 +965,156 @@ $.etcd.request = {
                     // $.app.show(response)
                 }, $.etcd.request.buildTokenHeader(serverInfo))
             });
+        },
+        user:{
+            list: function (fn, serverInfo){
+                return $.etcd.request.auth.user_list(fn, serverInfo);
+            },
+            get:function(fn, serverInfo, username){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+
+                    data.name = username;
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_USER_GET, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
+            add:function(fn, serverInfo, username, pwd){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+
+                    if($.extends.isEmpty(pwd)){
+                        data.password = '';
+                        data.options = {
+                            no_password: true
+                        }
+                    }else{
+                        data.password = pwd;
+                        data.hashedPassword = Math.uuid()
+                        data.options = {
+                            no_password: false
+                        }
+                    }
+
+                    data.name = username;
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_USER_ADD, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
+            delete:function(fn, serverInfo, username){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+
+                    data.name = username;
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_USER_DELETE, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
+            change_password:function(fn, serverInfo, username, pwd){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+
+                    data.password = pwd;
+                    data.name = username;
+                    data.hashedPassword = Math.uuid()
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_USER_CHNAGEPW, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
+        },
+        role:{
+            list: function (fn, serverInfo){
+                return $.etcd.request.auth.role_list(fn, serverInfo);
+            },
+            get:function(fn, serverInfo, rolename){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+
+                    data.role = rolename;
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_ROLE_GET, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
+            add:function(fn, serverInfo, rolename){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+                    data.name = rolename;
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_ROLE_ADD, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
+            delete:function(fn, serverInfo, rolename){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+
+                    data.role = rolename;
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_ROLE_DELETE, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
         }
     },
     cluster:{
@@ -965,6 +1126,7 @@ $.etcd.request = {
 
                     if($.etcd.response.check(response)){
                         if(fn && $.isFunction(fn)){
+                            response.members = response.members||[];
                             fn.call(node, response)
                         }
                     }
