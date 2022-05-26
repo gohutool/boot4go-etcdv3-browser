@@ -294,3 +294,7 @@ function test(){
         $.app.show('填写信息不规范，请检查填写数据内容')
     }
 }
+
+function onActivated(opts, title, idx){
+    $('#watchDg').datagrid('resize');
+}

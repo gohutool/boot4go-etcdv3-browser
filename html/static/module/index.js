@@ -88,8 +88,21 @@ $(function () {
         	};
 
             try{
-                console.log('resize selected panel')
-                $(this).tabs('getTab', index).panel('resize');
+                console.log('selected panel(title='+title+', index='+ index +') is onActivated');
+
+                if(opts.iframe){
+                    let tab = $(this).tabs('getTab', index);
+                    let w = tab.find('iframe')[0].contentWindow;
+                    if(w.onActivated && $.isFunction(w.onActivated)){
+                        w.onActivated.call(tab, opts, title, index);
+                    }
+                }else{
+                    if(opts.onActivated && $.isFunction(opts.onActivated) ){
+                        opts.onActivated.call(tab, opts, title, index);
+                    }else{
+                        $(this).tabs('getTab', index).panel('resize');
+                    }
+                }
             }catch (e) {
                 console.error(e)
             }
