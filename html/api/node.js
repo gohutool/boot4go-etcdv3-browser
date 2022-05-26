@@ -832,3 +832,32 @@ function importEtcd(){
         }]
     })
 }
+
+function showVersion(){
+    let node = $.v3browser.menu.getCurrentOpenMenuNode();
+
+    $.etcd.request.maintenance.version(function (response) {
+        $.app.show('服务器版本{0},集群版本{1}'.format(response.etcdserver, response.etcdcluster));
+    }, node)
+}
+
+function showStatus(){
+    let node = $.v3browser.menu.getCurrentOpenMenuNode();
+
+    $.etcd.request.maintenance.status(function (response) {
+
+        $.iDialog.openDialog({
+            title: '查看服务器信息',
+            minimizable:false,
+            width: 900,
+            height: 640,
+            href:contextpath + '/maintenance/status.html',
+            render:function(opts, handler){
+                let d = this;
+                console.log("Open dialog");
+                handler.render(response)
+            }
+        });
+
+    }, node)
+}

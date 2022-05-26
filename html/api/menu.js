@@ -68,10 +68,14 @@ $.v3browser.menu = {
             target: m.target,
             text: "关闭连接"
         });
+
         $('#nodemm').menu('setIcon', {
             target: $('#menuitem01')[0],
             iconCls: "fa fa-undo"
         });
+
+        $('#nodemm').menu('enableItem', $('#menuitem_version')[0]);
+        $('#nodemm').menu('enableItem', $('#menuitem_status')[0]);
 
         $('#nodemm').menu('show', {
             left: e.pageX,
@@ -91,6 +95,9 @@ $.v3browser.menu = {
             target: m.target,
             iconCls: "fa fa-folder-open-o"
         });
+
+        $('#nodemm').menu('disableItem', $('#menuitem_version')[0]);
+        $('#nodemm').menu('disableItem', $('#menuitem_status')[0]);
 
         $('#nodemm').menu('show', {
             left: e.pageX,

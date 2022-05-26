@@ -27,6 +27,10 @@ APIS.V3_AUTH_DISABLE = '/v3/auth/disable'
 APIS.V3_CLUSTER_MEMBER_LIST = '/v3/cluster/member/list'
 
 
+APIS.V3_MAINTEANCE_STATUS = '/v3/maintenance/status'
+APIS.V3_MAINTEANCE_VERSION = '/version'
+
+
 APIS.V3_RANGE = '/v3/kv/range'
 APIS.V3_RANGE_DEL = '/v3/kv/deleterange'
 APIS.V3_RANGE_PUT = '/v3/kv/put'
@@ -38,6 +42,10 @@ APIS.V3_LEASE_GRANT = '/v3/lease/grant'
 APIS.V3_LEASE_KEEPALIVE = '/v3/lease/keepalive'
 
 APIS.V3_WATCH_WATCH = '/v3/watch'
+
+
+
+
 
 let ETC4GO_LOCK_FORMAT = "/etcd4go-lock/#lock/_"
 let ETC4GO_LOCK_INFO_PREFIX = "/etcd4go-lock/#info/"
@@ -119,6 +127,24 @@ $.etcd.ajaxStream = function(url, datastr, fn, requestHeader){
         }
     });
 }
+
+$.etcd.getJson = function(url, datastr, fn, requestHeader, progressing){
+
+    if(requestHeader == null){
+        requestHeader = {};
+    }
+
+    requestHeader.isetcd = true
+
+    if(typeof datastr == 'object'){
+        datastr = $.extends.json.tostring(datastr)
+    }
+
+    requestHeader['Content-Type'] = 'application/json; charset=UTF-8';
+
+    $.app.ajax(url, datastr, 'GET', "json", fn, true, progressing, requestHeader);
+};
+
 
 $.etcd.postJson = function(url, datastr, fn, requestHeader, progressing){
 
@@ -1255,6 +1281,36 @@ $.etcd.request = {
                     if($.etcd.response.check(response)){
                         if(fn && $.isFunction(fn)){
                             response.members = response.members||[];
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        }
+    },
+    maintenance:{
+        version:function (fn, serverInfo) {
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.getJson(V3_ENDPOINT.format2(node) + APIS.V3_MAINTEANCE_VERSION, {}, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+    
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        },
+        status :function (fn, serverInfo) {
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_MAINTEANCE_STATUS, {}, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
                             fn.call(node, response)
                         }
                     }

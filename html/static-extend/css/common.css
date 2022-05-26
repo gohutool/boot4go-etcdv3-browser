@@ -150,3 +150,11 @@
     width:auto;float: none!important;
     padding-left: 10px!important;
 }
+
+
+.cubeui-content-selectable {
+    -webkit-user-select:text;
+    -moz-user-select:text;
+    -ms-user-select:text;
+    user-select:text;
+}
