@@ -1829,10 +1829,7 @@ $.iGrid = $.extend(!0, $.iGrid||{}, {
 			throw fn + " is not a functcion";
 		}
 	},
-
-
-
-	click_cell_herf_formatter:function(dg_selector, registery_event){
+	click_cell_href_formatter:function(dg_selector, registery_event){
 		return function(val, rowData, rowIndex){
 
 			if(rowData.ISFOOTER)
@@ -1844,6 +1841,59 @@ $.iGrid = $.extend(!0, $.iGrid||{}, {
 			var v = '<a style="color:blue;" class=\'\' href=\'#\' onclick=\'$.iGrid.click_cell_herf_handler(this, "'+dg_selector+'", "'+registery_event+'", "'+rowIndex+'")\'>{0}</a>'.format(val);
 
 			return v;
+		}
+	},
+	click_trigger_event:function(dgId, eventName, idx, isFooter){
+		let dg = $('#'+dgId);
+		let fn = $(dg).datagrid('options')['on' + eventName.UpperCaseFirst()];
+		$.extends.stopPropagation();
+
+		if(fn == null){
+			return ;
+		}
+
+		if($.isFunction(fn)){
+			let rowData = null;
+
+			if(isFooter){
+				rowData = dg.datagrid('getFooterRows')[idx];
+			}else{
+				rowData = dg.datagrid('getRows')[idx];
+			}
+
+			fn.call(dg, rowData, idx, isFooter);
+		}else{
+			throw fn + " is not a functcion";
+		}
+	},
+	click_trigger_formatter:function(eventName, includeFooter){
+
+		return function(value, rowData, idx){
+			let isFooter = false;
+
+			if(rowData.ISFOOTER && !includeFooter)
+				return val;
+
+			if(rowData.ISFOOTER)
+				isFooter = true;
+
+			if($.extends.isEmpty(value))
+				return '';
+
+			let dgId = this.formatter.caller.arguments[0].id;
+
+			let txt = `<a style='color:blue;' class='click_cell_href' href='#' onclick='$.iGrid.click_trigger_event("{1}","{2}","{3}", {4})'>{0}</a>`;
+			txt = txt.format(value.htmlEncode(), dgId, eventName, idx, isFooter);
+
+			if($.extends.isEmpty(rowData.title)){
+				return $.iTooltip.tooltip(txt, rowData.title);
+			}else{
+				if(!$.extends.isEmpty(value)){
+					return $.iTooltip.tooltip(txt, value);
+				}else{
+					return txt;
+				}
+			}
 		}
 	},
 	buildformatter:function(formatters){

@@ -15,8 +15,8 @@
     </div>
 </div>
 <script id="tmpl1" type="text/x-jquery-tmpl">
-<div data-toggle="cubeui-layout" data-options="fit:true">
-    <div data-options="region:'west',title:'授权角色',split:false,collapsible:false,border:false,width:500,iconCls:'fa fa-user-circle-o',
+<div id='layout'data-toggle="cubeui-layout" data-options="fit:true">
+    <div data-options="region:'center',title:'授权角色',split:false,collapsible:false,border:false,width:500,iconCls:'fa fa-user-circle-o',
     headerCls:'border_right',bodyCls:'border_right'">
     <table id="roleDg"></table>
     <!-- 表格工具栏开始 -->
@@ -55,11 +55,24 @@
             }">清空权限</a>
     </div>
     </div>
-
-    <div data-options="region:'center',title:'授权权限',iconCls:'icon-reload',split:true,border:false,bodyCls:'border_left',iconCls:'fa fa-user-o'">
-    <table id="permissionDg"></table>
-    </dvi>
 </div>
+
+<template id='eastTpl'>
+    <table id="permissionDg"></table>
+</template>
+
+
+<template id='footerTpl'>
+	<div id='footer' style="padding: 5px; text-align: right;">
+        <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+                onClick:function(){
+						$('#layout').layout('collapse', 'east');
+                },
+                btnCls: 'cubeui-btn-red',
+                iconCls: 'fa fa-close'
+            }">关闭</a>
+	</div>
+</template>
 </script>
 
 </body>

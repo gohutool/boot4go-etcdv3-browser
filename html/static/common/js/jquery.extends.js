@@ -44,6 +44,24 @@ String.prototype.format2 = function(args) {
 	return result;
 }
 
+String.prototype.UpperCaseFirst = function(){
+	let result = this;
+
+	if(result.length<=1)
+		return result.toUpperCase();
+
+	return result.substring(0,1).toUpperCase() + result.substring(1);
+}
+
+String.prototype.LowerCaseFirst = function(){
+	let result = this;
+
+	if(result.length<=1)
+		return result.toLowerCase();
+
+	return result.substring(0,1).toLowerCase() + result.substring(1);
+}
+
 String.prototype.format = function(args) {
     let result = this;
     if (arguments.length > 0) {

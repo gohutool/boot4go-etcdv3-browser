@@ -698,3 +698,16 @@ a.cubeui-link{
     color: #fff;
     background-color: #1E90FF
 }
+
+a.click_cell_href{
+    font-size: 13px!important;
+    text-decoration:none!important;
+}
+
+a.click_cell_href:hover{
+    text-decoration:none!important;
+}
+
+template{
+    display: none!important;
+}

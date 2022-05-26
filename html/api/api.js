@@ -983,9 +983,22 @@ $.etcd.request = {
                             return ;
 
                         if($.etcd.response.check(response)){
-                            if(fn && $.isFunction(fn)){
-                                fn.call(node, response)
-                            }
+
+                            response.roles = response.roles||[];
+
+                            response.count = response.roles.length;
+
+                            let roles = [];
+
+                            $.each(response.roles, function(idx,v){
+                                roles.push({
+                                    "name": v
+                                })
+                            });
+
+                            response.roles = roles;
+
+                            fn.call(node, response)
                         }
                     }, $.etcd.request.buildTokenHeader(serverInfo))
                 });
