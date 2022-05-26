@@ -47,6 +47,13 @@ function refreshRoles(row){
     }, node)
 }
 
+function editRoleDg(){
+    let row = $.v3browser.menu.getCurrentOpenMenuRow();
+    let node = $.v3browser.menu.getCurrentOpenMenuNode();
+    let title = $.v3browser.model.title.role(row.text, node)
+
+    $.v3browser.menu.addOneTabAndRefresh(title, './auth/permission.html', 'fa fa-user-o', node, row);
+}
 
 /// For Role
 function addRole(){

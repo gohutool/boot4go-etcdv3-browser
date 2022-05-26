@@ -158,6 +158,15 @@ function changePwd(){
     });
 }
 
+function editUserDg(){
+    let r = $.v3browser.menu.getCurrentOpenMenuRow();
+    let node = $.v3browser.model.getLocalNode(r.node_id)
+
+    let title = $.v3browser.model.title.user(r.text, node)
+
+    $.v3browser.menu.addOneTabAndRefresh(title, './auth/user.html', 'fa fa-user-circle-o', node, r);
+}
+
 function refreshUsers(row){
     let node;
     let dbId;
@@ -179,7 +188,15 @@ function refreshUsers(row){
 
             let datas = [];
             $.each(response.users, function (idx, user) {
-                datas.push($.v3browser.model.convert.User2Data(user, dbId))
+                let one = $.v3browser.model.convert.User2Data(user, dbId);
+                one.event = function(r){
+                    let node = $.v3browser.model.getLocalNode(r.node_id)
+
+                    let title = $.v3browser.model.title.user(r.text, node)
+
+                    $.v3browser.menu.addOneTabAndRefresh(title, './auth/user.html', 'fa fa-user-circle-o', node, r);
+                }
+                datas.push(one)
             })
 
             removeSubTree(userRowId);

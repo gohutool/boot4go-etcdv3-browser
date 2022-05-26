@@ -15,49 +15,51 @@
     </div>
 </div>
 <script id="tmpl1" type="text/x-jquery-tmpl">
-<table id="groupDg"></table>
-<!-- 表格工具栏开始 -->
-<div id="groupDg-toolbar" class="cubeui-toolbar"
-     data-options="grid:{
-           type:'datagrid',
-           id:'groupDg'
-       }">
+<div data-toggle="cubeui-layout" data-options="fit:true">
+    <div data-options="region:'west',title:'授权角色',split:false,collapsible:false,border:false,width:500,iconCls:'fa fa-user-circle-o',
+    headerCls:'border_right',bodyCls:'border_right'">
+    <table id="roleDg"></table>
+    <!-- 表格工具栏开始 -->
+    <div id="roleDg-toolbar" class="cubeui-toolbar"
+         data-options="grid:{
+               type:'datagrid',
+               id:'roleDg'
+           }">
 
-    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
-            method1: 'openDialog',
-            onClick:function(){
-                addKey();
-            },
-            extend: '#groupDg-toolbar',
-            btnCls: 'cubeui-btn-blue',
-            iconCls: 'fa fa-plus'
-        }">新增键值</a>
+        <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+                method1: 'openDialog',
+                onClick:function(){
+                    grantPermission();
+                },
+                extend: '#roleDg-toolbar',
+                btnCls: 'cubeui-btn-blue',
+                iconCls: 'fa fa-plus'
+            }">新增权限</a>
 
-    <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
-            onClick:function(){
-                emptyKeys();
-            },
-            extend: '#groupDg-toolbar',
-            btnCls: 'cubeui-btn-red',
-            iconCls: 'fa fa-trash'
-        }">清空</a>
+        <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+                onClick:function(){
+                    revokePermission();
+                },
+                extend: '#roleDg-toolbar',
+                btnCls: 'cubeui-btn-red',
+                iconCls: 'fa fa-times'
+            }">撤销权限</a>
 
-    <form id="queryForm" class="search-box">
-    	<input type="text" id='prefix_search' name="key" data-toggle="cubeui-textbox"
-               data-options="onClear:function(){
-                    console.log(111);
-                    $('#searchbtn').trigger('click');
-               }, mask:'{{:~js(prefix)}}', prompt:'key查询，按照prefix({{:~js(prefix)}})+key进行前缀查询',width:360">
-        <a href="javascript:void(0)" id="searchbtn"
-           data-toggle="cubeui-menubutton"
-           data-options="method:'query',
-           iconCls:'fa fa-search',
-           btnCls:'cubeui-btn-blue',
-           form:{id:'queryForm'},
-           grid:{type:'datagrid','id':'groupDg'}">查询</a>
-    </form>
+        <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
+                onClick:function(){
+                    emptyPermission();
+                },
+                extend: '#roleDg-toolbar',
+                btnCls: 'cubeui-btn-brown',
+                iconCls: 'fa fa-trash'
+            }">清空权限</a>
+    </div>
+    </div>
+
+    <div data-options="region:'center',title:'授权权限',iconCls:'icon-reload',split:true,border:false,bodyCls:'border_left',iconCls:'fa fa-user-o'">
+    <table id="permissionDg"></table>
+    </dvi>
 </div>
-<!-- 表格工具栏结束 -->
 </script>
 
 </body>
@@ -69,7 +71,7 @@
                 ROOT_RES_URL + "/api/api.js",
                 ROOT_RES_URL + "/api/model.js",
                 ROOT_RES_URL + "/api/menu.js",
-                ROOT_RES_URL + "/kv/kv.js",
+                ROOT_RES_URL + "/auth/user.js",
             ],
             render: function () {
                 stop = true
