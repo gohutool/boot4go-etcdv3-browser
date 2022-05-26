@@ -10,6 +10,8 @@ APIS.V3_AUTH_USER_ADD = '/v3/auth/user/add'
 APIS.V3_AUTH_USER_DELETE = '/v3/auth/user/delete'
 APIS.V3_AUTH_USER_CHNAGEPW = '/v3/auth/user/changepw'
 APIS.V3_AUTH_USER_GET = '/v3/auth/user/get'
+APIS.V3_AUTH_USER_REVOKE = '/v3/auth/user/revoke'
+APIS.V3_AUTH_USER_GRANT = '/v3/auth/user/grant'
 
 APIS.V3_AUTH_ROLE_LIST = '/v3/auth/role/list'
 APIS.V3_AUTH_ROLE_ADD = '/v3/auth/role/add'
@@ -1061,6 +1063,44 @@ $.etcd.request = {
                     data.hashedPassword = Math.uuid()
 
                     $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_USER_CHNAGEPW, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
+            revoke:function(fn, serverInfo, username, rolename){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+
+                    data.role = rolename;
+                    data.name = username;
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_USER_REVOKE, data, function (response) {
+                        if($.etcd.response.retoken(serverInfo,response))
+                            return ;
+
+                        if($.etcd.response.check(response)){
+                            if(fn && $.isFunction(fn)){
+                                fn.call(node, response)
+                            }
+                        }
+                    }, $.etcd.request.buildTokenHeader(serverInfo))
+                });
+            },
+            grant:function(fn, serverInfo, username, rolename){
+                $.etcd.request.execute(serverInfo, function (node) {
+                    let data = {};
+
+                    data.role = rolename;
+                    data.user = username;
+
+                    $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_AUTH_USER_GRANT, data, function (response) {
                         if($.etcd.response.retoken(serverInfo,response))
                             return ;
 

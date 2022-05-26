@@ -1812,6 +1812,24 @@ $.iTooltip = $.extend(!0, $.iTooltip, {
 	}
 });
 
+$.iLayout = $.extend({}, $.iLayout, {
+	getLayoutPanelOptions : function(target, region){
+		let p = $(target).layout('panel', region);
+
+		if(p.isNull()){
+			return null;
+		}else{
+
+			try{
+				return p.panel('options');
+			}catch (e){
+				console.error(e);
+				return null;
+			}
+		}
+	}
+});
+
 $.iGrid = $.extend(!0, $.iGrid||{}, {
 	click_cell_herf_handler:function(href, dg_selector, registery_event,  rowIndex){
 		var dg = $(dg_selector);
@@ -1885,14 +1903,10 @@ $.iGrid = $.extend(!0, $.iGrid||{}, {
 			let txt = `<a style='color:blue;' class='click_cell_href' href='#' onclick='$.iGrid.click_trigger_event("{1}","{2}","{3}", {4})'>{0}</a>`;
 			txt = txt.format(value.htmlEncode(), dgId, eventName, idx, isFooter);
 
-			if($.extends.isEmpty(rowData.title)){
+			if(!$.extends.isEmpty(rowData.title)){
 				return $.iTooltip.tooltip(txt, rowData.title);
 			}else{
-				if(!$.extends.isEmpty(value)){
-					return $.iTooltip.tooltip(txt, value);
-				}else{
-					return txt;
-				}
+				return txt;
 			}
 		}
 	},

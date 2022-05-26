@@ -821,6 +821,13 @@ $.extends.values = function(source, field) {
 	return rtn;
 }
 
+$.extends.map = function(source, fn) {
+	let rtn = {};
+	$.each(source, function(idx, v){
+		rtn[fn(v,idx)] = v
+	});
+	return rtn;
+}
 /*
 let date = new Date()
 dateFormat("YYYY-mm-dd HH:MM", date)

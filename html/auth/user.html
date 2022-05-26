@@ -26,33 +26,42 @@
                id:'roleDg'
            }">
 
+<!--        <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{-->
+<!--                method1: 'openDialog',-->
+<!--                onClick:function(){-->
+<!--                    grantPermission();-->
+<!--                },-->
+<!--                extend: '#roleDg-toolbar',-->
+<!--                btnCls: 'cubeui-btn-blue',-->
+<!--                iconCls: 'fa fa-plus'-->
+<!--            }">新增权限</a>-->
+
         <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
-                method1: 'openDialog',
                 onClick:function(){
-                    grantPermission();
+                    grantAll();
                 },
                 extend: '#roleDg-toolbar',
                 btnCls: 'cubeui-btn-blue',
-                iconCls: 'fa fa-plus'
-            }">新增权限</a>
+                iconCls: 'fa fa-universal-access'
+            }">全部授予</a>
 
         <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
                 onClick:function(){
-                    revokePermission();
+                    emptyRole();
                 },
                 extend: '#roleDg-toolbar',
                 btnCls: 'cubeui-btn-red',
-                iconCls: 'fa fa-times'
-            }">撤销权限</a>
+                iconCls: 'fa fa-trash'
+            }">全部撤销</a>
 
         <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
                 onClick:function(){
-                    emptyPermission();
+                    $('#roleDg').datagrid('reload')
                 },
                 extend: '#roleDg-toolbar',
-                btnCls: 'cubeui-btn-brown',
-                iconCls: 'fa fa-trash'
-            }">清空权限</a>
+                btnCls: 'cubeui-btn-orange',
+                iconCls: 'fa fa-refresh'
+            }">刷新</a>
     </div>
     </div>
 </div>
@@ -66,7 +75,7 @@
 	<div id='footer' style="padding: 5px; text-align: right;">
         <a  href="javascript:void(0)" data-toggle='cubeui-menubutton' data-options="{
                 onClick:function(){
-						$('#layout').layout('collapse', 'east');
+						closePermPanel();
                 },
                 btnCls: 'cubeui-btn-red',
                 iconCls: 'fa fa-close'

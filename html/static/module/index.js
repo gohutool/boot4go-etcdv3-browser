@@ -75,8 +75,7 @@ $(function () {
     var index_tabs = $('#index_tabs').iTabs({
         fit: true,
         onSelect:function(title,index){
-
-        	var opts = $(this).tabs('getTab', index).panel('options');
+        	let opts = $(this).tabs('getTab', index).panel('options');
         	$.app.debug(title + '  ' + index);
         	
         	if(opts.clickevent){
@@ -87,6 +86,14 @@ $(function () {
         	if(opts.navpath){
         		setMenuSelected.apply(this, opts.navpath);
         	};
+
+            try{
+                console.log('resize selected panel')
+                $(this).tabs('getTab', index).panel('resize');
+            }catch (e) {
+                console.error(e)
+            }
+
         },
         tools: [{
             iconCls: 'fa fa-home',

@@ -3,27 +3,10 @@ function load(){
     $(function(){
         $("#roleDg").iDatagrid({
             idField: 'id',
-            pagination: false,
-            rownumbers:false,
             frozenColumns:[[
-                {
-                    field: 'grant',
-                    width: 90,halign:'center',align:'center',
-                    formatter:$.iGrid.checkedformatter(1, '<span class=\"cube-label cube-label-orange\">已授权</span>', '  ')
-                }
-            ]],
-            columns: [[
-                {
-                    field: 'name',
-                    title: '角色',
-                    sortable: true,
-                    width: 200,
-                    formatter:$.iGrid.click_trigger_formatter('viewRole')
-                },
-                {
-                    field: 'op', title: '操作', sortable: false, halign:'center',align:'center', width: 200,
-                    formatter:role_operateFormatter
-                },
+                {field: 'id', title: '', checkbox: true},
+                {field: 'op', title: '操作', sortable: false, halign:'center',align:'center', width: 100,
+                    formatter:role_operateFormatter},
             ]],
             onBeforeLoad:function (param){
                 console.log(param)
@@ -31,13 +14,14 @@ function load(){
             },
             onViewRole:function(rowData, index){
               console.log(rowData);
-              let p = $('#layout').layout('panel', 'east');
+
+                let p = $('#layout').layout('panel', 'east');
 
               if(p.isNull()){
                   let east_layout_options = {
                       region:'east',
                       maximized1:true,
-                      split:false,border:false,width:'65%',collapsed:true,
+                      split:false,border:false,width:'75%',collapsed:true,
                       iconCls:'fa fa-user-o',
                       titleformat:'{0}-角色授权权限', title:'角色授权权限',
                       onCollapse:function(){
@@ -55,6 +39,8 @@ function load(){
                       },
                       headerCls:'border_right',bodyCls:'border_right',collapsible:false
                   }
+
+                  east_layout_options.role = rowData;
 
                   $('#layout').layout('add', east_layout_options);
 
@@ -85,6 +71,7 @@ function load(){
                               width: 200},
                       ]],
                       onBeforeLoad:function (param){
+                          param.role=rowData.name;
                           refreshPermission(param);
                       },
                       columns: [[
@@ -106,19 +93,28 @@ function load(){
               if (!$('#layout').layout('isExpand', 'east'))
                   $('#layout').layout('expand', 'east');
 
-              let opts = $.iLayout.getLayoutPanelOptions('#layout',  'east');
-              if(opts!=null){
-                  opts.role = rowData;
-              }
-
-              $('#permissionDg').datagrid('reload')
-
             },
+            columns: [[
+                {
+                    field: 'name',
+                    title: '角色',
+                    sortable: true,
+                    width: '280',
+                    formatter:$.iGrid.click_trigger_formatter('viewRole')
+                }
+            ]],
         });
     });
 }
 
+function closePermPanel(){
+    $('#layout').layout('collapse', 'east');
+}
+
+
+
 function emptyRole(){
+
     let node = $.v3browser.menu.getCurrentTabAttachNode();
     let user = $.v3browser.menu.getCurrentTabAttachData();
 
@@ -139,7 +135,7 @@ function emptyRole(){
             let revokeFn = function (){
                 if(rows.length == 0){
                     $.app.show("授权角色清除完成,成功撤销授权角色"+ok+'条');
-                    $('#roleDg').datagrid('reload')
+                    $('#permissionDg').datagrid('reload')
                     return ;
                 }
 
@@ -147,6 +143,12 @@ function emptyRole(){
 
                 $.etcd.request.auth.user.revoke(function (response){
                     ok ++;
+
+                    if(isClose==false && currentRole!=null && currentRole.name == row.name){
+                        closePermPanel();
+                        isClose = true;
+                    }
+
                     revokeFn()
                 }, node, user.text, row.name)
             }
@@ -162,80 +164,59 @@ function revokeRole(idx){
     let node = $.v3browser.menu.getCurrentTabAttachNode();
     let user = $.v3browser.menu.getCurrentTabAttachData();
 
-    let row = $('#roleDg').datagrid('getRows')[idx];
-    // $.app.confirm('确定撤销当前的的授权角色\''+row.name.jsEncode()+'\'', function (){
-    //
-    // })
-    $.etcd.request.auth.user.revoke(function (response){
-        $.app.show("授权的角色撤销成功");
-        $('#roleDg').datagrid('reload')
-    }, node, user.text, row.name)
-}
+    if($.extends.isEmpty(idx)){
+        let rows = $('#roleDg').datagrid('getChecked');
 
-function grantAll(){
+        if(rows.length == 0){
+            $.app.show('请选择需要撤销的授权角色');
+            return false;
+        }
 
-    let node = $.v3browser.menu.getCurrentTabAttachNode();
-    let user = $.v3browser.menu.getCurrentTabAttachData();
-
-    $.app.confirm('确定授予当前用户\''+user.text.jsEncode()+'\'所有的角色权限', function () {
-
-        $.etcd.request.auth.role.list(function (response) {
-
+        $.app.confirm('确定撤销当前选择的授权角色', function (){
+            let currentRole = getPermissionLayoutRowData();
+            let isClose = false;
             let ok = 0;
+            let revokeFn = function (){
 
-            response.roles = response.roles || [];
-            let roles = response.roles;
-
-            if (roles.length > 0) {
-
-                let grantFn = function () {
-                    if (roles.length == 0) {
-                        $.app.show("授权角色授权完成,成功授权角色" + ok + '条');
-                        $('#roleDg').datagrid('reload')
-                        return;
-                    }
-
-                    let row = roles.splice(0, 1)[0];
-
-                    $.etcd.request.auth.user.grant(function (response) {
-                        ok++;
-                        grantFn()
-                    }, node, user.text, row)
+                if(rows.length == 0){
+                    $.app.show("授权角色撤销完成,成功撤销的授权角色"+ok+'条');
+                    $('#roleDg').datagrid('reload')
+                    return ;
                 }
 
-                grantFn();
-            } else {
-                $('#roleDg').datagrid('loadData', {
-                    total: 0,
-                    rows: [],
-                })
+                let row = rows.splice(0, 1)[0];
+                console.log(row)
+
+                $.etcd.request.auth.role.revoke(function (response){
+                    ok ++;
+
+                    if(isClose==false && currentRole!=null && currentRole.name == row.name){
+                        closePermPanel();
+                        isClose = true;
+                    }
+
+                    revokeFn()
+                }, node, user.text, row.name)
             }
-        }, node);
-    });
-}
 
-function grantRole(idx){
+            revokeFn();
+        })
 
-    let node = $.v3browser.menu.getCurrentTabAttachNode();
-    let user = $.v3browser.menu.getCurrentTabAttachData();
+    }else{
+        let row = $('#roleDg').datagrid('getRows')[idx];
+        $.app.confirm('确定撤销当前的的授权角色\''+row.name.jsEncode()+'\'', function (){
+            $.etcd.request.auth.user.revoke(function (response){
+                $.app.show("授权的角色撤销成功");
+                $('#roleDg').datagrid('reload')
 
-    let row = $('#roleDg').datagrid('getRows')[idx];
-    // $.app.confirm('确定撤销当前的的授权角色\''+row.name.jsEncode()+'\'', function (){
-    //
-    // })
-    $.etcd.request.auth.user.grant(function (response){
-        $.app.show("角色授权成功");
-        $('#roleDg').datagrid('reload')
-    }, node, user.text, row.name)
-}
+                let currentRole = getPermissionLayoutRowData();
+                if(currentRole!=null && currentRole.name == row.name){
+                    closePermPanel();
+                }
 
-function role_operateFormatter(value, row, index) {
-    let htmlstr = "";
-
-    htmlstr += '<button class="layui-btn-blue layui-btn layui-btn-xs" onclick="grantRole(\'' + index + '\')">授予权限</button>';
-    htmlstr += '<button class="layui-btn-red layui-btn layui-btn-xs" onclick="revokeRole(\'' + index + '\')">撤销权限</button>';
-
-    return htmlstr;
+            }, node, user.text, row.name)
+        })
+    }
 }
 
 function getPermissionLayoutRowData(){
@@ -248,62 +229,33 @@ function getPermissionLayoutRowData(){
     }
 }
 
+function role_operateFormatter(value, row, index) {
+    let htmlstr = "";
+
+    htmlstr += '<button class="layui-btn-gray layui-btn layui-btn-xs" onclick="revokeRole(\'' + index + '\')">撤销权限</button>';
+
+    return htmlstr;
+}
+
 function refreshRoles(param){
     let node = $.v3browser.menu.getCurrentTabAttachNode();
     let row = $.v3browser.menu.getCurrentTabAttachData();
 
-    $.etcd.request.auth.role.list(function(response){
-        response.roles = response.roles || [];
-        let roles = response.roles;
+    $.etcd.request.auth.user.get(function(response){
+        let data = response.roles;
 
-        if(roles.length>0){
-            $.etcd.request.auth.user.get(function(response){
-                let data = response.roles;
+        $.each(data, function(idx, v){
+            v.id = v.name;
+        })
 
-                let hadMap = $.extends.map(data, function(v){
-                    return v.name
-                })
-
-                data = [];
-
-                $.each(roles, function(idx, v){
-                    let one = {};
-                    one.name = v;
-                    one.id = v;
-
-                    if($.extends.isEmpty(hadMap[v])){
-                       one.grant = 0
-                    }else{
-                        one.grant = 1
-                    }
-
-                    data.push(one);
-                })
-
-                $('#roleDg').datagrid('loadData', {
-                    total: data.length,
-                    rows: data
-                })
-            }, node, row.text)
-
-        }else{
-            $('#roleDg').datagrid('loadData', {
-                total: 0,
-                rows: [],
-            })
-        }
-    }, node);
+        $('#roleDg').datagrid('loadData', {
+            total: response.count,
+            rows: data
+        })
+    }, node, row.text)
 }
 
 function refreshPermission(param){
-
-    param = param||{}
-
-    let opts = $.iLayout.getLayoutPanelOptions('#layout',  'east');
-    if(opts !=null && opts.role != null)
-        param.role=opts.role.name;
-    else
-        param.role = '';
 
     if($.extends.isEmpty(param.role)){
         return ;
@@ -329,8 +281,4 @@ function refreshPermission(param){
             total: response.count
         })
     }, node, param.role)
-}
-
-function closePermPanel(){
-    $('#layout').layout('collapse', 'east');
 }

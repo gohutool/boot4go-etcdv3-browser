@@ -282,7 +282,8 @@ function test(){
                         result.splice(0,0, row)
                     })
 
-                    $('#watchDg').datagrid('reload')
+                    $('#watchDg').datagrid('reload');
+
                 }
             }
 
