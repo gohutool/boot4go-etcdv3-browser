@@ -147,7 +147,7 @@ $(this).menu('options').node=null;
         <span>新建连接</span>
         <div style="width:150px;">
             <div data-options="iconCls:'fa fa-share-square-o'" onclick='importEtcd()'>导入...</div>
-            <div data-options="iconCls:'fa fa-floppy-o'" onclick='saveAsEtcd()'>另存为...</div>
+            <div data-options="iconCls:'fa fa-floppy-o'" onclick='openEtcdAs()'>另存为...</div>
             <div class="menu-sep"></div>
             <div data-options="iconCls:'fa fa-html5'" onclick='createEtcd()'><b>Etcd数据库...</b></div>
             <div class="menu-sep"></div>
@@ -236,12 +236,16 @@ $(this).menu('options').node=null;
 <div id="memberRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
     <div onclick="addMemberDg()" data-options="iconCls:'fa fa-server'">添加服务成员...</div>
     <div class="menu-sep"></div>
+    <div data-options="iconCls:'fa fa-server'" onclick="showClusterStatus()">集群状况</div>
+    <div class="menu-sep"></div>
     <div onclick="refreshMembers()" data-options="iconCls:'fa fa-refresh'">刷新</div>
 </div>
 
 <div id="memberMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
-    <div onclick="editRoleDg()" data-options="iconCls:'fa fa-arrow-circle-up'">提升节点</div>
-    <div onclick="editRoleDg()" data-options="iconCls:'fa fa-retweet'">更新节点</div>
+    <div onclick="promoteMember()" data-options="iconCls:'fa fa-arrow-circle-up'">提升节点</div>
+    <div onclick="updateMember()" data-options="iconCls:'fa fa-retweet'">更新节点</div>
+    <div class="menu-sep"></div>
+    <div onclick="transferMember()" data-options="iconCls:'fa fa-volume-control-phone'">领导者</div>
     <div class="menu-sep"></div>
     <div onclick="removeMember()" data-options="iconCls:'fa fa-chain-broken'">从集群移除</div>
 </div>
@@ -265,6 +269,8 @@ $(this).menu('options').node=null;
 <div id="lockRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
     <div onclick="refreshRoles()" data-options="iconCls:'fa fa-refresh'">刷新</div>
 </div>
+
+
 </script>
 </body>
 

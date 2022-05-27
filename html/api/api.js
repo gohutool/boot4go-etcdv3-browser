@@ -25,9 +25,13 @@ APIS.V3_AUTH_ENABLE = '/v3/auth/enable'
 APIS.V3_AUTH_DISABLE = '/v3/auth/disable'
 
 APIS.V3_CLUSTER_MEMBER_LIST = '/v3/cluster/member/list'
-
+APIS.V3_CLUSTER_MEMBER_ADD = '/v3/cluster/member/add'
+APIS.V3_CLUSTER_MEMBER_REMOVE = '/v3/cluster/member/remove'
+APIS.V3_CLUSTER_MEMBER_UPDATE = '/v3/cluster/member/update'
+APIS.V3_CLUSTER_MEMBER_PROMOTE = '/v3/cluster/member/promote'
 
 APIS.V3_MAINTEANCE_STATUS = '/v3/maintenance/status'
+APIS.V3_MAINTEANCE_TRANSFER = '/v3/maintenance/transfer-leadership'
 APIS.V3_MAINTEANCE_VERSION = '/version'
 
 
@@ -218,7 +222,8 @@ $.etcd.request = {
     },
     execute: function(serverInfo, cmd){
         if($.extends.isEmpty(serverInfo)){
-            cmd.call(serverInfo, {});
+            $.app.show('连接节点信息不存在，请关闭连接后重新连接');
+            // cmd.call(serverInfo, {});
         }else{
             let node = serverInfo
 
@@ -1286,6 +1291,105 @@ $.etcd.request = {
                     }
                 }, $.etcd.request.buildTokenHeader(serverInfo))
             });
+        },
+        member_promote: function(fn, serverInfo, memberId){
+
+            $.etcd.request.execute(serverInfo, function (node) {
+                let data = {};
+                data.ID = memberId;
+
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_CLUSTER_MEMBER_PROMOTE, data, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            response.members = response.members||[];
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        },
+        member_update: function(fn, serverInfo, memberId, peerURLs){
+            if(peerURLs==null || $.extends.isEmpty(peerURLs) || peerURLs.length == 0){
+                $.app.show('通信节点不能为空');
+                return false;
+            }
+
+            if(typeof peerURLs == 'string'){
+                peerURLs = peerURLs.split(",")
+            }
+
+            $.etcd.request.execute(serverInfo, function (node) {
+                let data = {};
+                data.peerURLs = peerURLs;
+                data.ID = memberId;
+
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_CLUSTER_MEMBER_UPDATE, data, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            response.members = response.members||[];
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        },
+        member_remove: function(fn, serverInfo, memberId){
+
+            $.etcd.request.execute(serverInfo, function (node) {
+                let data = {};
+                data.ID = memberId;
+
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_CLUSTER_MEMBER_REMOVE, data, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            response.members = response.members||[];
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
+        },
+        member_add:function (fn, serverInfo, peerURLs, isLearner){
+            if(peerURLs==null || $.extends.isEmpty(peerURLs) || peerURLs.length == 0){
+                $.app.show('通信节点不能为空');
+                return false;
+            }
+
+            if(typeof peerURLs == 'string'){
+                peerURLs = peerURLs.split(",")
+            }
+
+            $.etcd.request.execute(serverInfo, function (node) {
+                let data = {};
+                data.peerURLs = peerURLs;
+
+                if(isLearner){
+                    data.isLearner = true;
+                }else{
+                    data.isLearner = false;
+                }
+
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_CLUSTER_MEMBER_ADD, data, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            response.members = response.members||[];
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
         }
     },
     maintenance:{
@@ -1316,6 +1420,24 @@ $.etcd.request = {
                     }
                 }, $.etcd.request.buildTokenHeader(serverInfo))
             });
+        },
+        transfer:function (fn, serverInfo, targetId) {
+
+            let data = {}
+            data.targetID = targetId;
+
+            $.etcd.request.execute(serverInfo, function (node) {
+                $.etcd.postJson(V3_ENDPOINT.format2(node) + APIS.V3_MAINTEANCE_TRANSFER, data, function (response) {
+                    if($.etcd.response.retoken(serverInfo,response))
+                        return ;
+
+                    if($.etcd.response.check(response)){
+                        if(fn && $.isFunction(fn)){
+                            fn.call(node, response)
+                        }
+                    }
+                }, $.etcd.request.buildTokenHeader(serverInfo))
+            });
         }
     }
 };
@@ -1327,6 +1449,9 @@ $.etcd.response = {
             return false;
         }else if(response&&response.code){
             $.app.show('服务器错误信息:'+response.error);
+            return false;
+        }else if(response.status<0){
+            $.app.show('服务器错误信息:服务器响应错误，请确定服务器响应正确后再尝试');
             return false;
         }
 

@@ -70,7 +70,14 @@
             <tr>
                 <td class="table-label">节点：</td>
                 <td>{{:name}}</td>
-                <td colspan="3">{{:ID}}</td>
+                <td colspan="3">
+                    {{:ID}}
+                    {{if isLearner}}
+                    <font color="red">
+                    [学习者]
+                    </font>
+                    {{/if}}
+                </td>
             </tr>
             <tr>
                 <td class="table-label">接口地址：</td>

@@ -846,18 +846,36 @@ function showStatus(){
 
     $.etcd.request.maintenance.status(function (response) {
 
-        $.iDialog.openDialog({
-            title: '查看服务器信息',
-            minimizable:false,
-            width: 900,
-            height: 640,
-            href:contextpath + '/maintenance/status.html',
-            render:function(opts, handler){
-                let d = this;
-                console.log("Open dialog");
-                handler.render(response)
-            }
-        });
+        $.etcd.request.cluster.member_list(function(ms){
+
+            response.members = ms.members||[];
+
+            $.iDialog.openDialog({
+                title: '查看服务器信息',
+                minimizable:false,
+                width: 900,
+                height: 700,
+                href:contextpath + '/maintenance/status.html',
+                render:function(opts, handler){
+                    let d = this;
+                    console.log("Open dialog");
+                    handler.render(response)
+                },
+                buttonsGroup: [{
+                    text: '刷新',
+                    iconCls: 'fa fa-refresh',
+                    btnCls: 'cubeui-btn-orange',
+                    handler:'ajaxForm',
+                    beforeAjax:function(o){
+
+                        return false
+                    }
+                }]
+
+            });
+
+        }, node);
+
 
     }, node)
 }
