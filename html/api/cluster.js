@@ -15,31 +15,42 @@ function refreshMembers(row){
 
     let memberRowId = dbId + '_7';
 
-    $.etcd.request.cluster.member_list(function (response) {
+    $.etcd.request.maintenance.status(function (res) {
 
-        if($.etcd.response.check(response)){
-            $.app.show('刷新集群成功，集群节点个数为' + response.members.length);
+        let leader = res.leader;
 
-            let datas = [];
-            $.each(response.members, function (idx, member) {
-                let one = $.v3browser.model.convert.Member2Data(member, dbId)
-                one.data = member
-                datas.push(one)
-            })
+        $.etcd.request.cluster.member_list(function (response) {
 
-            removeSubTree(memberRowId);
-            $('#databaseDg').treegrid('append', {
-                parent:memberRowId,
-                data: datas
-            });
+            if($.etcd.response.check(response)){
+                $.app.show('刷新集群成功，集群节点个数为' + response.members.length);
 
-            $('#databaseDg').treegrid('refresh', memberRowId);
-            $('#databaseDg').treegrid('expand', memberRowId);
+                let datas = [];
+                $.each(response.members, function (idx, member) {
+                    let one = $.v3browser.model.convert.Member2Data(member, dbId)
+                    one.data = member
 
-        }else{
+                    if(member.ID == leader){
+                        one.iconCls = 'fa fa-grav';
+                    }
 
-        }
+                    datas.push(one)
+                })
+
+                removeSubTree(memberRowId);
+                $('#databaseDg').treegrid('append', {
+                    parent:memberRowId,
+                    data: datas
+                });
+
+                $('#databaseDg').treegrid('refresh', memberRowId);
+                $('#databaseDg').treegrid('expand', memberRowId);
+
+            }else{
+
+            }
+        }, node)
     }, node)
+
 }
 
 /// For Cluster end

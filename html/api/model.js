@@ -618,8 +618,8 @@ $.v3browser.model = {
             //row.id = node_id + '_' + username;
             if(member.isLearner){
                 //row.text = '[学习者]'+member.peerURLs[0];
-                row.text = '[学习者]'+member.peerURLs[0];
-                row.iconCls = 'fa fa-lightbulb-o';
+                row.text = member.peerURLs[0];
+                row.iconCls = 'fa fa-compass';
             }else{
                 row.text = member.peerURLs[0];
                 row.iconCls = 'fa fa-server';
