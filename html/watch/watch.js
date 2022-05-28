@@ -147,9 +147,9 @@ function removeLock(idx, leaseid){
 let watchId;
 let xhrObj;
 
-function stopTest(){
+function stopTest() {
 
-    if(watchId==null){
+    if (watchId == null) {
         $.app.show('没有活动的观察点，请先启动观察点');
 
         $('#startWatchBtn').linkbutton('enable');
@@ -163,16 +163,16 @@ function stopTest(){
     // $.etcd.request.watch.stop(function(response){
     // }, node, watchId);
 
-    if(xhrObj!=null){
+    if (xhrObj != null) {
         xhrObj.abort();
         xhrObj = null;
     }
 
-    if(watchId!=null){
-        $.app.show('观察点'+watchId+'已经停止');
+    if (watchId != null) {
+        //$.app.alert('观察点'+watchId+'已经停止');
+    } else {
+        //$.app.show('观察点已经停止');
     }
-    else
-        $.app.show('观察点已经停止');
 
     $('#startWatchBtn').linkbutton('enable');
     $('#stopWatchBtn').linkbutton('disable');
@@ -288,7 +288,18 @@ function test(){
             }
 
         }, node, watchId, param.prefix, param.range_end, param.with_prefix, param.prev_kv, param.fragment,
-            param.progress_notify, param.start_revision)
+            param.progress_notify, param.start_revision, function (xhr,status,result) {
+                console.log(status)
+                console.log(xhr)
+
+                $('#startWatchBtn').linkbutton('enable');
+                $('#stopWatchBtn').linkbutton('disable');
+                //$('#clearBtn').linkbutton('disable');
+
+                $.app.show('观测点已经停止，并已中断和服务器的连接')
+
+                watchId = null;
+            })
 
     }else{
         $.app.show('填写信息不规范，请检查填写数据内容')

@@ -883,15 +883,10 @@ function showStatus(){
 function snapshot(){
 
     let node = $.v3browser.menu.getCurrentOpenMenuNode();
-    $.etcd.request.maintenance.snapshot(function(response, xhr,state){
+    $.etcd.request.maintenance.snapshot(function(response, xhr,status){
             console.log(xhr);
+            console.log(status)
             console.log(response);
-
-
-            if(state==4){
-                console.log("============================= finish")
-            }
-
             // if(response.result){
             //
             //     if(response.result.blob){
@@ -901,5 +896,9 @@ function snapshot(){
             //     }
             // }
 
-        }, node)
+        }, node, function(xhr, status, result){
+        console.log(xhr)
+        console.log(status)
+        console.log(result)
+    })
 }

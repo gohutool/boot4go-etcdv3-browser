@@ -62,6 +62,19 @@ String.prototype.LowerCaseFirst = function(){
 	return result.substring(0,1).toLowerCase() + result.substring(1);
 }
 
+String.prototype.base642UInt8Array = function(){
+	let data = this;
+	let bStr = atob(data);
+	let n = bStr.length;
+	let u8arr = new Uint8Array(n);
+
+	while (n--) {
+		u8arr[n] = bStr.charCodeAt(n);
+	}
+
+	return u8arr;
+}
+
 String.prototype.format = function(args) {
     let result = this;
     if (arguments.length > 0) {
@@ -1228,6 +1241,20 @@ $.extends.initExtentValidateRule=function() {
 	 {
 	 	$(this).;
 	 }*/
+}
+
+$.extends.downloadStream = function(data, name, type){
+	type = type || 'octet/stream';
+	name = name || 'default.dat';
+	const blob = new Blob([data], {type: type});
+	let objectURL = window.URL.createObjectURL(blob);
+	let anchor = document.createElement('a');
+
+	anchor.href = objectURL;
+	anchor.download = name;
+	anchor.click();
+
+	URL.revokeObjectURL(objectURL);
 }
 
 $.extends.download = function(url, data, method) {

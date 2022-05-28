@@ -104,7 +104,7 @@ $.app.afterError = function (options, response){
 
 $.etcd = {}
 
-$.etcd.ajaxStream = function(url, datastr, fn, requestHeader, successFn, errorFn){
+$.etcd.ajaxStream = function(url, datastr, fn, requestHeader, options){
 
     if(requestHeader == null){
         requestHeader = {};
@@ -119,19 +119,21 @@ $.etcd.ajaxStream = function(url, datastr, fn, requestHeader, successFn, errorFn
 
     }
 
-    let options = {
+    let opt = $.extend({
         headers:requestHeader,
         method:'POST',
         data:datastr
-    };
-
+    }, options);
+/*
     if(successFn)
         options.success = successFn;
 
     if(errorFn)
         options.error = errorFn;
+        )
+ */
 
-    $.app.ajaxStream(url, options,
+    $.app.ajaxStream(url, opt,
         function(xhr, state, chunk){
         if(!$.extends.isEmpty(chunk)){
             if(fn){
@@ -201,13 +203,13 @@ $.etcd.request = {
 
         return {"token":serverInfo.node_token};
     },
-    ajaxStream:function(serverInfo, url, data, fn, successFn, errorFn){
+    ajaxStream:function(serverInfo, url, data, fn, options){
         $.etcd.request.kv.range(function(response){
             if ($.etcd.response.retoken(serverInfo, response))
                 return;
 
             if($.etcd.response.check(response)){
-                $.etcd.ajaxStream(url, data, fn, $.etcd.request.buildTokenHeader(serverInfo), successFn, errorFn)
+                $.etcd.ajaxStream(url, data, fn, $.etcd.request.buildTokenHeader(serverInfo), options)
             }
         }, serverInfo, '___', null, null, true)
     },
@@ -300,7 +302,7 @@ $.etcd.request = {
         }, null, progressing)
     },
     watch:{
-      watch: function(fn, serverInfo, watchId, key, range_end, withPrefix, prev_kv, fragment, progress_notify, start_revision){
+      watch: function(fn, serverInfo, watchId, key, range_end, withPrefix, prev_kv, fragment, progress_notify, start_revision, overFn){
           let request = {};
           let data = {};
 
@@ -358,6 +360,22 @@ $.etcd.request = {
               }else{
                   console.log(xhr);
                   console.log(chuck);
+              }
+          },{
+              success:function(result, status, xhr){
+                  if(overFn){
+                      overFn(xhr,status, result)
+                  }
+              },
+              error:function(xhr,status){
+                  if(overFn){
+                      overFn(xhr,status, null)
+                  }
+              },
+              complete1:function(xhr,status){
+                  if(overFn){
+                      overFn(xhr,status, null)
+                  }
               }
           })
 
@@ -1448,13 +1466,24 @@ $.etcd.request = {
                 }, $.etcd.request.buildTokenHeader(serverInfo))
             });
         },
-        snapshot: function(fn, serverInfo){
+        snapshot: function(fn, serverInfo, overFn){
 
             $.etcd.request.ajaxStream(serverInfo, V3_ENDPOINT.format2(serverInfo) + APIS.V3_MAINTEANCE_SNAPSHOT,
                 {}, function(xhr, state, chuck){
                 if(fn)
                     fn(chuck, xhr, state)
-            }, function(){})
+            }, {
+                    success:function(result, status, xhr){
+                        if(overFn){
+                            overFn(xhr,status, result)
+                        }
+                    },
+                    error:function(xhr,status){
+                        if(overFn){
+                            overFn(xhr,status, null)
+                        }
+                    }
+            });
 
         }
     }
