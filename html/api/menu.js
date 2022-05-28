@@ -76,6 +76,7 @@ $.v3browser.menu = {
 
         $('#nodemm').menu('enableItem', $('#menuitem_version')[0]);
         $('#nodemm').menu('enableItem', $('#menuitem_status')[0]);
+        $('#nodemm').menu('enableItem', $('#menuitem_snapshot')[0]);
 
         $('#nodemm').menu('show', {
             left: e.pageX,
@@ -98,6 +99,7 @@ $.v3browser.menu = {
 
         $('#nodemm').menu('disableItem', $('#menuitem_version')[0]);
         $('#nodemm').menu('disableItem', $('#menuitem_status')[0]);
+        $('#nodemm').menu('disableItem', $('#menuitem_snapshot')[0]);
 
         $('#nodemm').menu('show', {
             left: e.pageX,

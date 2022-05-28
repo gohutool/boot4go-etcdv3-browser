@@ -879,3 +879,27 @@ function showStatus(){
 
     }, node)
 }
+
+function snapshot(){
+
+    let node = $.v3browser.menu.getCurrentOpenMenuNode();
+    $.etcd.request.maintenance.snapshot(function(response, xhr,state){
+            console.log(xhr);
+            console.log(response);
+
+
+            if(state==4){
+                console.log("============================= finish")
+            }
+
+            // if(response.result){
+            //
+            //     if(response.result.blob){
+            //         let blob = response.result.blob;
+            //         let cnt = Base64.decode(blob);
+            //         console.log(cnt);
+            //     }
+            // }
+
+        }, node)
+}

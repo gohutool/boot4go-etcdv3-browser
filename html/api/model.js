@@ -617,12 +617,15 @@ $.v3browser.model = {
             row.id = node_id + '_' + member.ID;
             //row.id = node_id + '_' + username;
             if(member.isLearner){
+                //row.text = '[学习者]'+member.peerURLs[0];
                 row.text = '[学习者]'+member.peerURLs[0];
                 row.iconCls = 'fa fa-lightbulb-o';
             }else{
                 row.text = member.peerURLs[0];
                 row.iconCls = 'fa fa-server';
             }
+
+            //row.text = '['+member.name+']'+member.peerURLs[0];
 
             row.mm = 'memberMm';
             return row;

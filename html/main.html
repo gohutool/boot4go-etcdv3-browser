@@ -161,6 +161,8 @@ $(this).menu('options').node=null;
     <div class="menu-sep"></div>
     <div data-options="iconCls:'fa fa-refresh'" onclick="refreshNodes()">刷新</div>
     <div class="menu-sep"></div>
+    <div id="menuitem_snapshot" data-options="iconCls:'fa fa-camera',disabled:true" onclick="snapshot()">导出快照</div>
+    <div class="menu-sep"></div>
     <div id="menuitem_status" data-options="iconCls:'fa fa-server',disabled:true" onclick="showStatus()">服务器状况</div>
     <div id="menuitem_version" data-options="iconCls:'fa fa-registered',disabled:true" onclick="showVersion()">版本信息</div>
 </div>
@@ -236,7 +238,7 @@ $(this).menu('options').node=null;
 <div id="memberRootMm" data-toggle="cubeui-menu" style="width:120px;display:none" data-options="">
     <div onclick="addMemberDg()" data-options="iconCls:'fa fa-server'">添加服务成员...</div>
     <div class="menu-sep"></div>
-    <div data-options="iconCls:'fa fa-server'" onclick="showClusterStatus()">集群状况</div>
+    <div data-options="iconCls:'fa fa-bug'" onclick="showClusterStatus()">集群状况</div>
     <div class="menu-sep"></div>
     <div onclick="refreshMembers()" data-options="iconCls:'fa fa-refresh'">刷新</div>
 </div>

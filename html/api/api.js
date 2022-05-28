@@ -32,6 +32,7 @@ APIS.V3_CLUSTER_MEMBER_PROMOTE = '/v3/cluster/member/promote'
 
 APIS.V3_MAINTEANCE_STATUS = '/v3/maintenance/status'
 APIS.V3_MAINTEANCE_TRANSFER = '/v3/maintenance/transfer-leadership'
+APIS.V3_MAINTEANCE_SNAPSHOT = '/v3/maintenance/snapshot'
 APIS.V3_MAINTEANCE_VERSION = '/version'
 
 
@@ -103,7 +104,7 @@ $.app.afterError = function (options, response){
 
 $.etcd = {}
 
-$.etcd.ajaxStream = function(url, datastr, fn, requestHeader){
+$.etcd.ajaxStream = function(url, datastr, fn, requestHeader, successFn, errorFn){
 
     if(requestHeader == null){
         requestHeader = {};
@@ -118,11 +119,19 @@ $.etcd.ajaxStream = function(url, datastr, fn, requestHeader){
 
     }
 
-    $.app.ajaxStream(url,{
+    let options = {
         headers:requestHeader,
         method:'POST',
         data:datastr
-    },
+    };
+
+    if(successFn)
+        options.success = successFn;
+
+    if(errorFn)
+        options.error = errorFn;
+
+    $.app.ajaxStream(url, options,
         function(xhr, state, chunk){
         if(!$.extends.isEmpty(chunk)){
             if(fn){
@@ -192,13 +201,13 @@ $.etcd.request = {
 
         return {"token":serverInfo.node_token};
     },
-    ajaxStream:function(serverInfo, url, data, fn){
+    ajaxStream:function(serverInfo, url, data, fn, successFn, errorFn){
         $.etcd.request.kv.range(function(response){
             if ($.etcd.response.retoken(serverInfo, response))
                 return;
 
             if($.etcd.response.check(response)){
-                $.etcd.ajaxStream(url, data, fn, $.etcd.request.buildTokenHeader(serverInfo))
+                $.etcd.ajaxStream(url, data, fn, $.etcd.request.buildTokenHeader(serverInfo), successFn, errorFn)
             }
         }, serverInfo, '___', null, null, true)
     },
@@ -1438,6 +1447,15 @@ $.etcd.request = {
                     }
                 }, $.etcd.request.buildTokenHeader(serverInfo))
             });
+        },
+        snapshot: function(fn, serverInfo){
+
+            $.etcd.request.ajaxStream(serverInfo, V3_ENDPOINT.format2(serverInfo) + APIS.V3_MAINTEANCE_SNAPSHOT,
+                {}, function(xhr, state, chuck){
+                if(fn)
+                    fn(chuck, xhr, state)
+            }, function(){})
+
         }
     }
 };
