@@ -880,13 +880,32 @@ function showStatus(){
     }, node)
 }
 
+let isDowning = false;
+
 function snapshot(){
 
+    if(isDowning == true){
+        $.app.alert('当前还在下载中....,本版本只支持同时下载仅一个服务器快照');
+        return ;
+    }
+
+    let bytes =  new ByteArray();
     let node = $.v3browser.menu.getCurrentOpenMenuNode();
+
+    $.app.showProgress('获取服务器快照数据中......')
+
+    let idx = 1;
+
     $.etcd.request.maintenance.snapshot(function(response, xhr,status){
             console.log(xhr);
             console.log(status)
-            console.log(response);
+
+            $.app.closeProgess();
+            $.app.showProgress('已经成功获取服务器快照碎片('+idx+')数据......')
+            idx ++
+
+        //console.log(response);
+
             // if(response.result){
             //
             //     if(response.result.blob){
@@ -897,6 +916,37 @@ function snapshot(){
             // }
 
         }, node, function(xhr, status, result){
+            isDowning = false;
+
+            $.app.closeProgess();
+
+        if(xhr.status == 200){
+
+            $.app.show('获取服务器快照成功，开始进行下载')
+
+            let cnt = xhr.responseText;
+            let line = cnt.split('\n');
+
+            console.log(line.length)
+
+            $.each(line, function (idx, val){
+                console.log(val)
+                if($.extends.isEmpty(val))
+                    return true;
+
+                let one = $.extends.json.toobject2(val).result.blob||'';
+                bytes.push(one.base642UInt8Array())
+
+                //data = data + one;
+            })
+
+            //let uint8A = new Uint8Array(Base64.decode(data).bytes2());
+
+            $.extends.downloadStream(bytes.readBytes(), node.node_host+':'+node.node_port+'-snapshot.dat', 'octet/stream');
+
+        }else{
+            $.app.show('获取服务器快照中断，导出失败')
+        }
         console.log(xhr)
         console.log(status)
         console.log(result)
