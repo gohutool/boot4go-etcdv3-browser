@@ -44,6 +44,24 @@ You can use Etcdv3 browser to manage the etcd instance more easy.
 #### It can be unlocked forcibly, and the next lock application will become the holder of the lock.
 ![image](https://img-blog.csdnimg.cn/facaba3079c04047976ee2f91e452600.png)
 
+### User and Authorization management
+![image](https://images.gitee.com/uploads/images/2022/0530/102037_81785dce_6575697.png)
+
+![image](https://images.gitee.com/uploads/images/2022/0530/103309_0d3e2888_6575697.png)
+
+### Role management
+![image](https://images.gitee.com/uploads/images/2022/0530/102445_d443126c_6575697.png)
+
+### Watch key changed and deleted
+![image](https://images.gitee.com/uploads/images/2022/0530/103621_3226260b_6575697.png)
+
+![image](https://images.gitee.com/uploads/images/2022/0530/104110_5a2d86ed_6575697.png)
+
+### Cluster maintenance
+![image](https://images.gitee.com/uploads/images/2022/0530/104310_dd026822_6575697.png)
+![image](https://images.gitee.com/uploads/images/2022/0530/104343_11e0da56_6575697.png)
+![image](https://images.gitee.com/uploads/images/2022/0530/104416_d1c69151_6575697.png)
+
 ### Others
 ![image](https://images.gitee.com/uploads/images/2022/0524/104248_dc1731a9_6575697.png)
 

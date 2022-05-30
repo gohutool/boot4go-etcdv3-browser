@@ -1,5 +1,9 @@
 function load(){
 
+    let r1 = $($('#layout').layout('panel', 'center'));
+    let user = $.v3browser.menu.getCurrentTabAttachData();
+    r1.panel('setTitle', user.text+'-用户授权角色');
+
     $(function(){
         $("#roleDg").iDatagrid({
             idField: 'id',
