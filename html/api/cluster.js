@@ -275,3 +275,61 @@ function showClusterStatus(){
 
     }, node1)
 }
+
+
+function startMemberDg(){
+    let row = $.v3browser.menu.getCurrentOpenMenuRow()
+    let node1 = $.v3browser.menu.getCurrentOpenMenuNode();
+
+    $.etcd.request.maintenance.status(function (response) {
+
+        $.etcd.request.cluster.member_list(function(ms){
+
+            response.members = ms.members||[]||[];
+
+            $.iDialog.openDialog({
+                title: '查看服务器信息',
+                minimizable:false,
+                width: 900,
+                height: 700,
+                href:contextpath + '/cluster/command.html',
+                render:function(opts, handler){
+                    let d = this;
+                    console.log("Open dialog");
+
+                    let urls = [];
+
+
+                    $.each(response.members, function (idx, val) {
+                        if (val.name) {
+                            urls.push(val.name+'='+val.peerURLs.join(';'))
+                        }else{
+                            urls.push('$NODE_NAME='+val.peerURLs.join(';'))
+                        }
+                    })
+
+                    urls = urls.join(',')
+
+                    response.urls = urls
+                    response.peerurl = row.data.peerURLs.join(",")
+                    
+                    handler.render(response)
+                },
+                buttonsGroup: [{
+                    text: '刷新',
+                    iconCls: 'fa fa-refresh',
+                    btnCls: 'cubeui-btn-orange',
+                    handler:'ajaxForm',
+                    beforeAjax:function(o){
+
+                        return false
+                    }
+                }]
+
+            });
+
+        }, node1);
+
+
+    }, node1)
+}

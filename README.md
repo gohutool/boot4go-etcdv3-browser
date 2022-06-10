@@ -73,8 +73,8 @@ You can use Etcdv3 browser to manage the etcd instance more easy.
 - Install the golang runtime environment.
 - Come into the project directory
 - Run command as blow;
-  - set GO111MODULE=on 
-  - set GOPROXY="https://goproxy.cn,direct"
+  - export GO111MODULE=on 
+  - export GOPROXY="https://goproxy.cn,direct"
   - go mod tidy
   - go mod download
   - go build -o server .

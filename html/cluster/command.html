@@ -1,0 +1,82 @@
+<style>
+    .align-center {
+        text-align: center;
+    }
+    .margin-top-10{
+        margin-top: 10px;
+    }
+    .layui-container-fluid {
+        margin: 5px;
+    }
+    .table-label{
+        min-width: 90px!important;
+    }
+    .table-value{
+        word-break:break-all!important;
+    }
+
+</style>
+
+<div style="background-color: #f7f7f7;" class="cubeui-content-selectable">
+    <div class="layui-fluid">
+        <table class="layui-table" style="margin: 0px 0;">
+            <thead>
+            <tr>
+                <th colspan="6" style="text-align: center">服务器状况</th>
+            </tr>
+            </thead>
+            <tr>
+                <td class="table-label">节点ID：</td>
+                <th colspan="5" class="table-value">{{:header.member_id}}</th>
+            </tr>
+            <tr>
+                <td class="table-label">服务器版本：</td>
+                <td>{{:version}}</td>
+                <td class="table-label">数据大小：</td>
+                <td>
+                    {{:dbSize}} (Bytes)
+                </td>
+            </tr>
+
+            <tr>
+                <td class="table-label">当前修订号：</td>
+                <td>{{:header.revision}}</td>
+                <td class="table-label">已用数据：</td>
+                <td>{{:dbSizeInUse}} (Bytes)</td>
+
+            </tr>
+
+
+
+            <tr style="background-color: #f2f2f2;">
+                <th colspan="6" style="text-align: center">&nbsp;</th>
+            </tr>
+
+            <tr>
+                <th colspan="6" style="text-align: center">节点启动命令</th>
+            </tr>
+
+            <tr>
+                <th colspan="6" class="table-value">
+                    <br>
+                    export NODE_NAME='<font color="red">YOUR NODENAME(etc02)</font>'<br>
+                    export ADVERTISE_CLIENT_URLS='<font color="red">YOUR ADVERTISE CLIENT URLS(http://192.168.56.101:2379)</font>'<br>
+                    export CLIENT_LISTEN_PORT='<font color="red">YOUR CLIENT LISTEN PORT(2379)</font>'<br>
+                    export PEER_LISTEN_PORT='<font color="red">YOUR CLIENT LISTEN PORT(2380)</font>'<br>
+                    etcd --name $NODE_NAME \<br>
+                    --listen-client-urls http://0.0.0.0:$CLIENT_LISTEN_PORT \<br>
+                    --listen-peer-urls http://0.0.0.0:$PEER_LISTEN_PORT \<br>
+                    --advertise-client-urls "$ADVERTISE_CLIENT_URLS" \<br>
+                    --initial-advertise-peer-urls {{:peerurl}} \<br>
+                    --initial-cluster "{{:urls}}" \<br>
+                    --initial-cluster-state existing<br>
+                    <br>
+
+                </th>
+            </tr>
+
+
+            </thead>
+        </table>
+    </div>
+</div>
