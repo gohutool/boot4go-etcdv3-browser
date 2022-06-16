@@ -295,6 +295,7 @@ $(this).menu('options').node=null;
 </table>
 
 <script>
+
     new APP(function(){
         return {
             css: [
@@ -316,6 +317,14 @@ $(this).menu('options').node=null;
                 ROOT_RES_URL + '/static/plugins/easyui/treegrid-dnd/treegrid-dnd.js'
             ],
             render: function () {
+
+                if (!isTokenOK()) {
+                    $.app.alert("登录已经无效，重新登录", function(){
+                        window.location = "./login.html";
+                    })
+                    return
+                }
+
                 stop = true
                 console.log("finish")
 
