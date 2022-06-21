@@ -15,7 +15,7 @@ import "time"
 */
 
 const DEFAULT_TOKEN_EXPIRE = 24 * time.Hour
-const DEFAULT_ISSUER = "GATEWAY-UIMANAGER"
+const DEFAULT_ISSUER = "ETCDV3-BROWSER"
 
 var TokenExpire = DEFAULT_TOKEN_EXPIRE
 var Issuer = DEFAULT_ISSUER

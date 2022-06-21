@@ -44,8 +44,8 @@ const (
 )
 
 func main() {
-	app := kingpin.New("Gateway-Manager", "A gateway manager with UI.")
-	addr_flag := app.Flag("addr", "Addr: gateway manager listen addr.").Short('l').Default(":9996").String()
+	app := kingpin.New("EtcdV3-Browser", "A Etcd management with UI.")
+	addr_flag := app.Flag("addr", "Addr: Etcd management listen addr.").Short('l').Default(":9996").String()
 	issuer_flag := app.Flag("issuer", "Issuer: token's issuer.").Short('i').Default(constants.DEFAULT_ISSUER).String()
 	expired_flag := app.Flag("token_expire", "Token_expire: many hour(s) token will expire.").Short('e').Default("24").Int()
 
