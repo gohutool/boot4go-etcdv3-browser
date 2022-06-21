@@ -207,7 +207,47 @@ $(function () {
     // 初始化accordion
     $("#RightAccordion").iAccordion({
         fit: true,
-        border: false
+        border: false,
+        onSelect:function (title,index){
+            let allSelected = $("#RightAccordion").iAccordion('getSelections')
+            $.each(allSelected, function (idx, p){
+                let currentIndex = $('#RightAccordion').iAccordion('getPanelIndex', p);
+                if(currentIndex != index)
+                    $("#RightAccordion").iAccordion('unselect', currentIndex)
+            });
+        },
+        onAdd:function (title,index) {
+            let opt = $(this).iAccordion('getPanel', index).panel('options')
+
+
+            if(opt.actionData!=null){
+                console.log(title + ' ' + index + ' use click action')
+                console.log(opt.actionData)
+
+                let titleObj = $(this).iAccordion('getPanel', index).parent().find('.panel-header')
+
+                $(titleObj).on('click', function (obj) {
+
+                    $("#RightAccordion").iAccordion('select', index);
+                    let node = opt.actionData
+                    console.log(node)
+
+                    if (node.url) {
+                        /*if(typeof node.attributes != "object") {
+                         node.attributes = $.parseJSON(node.attributes);
+                         }*/
+                        if(node.url.indexOf('javascript:')>=0)
+                        {
+                            var script = node.url.replace('javascript:','');
+                            eval(script);
+                        }else{
+                            addTab(node);
+                        }
+                    }
+                })
+            }
+
+        }
     });
 
 
@@ -526,7 +566,6 @@ function setMenuSelected(navtitle, iaccordtitle, menutitle, submenutitle){
 
 	if(selected<0){
 		$.app.err('can not find nav item with ' + navtitle);
-		return -1;
 	}
 
 	if(arguments.length==1){
@@ -755,6 +794,23 @@ function createMenu(moduleId, systemName){
         var isSelected = i == 0 ? true : false;
 		//console.log(e.text + ' : ' + e.id + ' : ' + e.iconCls + ' : ' + e.url + ' childrens: ' + e.children);
 		if($.isEmptyObject(e.children)){
+
+            e.navpath=[systemName, e.text]
+
+            $('#RightAccordion').iAccordion('add', {
+                fit: false,
+                actionData:e,
+                title: e.text,
+                content: "<ul id='tree_" + treeid + "' ></ul>",
+                border: false,
+                //selected: isSelected,
+                selected:isSelected,
+                collapsible:false,
+                iconCls: e.iconCls,
+                onSelect:function (title,index) {
+                    console.log(title + '  ' + index)
+                }
+            });
 		}
 		else{
 			//var isSelected = i == 0 ? true : false;
@@ -878,16 +934,20 @@ function addTab(params) {
 
 			var treeobj = $(currentnode.target).closest('div.accordion-body').find('>ul')
 
-			var navpath = treeobj.tree('options').navpath;
+            if(!treeobj.isNull()){
+                let navpath = treeobj.tree('options').navpath;
 
-			while(currentnode){
-				nodepath.push(currentnode.text);
-				currentnode = treeobj.tree('getParent', currentnode.target);
-			}
+                while(currentnode){
+                    nodepath.push(currentnode.text);
+                    currentnode = treeobj.tree('getParent', currentnode.target);
+                }
 
-			nodepath.reverse();
+                nodepath.reverse();
+                opts.navpath = navpath.concat(nodepath);
+            }else{
+                opts.navpath = params.navpath;
+            }
 
-			opts.navpath = navpath.concat(nodepath);
 			opts.clickevent = true;
 
 			if(t.iTabs('exists', opts.title)){
