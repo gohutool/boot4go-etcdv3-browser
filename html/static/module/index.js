@@ -631,8 +631,11 @@ function setMenuSelected(navtitle, iaccordtitle, menutitle, submenutitle){
 				//var treeobj = current.find('ul');
 
 				if(levelindx == arguments.length-3 && $(treeobj).tree('isLeaf',currentnode.target)){
-					$(treeobj).tree('select',currentnode.target)
+                    try{
+                        $(treeobj).tree('select',currentnode.target)
+                    }catch (v){
 
+                    }
 				}else{
 					$(currentnode.target).trigger('click');
 				}
