@@ -689,7 +689,6 @@ function triggerMenuClick(navtitle, iaccordtitle, menutitle, submenutitle, onAft
 
 	if(selected<0){
 		$.app.err('can not find nav item with ' + navtitle);
-		return -1;
 	}
 
 	if(arguments.length==1){
@@ -700,16 +699,23 @@ function triggerMenuClick(navtitle, iaccordtitle, menutitle, submenutitle, onAft
 
 	selected = -1;
 
+    let treeobj = null;
+
+    let titleObj = null
+
 	for(var idx = 0 ; idx < allPanel.length; idx ++){
 		var current = $(allPanel[idx]);
 		var title = current.panel('options').title || '' ;
+        var titleId = current.panel('options').titleId || '' ;
 
-		if(title == iaccordtitle){
+		if(title == iaccordtitle || (titleId != '' && titleId==iaccordtitle) ){
 			selected = idx;
 			//current.trigger('click');
 			$("#RightAccordion").iAccordion('select', idx);
 
-			var treeobj = current.find('ul');
+            titleObj = $(current).parent().find('.panel-header')
+
+            treeobj = current.find('ul');
 
 			break;
 		}
@@ -729,7 +735,12 @@ function triggerMenuClick(navtitle, iaccordtitle, menutitle, submenutitle, onAft
 		onAfterClick = arguments.pop();
 	}
 
-	if(arguments.length==2){
+	if(arguments.length==2 || arguments[2] == null){
+
+        if(!$.isEmptyObject(titleObj)){
+            titleObj.trigger('click');
+        }
+
 		return 1;
 	}
 
@@ -750,8 +761,9 @@ function triggerMenuClick(navtitle, iaccordtitle, menutitle, submenutitle, onAft
 			var nodedata = treeobj.tree('getData', currentnode.target);
 
 			var title = nodedata.text ;
+            var titleId = nodedata.titleId || '' ;
 
-			if(title == wantmenutitle){
+			if(title == wantmenutitle || (titleId != '' && titleId==wantmenutitle) ){
 				selected = idx;
 				//current.trigger('click');
 				//$(treeobj).tree("expand",currentnode.target);
