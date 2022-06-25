@@ -85,7 +85,9 @@ $(function () {
         	
         	if(opts.navpath){
         		setMenuSelected.apply(this, opts.navpath);
-        	};
+        	}else{
+                setMenuSelected.apply(this,['ALL',title])
+            }
 
             try{
                 console.log('selected panel(title='+title+', index='+ index +') is onActivated');
@@ -572,15 +574,27 @@ function setMenuSelected(navtitle, iaccordtitle, menutitle, submenutitle){
 		return 1;
 	}
 
-	var allPanel = $("#RightAccordion").iAccordion('panels');
+	var allPanel = null;
+    try{
+        allPanel = $("#RightAccordion").iAccordion('panels');
+    }catch (e) {
+        return ;
+    }
+
 
 	selected = -1;
 
 	for(var idx = 0 ; idx < allPanel.length; idx ++){
 		var current = $(allPanel[idx]);
 		var title = current.panel('options').title || '' ;
+        var titleId = current.panel('options').titleId || '' ;
 
-		if(title == iaccordtitle){
+        let temp = $('<span></span>')
+        let t1 = temp.html(title).text();
+        let t2 = temp.html(iaccordtitle).text();
+
+
+		if(title == iaccordtitle || (titleId && titleId!='' && titleId == iaccordtitle) || t1 == t2){
 			selected = idx;
 			//current.trigger('click');
 			$("#RightAccordion").iAccordion('select', idx);
@@ -796,14 +810,19 @@ function createMenu(moduleId, systemName){
         var treeid = i;
         var isSelected = i == 0 ? true : false;
 		//console.log(e.text + ' : ' + e.id + ' : ' + e.iconCls + ' : ' + e.url + ' childrens: ' + e.children);
+        let textId = e.textId || e.text
+
 		if($.isEmptyObject(e.children)){
 
-            e.navpath=[systemName, e.text]
+
+
+            e.navpath=[systemName, textId]
 
             $('#RightAccordion').iAccordion('add', {
                 fit: false,
                 actionData:e,
                 title: e.text,
+                titleId:textId,
                 content: "<ul id='tree_" + treeid + "' ></ul>",
                 border: false,
                 //selected: isSelected,
@@ -821,6 +840,7 @@ function createMenu(moduleId, systemName){
 			$('#RightAccordion').iAccordion('add', {
 				fit: false,
 				title: e.text,
+                titleId:textId,
 				content: "<ul id='tree_" + treeid + "' ></ul>",
 				border: false,
 				//selected: isSelected,

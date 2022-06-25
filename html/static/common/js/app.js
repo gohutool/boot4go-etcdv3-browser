@@ -523,6 +523,18 @@ $.easyui = $.extend(!0, $.easyui, {
 				return ms;
 			}
 			return setTimeout(fn, ms)
+		},
+		stopLoop:function(handle){
+			clearInterval(handle)
+		},
+		loop:function(fn, ms){
+			return setInterval(fn, ms);
+		},
+		stopTimeout:function(handle){
+			clearTimeout(handle)
+		},
+		timeout:function(fn, ms){
+			return setTimeout(fn, ms)
 		}
 	},
 	window:{
