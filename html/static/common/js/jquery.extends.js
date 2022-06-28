@@ -30,6 +30,16 @@ String.prototype.htmlEncode = function() {
 	return result;
 }
 
+String.prototype.htmlEncodeBracket = function() {
+	let result = this;
+
+	result = result.replace('<', '&lt;');
+	result = result.replace('>', '&gt;');
+
+
+	return result;
+}
+
 
 String.prototype.format2 = function(args) {
 	let result = this;
@@ -100,6 +110,45 @@ String.prototype.format = function(args) {
         }
     }
     return result;
+}
+
+String.prototype.inArray = function(list){
+	let result = this;
+	let rtn = -1;
+	$.each(list, function (idx, v) {
+		if(result == v){
+			rtn = idx;
+			return false;
+		}
+	});
+
+	return rtn;
+}
+
+String.prototype.inPrefixArray = function(list){
+	let rtn = -1;
+	let result = this;
+	$.each(list, function (idx, v) {
+		if(result.indexOf(v)>=0){
+			rtn = idx;
+			return false;
+		}
+	});
+
+	return rtn;
+}
+
+String.prototype.inArrayWithPrefix = function(list){
+	let rtn = -1;
+	let result = this;
+	$.each(list, function (idx, v) {
+		if(v.indexOf(result)>=0){
+			rtn = idx;
+			return false;
+		}
+	});
+
+	return rtn;
 }
 
 String.prototype.bytes2 = function(){
@@ -814,9 +863,19 @@ $.extends.json = {
 			key = keyvalue[0];
 			value = decodeURIComponent(keyvalue[1]);
 			if(obj.hasOwnProperty(key)){
-				list = [];
-				list.push(obj[key]);
-				list.push(value);
+
+				let old_obj = obj[key];
+				let list = null;
+
+				if(Array.isArray(old_obj)){
+					list = old_obj
+					list.push(value);
+				}else{
+					list = [];
+					list.push(old_obj);
+					list.push(value);
+				}
+
 				obj[key] = list;
 			}else{
 				obj[key] = value;
