@@ -143,39 +143,48 @@ $.etcd.ajaxStream = function(url, datastr, fn, requestHeader, options){
     });
 }
 
-$.etcd.getJson = function(url, datastr, fn, requestHeader, progressing){
-
-    if(requestHeader == null){
-        requestHeader = {};
+$.etcd.getJson = function (url, datastr, fn, requestHeader, progressing) {
+    let u = new URL(url);
+    if (requestHeader == null) {
+        requestHeader = {
+            'etcd-node': u.host,
+        };
     }
 
     requestHeader.isetcd = true
 
-    if(typeof datastr == 'object'){
+    if (typeof datastr == 'object') {
         datastr = $.extends.json.tostring(datastr)
     }
 
     requestHeader['Content-Type'] = 'application/json; charset=UTF-8';
+    requestHeader['etcd-node'] = u.host;
 
-    $.app.ajax(url, datastr, 'GET', "json", fn, true, progressing, requestHeader);
+    u.host = window.location.host;
+    $.app.ajax(u.toString(), datastr, 'GET', "json", fn, true, progressing, requestHeader);
 };
 
 
-$.etcd.postJson = function(url, datastr, fn, requestHeader, progressing){
+$.etcd.postJson = function (url, datastr, fn, requestHeader, progressing) {
 
-    if(requestHeader == null){
-        requestHeader = {};
+    let u = new URL(url);
+    if (requestHeader == null) {
+        requestHeader = {
+            'etcd-node': u.host,
+        };
     }
 
     requestHeader.isetcd = true
 
-    if(typeof datastr == 'object'){
+    if (typeof datastr == 'object') {
         datastr = $.extends.json.tostring(datastr)
     }
 
     requestHeader['Content-Type'] = 'application/json; charset=UTF-8';
+    requestHeader['etcd-node'] = u.host;
 
-    $.app.ajax(url, datastr, 'POST', "json", fn, true, progressing, requestHeader);
+    u.host = window.location.host;
+    $.app.ajax(u.toString(), datastr, 'POST', "json", fn, true, progressing, requestHeader);
 };
 
 $.etcd.callback = {
