@@ -169,16 +169,10 @@ function loadAll(cb){
         ROOT_RES_URL + "/static/cubeui/js/locale/cubeui.lang.zh_CN.js?" + APP_VERSION,
         ROOT_RES_URL + "/static/common/js/locale/core.message.js?" + APP_VERSION,
         ROOT_RES_URL + "/static/common/js/locale/core.message.zh_CN.js?" + APP_VERSION,
-
         ROOT_RES_URL + "/static/plugins/layui/layui.js?" + APP_VERSION,
         ROOT_RES_URL + "/static/common/js/app.js?" + APP_VERSION,
         ROOT_RES_URL + "/static/common/js/mvvm.js?" + APP_VERSION,
         ROOT_RES_URL + "/static/plugins/jquery/jquery-tmpl-master/jsrender.min.js?" + APP_VERSION,
-
-
-        ROOT_RES_URL + "/static/plugins/pdfmake/pdfmake.js?" + APP_VERSION,
-
-        ROOT_RES_URL + "/static-extend/js/common.js?" + APP_VERSION,
     ];
 
     dynamicLoading.dynLoadJs(js, function (){
