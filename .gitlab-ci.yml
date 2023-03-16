@@ -1,0 +1,20 @@
+stages:
+  - build_image
+
+build_image:
+  stage: build_image
+  image:
+    name: micr.cloud.mioffice.cn/containercloud/kaniko-executor-xiaomi:release-latest
+    entrypoint: [""]
+  script:
+    - echo "build image"
+    - cd $CI_PROJECT_DIR
+    - echo "build image"
+    - IMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_SHORT_SHA}
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" >  /kaniko/.docker/config.json
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}"
+    - echo "generate docker image $IMAGE"
+    - executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile -d $IMAGE  --cleanup --reproducible
+  after_script:
+    - echo "build completed"
+  when: on_success
