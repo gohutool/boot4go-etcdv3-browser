@@ -1,20 +1,19 @@
 stages:
   - build_image
 
+
+.script_1: &script_init_image_var |
+  export REPO_IMAGE_NAME=$CI_PROJECT_NAME
+  export REPO_IMAGE_TAG=$CI_COMMIT_SHORT_SHA
+  export APP_IMAGE=$REPO_SERVER/$REPO_NAMESPACE/$REPO_IMAGE_NAME:$REPO_IMAGE_TAG
+
+
 build_image:
   stage: build_image
   image:
-    name: micr.cloud.mioffice.cn/containercloud/kaniko-executor-xiaomi:release-latest
+    name: cr.d.xiaomi.net/containercloud/kaniko-executor-xiaomi:release-latest
     entrypoint: [""]
   script:
-    - echo "build image"
-    - cd $CI_PROJECT_DIR
-    - echo "build image"
-    - IMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_SHORT_SHA}
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" >  /kaniko/.docker/config.json
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}"
-    - echo "generate docker image $IMAGE"
-    - executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile -d $IMAGE  --cleanup --reproducible
-  after_script:
-    - echo "build completed"
-  when: on_success
+    - *script_init_image_var
+    - echo "{\"auths\":{\"$REPO_SERVER\":{\"username\":\"$REPO_USER\",\"password\":\"$REPO_PASS\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --destination $APP_IMAGE --validate-image
