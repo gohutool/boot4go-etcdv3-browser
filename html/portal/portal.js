@@ -11,7 +11,7 @@ function renderPage(){
 
 function refreshPieChart(){
 
-    $.app.getJson('https://www.ginghan.com/info.json', null, function(data){
+    $.app.getJson('//www.ginghan.com/info.json', null, function(data){
         $('#nodeCount').text(data.data.nodeCount);
         $('#nodeVisit').text(data.data.nodeVisit);
         $('#manCount').text(data.data.manCount);
