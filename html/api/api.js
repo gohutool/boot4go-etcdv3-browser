@@ -1,4 +1,4 @@
-let V3_ENDPOINT = '//{node_host}:{node_port}'
+let V3_ENDPOINT = 'https://{node_host}:{node_port}'
 
 let APIS = {}
 APIS.V3_ECHO = '/v3/kv/range'
@@ -157,6 +157,7 @@ $.etcd.getJson = function (url, datastr, fn, requestHeader, progressing) {
     requestHeader['Content-Type'] = 'application/json; charset=UTF-8';
     requestHeader['etcd-node'] = u.host;
 
+    u.protocol = document.location.protocol
     u.host = window.location.host;
     u.port = window.location.port
     $.app.ajax(u.toString(), datastr, 'GET', "json", fn, true, progressing, requestHeader);
@@ -181,6 +182,7 @@ $.etcd.postJson = function (url, datastr, fn, requestHeader, progressing) {
     requestHeader['Content-Type'] = 'application/json; charset=UTF-8';
     requestHeader['etcd-node'] = u.host;
 
+    u.protocol = document.location.protocol
     u.host = window.location.host;
     u.port = window.location.port
     $.app.ajax(u.toString(), datastr, 'POST', "json", fn, true, progressing, requestHeader);
