@@ -5,6 +5,7 @@ A client of etcd with v3 api to browse and maintain the data and resource of etc
 
 # what's new?
 1. 删除了go部分,请配合nginx启动该项目
+2. 配合nginx转发解决访问etcd跨域问题，合并解决办公网环境无法直接访问机房问题
 
 ## Installation and Getting Started
 
