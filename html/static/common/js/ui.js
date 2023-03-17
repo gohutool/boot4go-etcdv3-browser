@@ -173,6 +173,7 @@ function loadAll(cb){
         ROOT_RES_URL + "/static/common/js/app.js?" + APP_VERSION,
         ROOT_RES_URL + "/static/common/js/mvvm.js?" + APP_VERSION,
         ROOT_RES_URL + "/static/plugins/jquery/jquery-tmpl-master/jsrender.min.js?" + APP_VERSION,
+        ROOT_RES_URL + "/static/plugins/pdfmake/pdfmake.js?" + APP_VERSION,
     ];
 
     dynamicLoading.dynLoadJs(js, function (){
