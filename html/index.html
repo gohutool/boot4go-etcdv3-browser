@@ -17,7 +17,6 @@
         var bar = 0
         var line = "||"
         var amount = "||"
-        var isTokenOk = false
         count()
 
         let app = new APP({
@@ -28,12 +27,6 @@
                 $(function () {
                     console.log("Jquery is ok")
                 })
-
-                if(isTokenOK()){
-                    isTokenOk = true;
-                }else{
-                    isTokenOk = false;
-                }
             }
         });
 
@@ -46,13 +39,7 @@
             if (!stop) {
                 setTimeout("count()", 100);
             } else {
-                if(isTokenOk){
-                    window.location = "./main.html";
-                }else{
-                    window.location = "./login.html";
-                }
-
-//window.location = "./html/index";
+                window.location = "./main.html";
             }
         }</script>
     　</p>

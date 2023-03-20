@@ -456,42 +456,6 @@ function changeTheme(themeName) {/* 更换主题 */
     });
 };
 
-/**
-if ($.cookie('themeName')) {
-    changeTheme($.cookie('themeName'));
-}else{
-	changeTheme('bluelight');
-}
-**/
-// 退出系统
-function logout() {
-
-	/**
-	$.app.confirm(message.core.login.comfirm_logout, function (r) {
-		$.app.get(contextpath+'/passport/logout',
-        		null, function(){
-        	window.location.href = contextpath + '/passport/login';
-        }, null, message.core.login.logouting);
-    });
-	**/
-
-	$.app.confirm(message.core.login.comfirm_logout, function (r) {
-		$.app.get(contextpath + '/logout.json',null
-            , function(){
-        	window.location.href = contextpath + '/login.html';
-        });
-
-        $.app.localStorage.remove(window.app.clientId+'.token');
-        $.app.localStorage.remove(window.app.clientId+'.permissions');
-        $.app.localStorage.remove(window.app.clientId+'.permissions');
-        $.app.localStorage.remove(window.app.clientId+'.userid');
-        $.app.localStorage.remove(window.app.clientId+'.token');
-        $.app.localStorage.remove(window.app.clientId+'.tokenType');
-    });
-
-
-}
-
 $.index = {};
 $.index.modules = [];
 
@@ -1293,16 +1257,6 @@ $(function(){
    });
 });
 
-
-function show_term() {
-
-    $.iDialog.openDialog({
-        width: 1000,
-        height: 600,
-        title: "《条款说明》",
-        href: 'https://erp-cdn.ginghan.com/public/cube/static/term/terms.html?1.0.0.23'
-    });
-}
 
 function loadMenu(){
 

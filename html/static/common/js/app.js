@@ -5200,7 +5200,7 @@ function relogin() {
 
 	if(window.top===window.self ){
 		$.app.alert(null, "登录已经超时，请重新登录", function () {
-			window.location.href=contextpath + '/login.html';
+			window.location.href=contextpath + '/index.html';
 		})
 	}else{
 		var opts = {
